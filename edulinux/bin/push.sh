@@ -13,7 +13,7 @@ img="$reg/$osver-$base:$Architecture"
 # docker tag "$base" "$img"
 docker build --tag "$img" --file Dockerfile.upgrade context
 
-docker-login.sh
+# docker-login.sh
 if docker push "$img"; then
     git add ..
     git commit --message="push $img" --untracked-files=no
