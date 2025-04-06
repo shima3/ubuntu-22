@@ -13,6 +13,9 @@ export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S "
 # shopt -s histappend
 export PROMPT_COMMAND='history -a; history -c; history -r'
 
+# コアダンプを無効化
+ulimit -c 0
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
