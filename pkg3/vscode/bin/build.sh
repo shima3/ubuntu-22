@@ -41,5 +41,5 @@ cd ..
 if ! docker build --tag "test:$base" --target test-stage -f Dockerfile context; then exit 1; fi
 if ! docker build --tag "pkg:$base" --target package-stage --label "OS-Ver=$osver" -f Dockerfile context; then exit 1; fi
 
-docker-remove-nameless-images
+# docker-remove-nameless-images
 exit 0
