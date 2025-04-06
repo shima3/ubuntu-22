@@ -19,8 +19,8 @@ bin/_run.sh \
 docker exec "$base" reset-password.sh student 1883shima
 echo 'Shima Group Student' | docker exec --interactive --user student "$base" config-git.sh shima@hiroshima-cu.ac.jp
 
-docker exec "$base" useradd -g users -m -s /bin/bash student2
-echo 'student2:1883shima' | docker exec -i "$base" chpasswd
+docker exec "$base" useradd -g users -m -s /bin/bash shima
+echo 'shima:1883shima' | docker exec -i "$base" chpasswd
 
 docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK
