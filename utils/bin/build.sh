@@ -29,5 +29,6 @@ img="${osver/-/:}.04"
 docker pull "$img"
 docker tag "$img" ubuntu
 
-docker build --tag "$base" --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" --file Dockerfile context
-docker-remove-nameless-images
+# docker build --tag "$base" --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" --file Dockerfile context
+docker build --tag "$base" --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" context
+# docker-remove-nameless-images
