@@ -1,4 +1,8 @@
 2025/4/6 Sun
+症状：Chromiumを起動したとき、「認証が必要です」というダイアログが出てパスワードの入力を求められます。
+Macホストではでない。Ubuntuホストで起こる。
+原因：Chromium が GNOME Keyring（gnome-keyring-daemon） を使って保存されたパスワードにアクセスしようとする。その際、セッションにキーチェーンが「ロック」されていてパスワードが必要
+
 ファイルの更新日時とフルパスを出力する。
 find ~/.config -type f -printf "%TY-%Tm-%Td %TH:%TM:%TS %p\n" > /tmp/a.txt
 
