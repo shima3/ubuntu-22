@@ -26,9 +26,9 @@ FROM update-stage AS download-stage
 ARG PACKAGE
 # ARG TARGETARCH
 
-COPY 99keyring /etc/X11/Xsession.d/99keyring
 # RUN wget --output-document=/chromium.deb "http://ftp.debian.org/debian/pool/main/c/chromium/chromium_134.0.6998.117-1_$TARGETARCH.deb"
 RUN apt-get install --yes --download-only --fix-missing $PACKAGE
+COPY 99keyring /etc/X11/Xsession.d/99keyring
 RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/X11/Xsession.d/99keyring
 
 RUN echo 'add-apt-repository ppa:xtradeb/apps -y' > /install
