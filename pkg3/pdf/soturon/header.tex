@@ -1,0 +1,193 @@
+%ここから
+% \documentclass[12pt,a4j]{jarticle}
+\documentclass[12pt,a4j,uplatex]{jarticle} % 縦書き用
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{float}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage[titletoc,title]{appendix}
+\usepackage{plext} % 縦書き用
+\usepackage[a4paper]{geometry} % 縦書き用
+
+\pagestyle{plain}
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{230mm}
+\setlength{\oddsidemargin}{+4.6mm}
+\setlength{\topmargin}{-10mm}
+\setlength{\footskip}{20mm}
+\newfont{\ssf}{cmssbx10 scaled\magstep3}
+
+\nonstopmode
+%日本語用に　jplain　英語の場合は plain にすること
+% \bibliographystyle{jplain}
+\bibliographystyle{esdhcu}
+
+%何か追加したい場合，ここから追加すること
+\usepackage{newenum}
+\usepackage{listings}
+%\usepackage[dvips]{graphicx}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+%\usepackage{textcomp}
+\usepackage{latexsym}
+%\usepackage[fleqn]{amsmath}
+%\usepackage{amssymb}
+\usepackage{comment}
+\usepackage{fancyvrb}
+\usepackage{multicol}
+\usepackage{newtxtext}
+\usepackage{enumerate}
+\usepackage{wrapfig}
+
+%\setlength{\topskip}{0cm} % 段落間
+%\setlength{\partopsep}{0cm} % 項目間
+
+\makeatletter
+\renewenvironment{itemize}
+  {\ifnum \@itemdepth >\thr@@\@toodeep\else
+   \advance\@itemdepth\@ne
+   \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+   \expandafter \list \csname \@itemitem\endcsname{%
+      \iftdir
+         \ifnum \@listdepth=\@ne \topsep.5\normalbaselineskip
+           \else\topsep\z@\fi
+         \parskip\z@ \itemsep\z@ \parsep\z@
+         \labelwidth1zw \labelsep.3zw
+         \ifnum \@itemdepth =\@ne \leftmargin1zw\relax
+           \else\leftmargin\leftskip\fi
+         \advance\leftmargin 1zw
+      \fi
+         \def\makelabel##1{\hss\llap{##1}}}%
+   \fi}{\endlist}
+
+\renewenvironment{description}
+  {\list{}{\labelwidth\z@ \itemindent-\leftmargin
+    \iftdir
+    \leftmargin\leftskip \advance\leftmargin3\Cwd
+    \rightmargin\rightskip
+    \labelsep=0zw \itemsep\z@
+    \listparindent\z@ \topskip\z@ \parskip\z@ \partopsep\z@
+    \fi
+    \let\makelabel\descriptionlabel}
+    % \setlength{\parsep}{0mm} % 各段落間のスペース
+    % \setlength{\parskip}{0mm} % 段落の前に入る縦方向スペース
+    % \setlength{\itemsep}{0mm} % 項目間に入る縦方向スペース
+  }{\endlist}
+\renewcommand{\descriptionlabel}[1]{%
+  \hspace\labelsep\normalfont\bfseries #1}
+\makeatother
+
+% \setlength{\itemindent}{0em}
+% \setlength{\leftskip}{0em}
+% \setlength{\listparindent}{-1em}
+
+\newenvironment{dl}{
+  % \setlength{\leftmargin}{0em}
+  % \setlength{\leftskip}{0em}
+  \begin{description}
+    \setlength{\itemindent}{-1em}
+    \setlength{\leftskip}{0em}
+    % \addtolength{\itemindent}{1em}
+    % \addtolength{\leftskip}{1em}
+    \setlength{\parskip}{0mm} % 段落の前に入る縦方向スペース
+    \setlength{\itemsep}{1mm} % 項目間に入る縦方向スペース
+}{\end{description}}
+
+\newenvironment{ol}{
+  \begin{enumerate}
+    \setlength{\itemindent}{0em}
+    \setlength{\leftskip}{1em}
+    % \addtolength{\itemindent}{-1em}
+    % \addtolength{\leftmargin}{1em}
+    % \setlength{\parsep}{0mm} % 各段落間のスペース
+    \setlength{\parskip}{0mm} % 段落の前に入る縦方向スペース
+    \setlength{\itemsep}{0mm} % 項目間に入る縦方向スペース
+}{\end{enumerate}}
+
+\newenvironment{ul}{
+  \begin{itemize}
+    \setlength{\itemindent}{0em}
+    \setlength{\leftskip}{0em}
+    % \addtolength{\leftmargin}{1em}
+}{\end{itemize}}
+
+\emergencystretch=1em
+
+\renewcommand{\lstlistingname}{リスト}
+\lstset{language=,%
+        basicstyle=\ttfamily\footnotesize,%
+        commentstyle=\textit,%
+        classoffset=1,%
+        keywordstyle=\bfseries,%
+	% frame=single,
+	frame=tRBl,
+        framesep=5pt,%
+	showstringspaces=false,%
+        numbers=left,
+        stepnumber=1,
+        numberstyle=\footnotesize%
+	}%
+
+% 図と図の間のスペース
+\setlength\floatsep{2truemm}
+% 本文と図の間のスペース
+\setlength\textfloatsep{2truemm}
+% 本文中の図のスペース
+\setlength\intextsep{0pt}
+% 図とキャプションの間のスペース
+\setlength\abovecaptionskip{1truemm}
+
+% ぶら下げ
+\newenvironment{hang}[1][\parindent]
+  {\def\item{\par\hangindent=#1\noindent}}
+  {\par}
+
+% カンマの後，改行を許す
+% \def\,{,\allowbreak}
+% これを定義すると \cite に余計なカンマが入る．
+
+% 縦棒の後，改行を許す
+\def\|{\tt |\allowbreak}
+% circumflex accent, caret, up arrow, hat, chevron
+\def\hat{\mbox{\^{ }}}
+% 鍵括弧
+\def\sb#1{[#1]}
+% 二重鍵括弧
+\def\db#1{[\![#1]\!]}
+% 三重鍵括弧
+\def\tb#1{[\![\![#1]\!]\!]}
+% 角括弧
+\def\sa#1{\langle#1\rangle}
+% 二重角括弧
+\def\da#1{\langle\!\langle#1\rangle\!\rangle}
+% 矢印
+\def\->{\allowbreak\mbox{$\rightarrow$}\allowbreak}
+% ・・・
+\def\c...{\mbox{$\cdots\mbox{}$}}
+% :=
+\newcommand{\defeq}{\mathrel{\mathop:}=}
+
+\newcommand{\NT}[1]{\ensuremath{\langle\mbox{#1}\rangle}\allowbreak}
+\newcommand{\C}[1]{\mbox{\tt#1}}
+
+% Hatの意味関数
+\newcommand{\sH}[1]{\ensuremath{\mathcal{H}}\dlrBrack{\mbox{\tt#1}}}
+\newcommand{\dlrBrack}[1]{\ensuremath{[\![#1]\allowbreak\!]}}
+
+% Schemeの意味関数
+\newcommand{\sS}[1]{\ensuremath{\mathcal{E}}\dlrBrack{\mbox{\tt#1}}}
+
+% 式に含まれる自由変数の集合
+\newcommand{\FV}[1]{\ensuremath{\mathcal{F}}\dlrBrack{\C{#1}}}
+
+% ドットの前後に空白
+\newcommand{\D}{\mbox{\tt\ .\ }}
+
+% 継続付き関数
+\newcommand{\FC}[2]{\mbox{\tt F.C #1\D#2}}
+
+%追加ここまで
+
+%ここまで

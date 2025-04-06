@@ -1,0 +1,3 @@
+[org/mate/session]
+logout-dialog-shutdown=false
+logout-dialog-reboot=false

@@ -1,0 +1,6 @@
+# 毎日 4:00 AM に実行
+0 4 * * * root /usr/bin/rsnapshot daily >> /var/log/rsnapshot.log 2>&1
+# 毎週土曜 12:00 AM に実行
+0 12 * * 6 root /usr/bin/rsnapshot weekly >> /var/log/rsnapshot.log 2>&1
+# 毎月1日 8:00 PM に実行
+0 20 1 * * root /usr/bin/rsnapshot monthly >> /var/log/rsnapshot.log 2>&1

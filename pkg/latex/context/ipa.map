@@ -1,0 +1,9 @@
+% custom.map - カスタムフォントマップ
+% Ryumin-Light-Identity-H をヒラギノ明朝に置き換える
+% Ryumin-Light-Identity-H  HiraginoMinchoPro-W3  "Identity-H"
+% GothicBBB-Medium-Identity-H をヒラギノ角ゴシックに置き換える
+% GothicBBB-Medium-Identity-H  HiraginoKakuGothicPro-W6  "Identity-H"
+% Ryumin-Light-Identity-H  IPAexMincho  "Identity-H"
+% GothicBBB-Medium-Identity-H  IPAexGothic  "Identity-H"
+Ryumin-Light-Identity-H  IPAMincho  "Identity-H"
+GothicBBB-Medium-Identity-H  IPAGothic  "Identity-H"

@@ -1,0 +1,80 @@
+% /var/lib/texmf/fonts/map/dvipdfmx/updmap/kanjix.map:
+% maintained by updmap[-sys] (multi).
+% Don't change this file directly. Use updmap[-sys] instead.
+% See the updmap documentation.
+% A log of the run that created this file is available here:
+% /var/lib/texmf/web2c/updmap.log
+% morisawa5.map
+% otf-ko-noEmbed.map
+otf-ckgb-h Identity-H !HYGoThic-Medium
+otf-ckgb-v Identity-V !HYGoThic-Medium
+otf-ckge-h Identity-H !HYGoThic-Medium
+otf-ckge-v Identity-V !HYGoThic-Medium
+otf-ckmb-h Identity-H !HYSMyeongJo-Medium
+otf-ckmb-v Identity-V !HYSMyeongJo-Medium
+otf-ckmgr-h Identity-H !HYRGoThic-Medium
+otf-ckmgr-v Identity-V !HYRGoThic-Medium
+otf-ckml-h Identity-H !HYSMyeongJo-Medium
+otf-ckml-v Identity-V !HYSMyeongJo-Medium
+otf-ukgb-h UniKS-UCS2-H !HYGoThic-Medium
+otf-ukgb-v UniKS-UCS2-V !HYGoThic-Medium
+otf-ukge-h UniKS-UCS2-H !HYGoThic-Medium
+otf-ukge-v UniKS-UCS2-V !HYGoThic-Medium
+otf-ukmb-h UniKS-UCS2-H !HYSMyeongJo-Medium
+otf-ukmb-v UniKS-UCS2-V !HYSMyeongJo-Medium
+otf-ukmgr-h UniKS-UCS2-H !HYRGoThic-Medium
+otf-ukmgr-v UniKS-UCS2-V !HYRGoThic-Medium
+otf-ukml-h UniKS-UCS2-H !HYSMyeongJo-Medium
+otf-ukml-v UniKS-UCS2-V !HYSMyeongJo-Medium
+% otf-noEmbed.map
+% otf-sc-noEmbed.map
+otf-ccgb-h Identity-H !STHeiti-Regular
+otf-ccgb-v Identity-V !STHeiti-Regular
+otf-ccge-h Identity-H !STHeiti-Regular
+otf-ccge-v Identity-V !STHeiti-Regular
+otf-ccmb-h Identity-H !STSong-Regular
+otf-ccmb-v Identity-V !STSong-Regular
+otf-ccmgr-h Identity-H !STKaiti-Regular
+otf-ccmgr-v Identity-V !STKaiti-Regular
+otf-ccml-h Identity-H !STSong-Light
+otf-ccml-v Identity-V !STSong-Light
+otf-ucgb-h UniGB-UCS2-H !STHeiti-Regular
+otf-ucgb-v UniGB-UCS2-V !STHeiti-Regular
+otf-ucge-h UniGB-UCS2-H !STHeiti-Regular
+otf-ucge-v UniGB-UCS2-V !STHeiti-Regular
+otf-ucmb-h UniGB-UCS2-H !STSong-Regular
+otf-ucmb-v UniGB-UCS2-V !STSong-Regular
+otf-ucmgr-h UniGB-UCS2-H !STKaiti-Regular
+otf-ucmgr-v UniGB-UCS2-V !STKaiti-Regular
+otf-ucml-h UniGB-UCS2-H !STSong-Light
+otf-ucml-v UniGB-UCS2-V !STSong-Light
+% otf-tc-noEmbed.map
+otf-ctgb-h Identity-H !MHei-Medium
+otf-ctgb-v Identity-V !MHei-Medium
+otf-ctge-h Identity-H !MHei-Medium
+otf-ctge-v Identity-V !MHei-Medium
+otf-ctmb-h Identity-H !MSung-Medium
+otf-ctmb-v Identity-V !MSung-Medium
+otf-ctmgr-h Identity-H !MKai-Medium
+otf-ctmgr-v Identity-V !MKai-Medium
+otf-ctml-h Identity-H !MSung-Light
+otf-ctml-v Identity-V !MSung-Light
+otf-utgb-h UniCNS-UCS2-H !MHei-Medium
+otf-utgb-v UniCNS-UCS2-V !MHei-Medium
+otf-utge-h UniCNS-UCS2-H !MHei-Medium
+otf-utge-v UniCNS-UCS2-V !MHei-Medium
+otf-utmb-h UniCNS-UCS2-H !MSung-Medium
+otf-utmb-v UniCNS-UCS2-V !MSung-Medium
+otf-utmgr-h UniCNS-UCS2-H !MKai-Medium
+otf-utmgr-v UniCNS-UCS2-V !MKai-Medium
+otf-utml-h UniCNS-UCS2-H !MSung-Light
+otf-utml-v UniCNS-UCS2-V !MSung-Light
+% otf-up-noEmbed.map
+% ptex-noEmbed.map
+% uptex-ko-noEmbed.map
+% uptex-noEmbed.map
+% uptex-sc-noEmbed.map
+% uptex-tc-noEmbed.map
+% IPA fonts
+Ryumin-Light-Identity-H  IPAexMincho  "Identity-H"
+GothicBBB-Medium-Identity-H  IPAexGothic  "Identity-H"

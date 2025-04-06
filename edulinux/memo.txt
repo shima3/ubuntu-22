@@ -1,0 +1,38 @@
+2025/4/6 Sun
+ファイルの更新日時とフルパスを出力する。
+find ~/.config -type f -printf "%TY-%Tm-%Td %TH:%TM:%TS %p\n" > /tmp/a.txt
+
+Mozcキー設定
+編集＞エントリーを追加
+直接入力	Ctrl Space	IMEを有効化
+入力文字なし	Ctrl Space	IMEを無効化
+
+find ~/.config -type f -printf "%TY-%Tm-%Td %TH:%TM:%TS %p\n" > /tmp/b.txt
+diff /tmp/a.txt /tmp/b.txt
+14c14
+< 2025-04-06 10:45:26.6108300120 /home/student/.config/mozc/config1.db
+---
+> 2025-04-06 10:46:30.8616100000 /home/student/.config/mozc/config1.db
+
+mkdir context/mozc
+docker cp edulinux:/home/student/.config/mozc/config1.db context/mozc/
+
+2025/4/5 Sat
+ssh-gws2025.sh
+shima@gws2025:~$
+sudo useradd -m -s /bin/bash -g docker edulinux
+
+mac2024m3:~/sync/docker/ubuntu-22/edulinux shima$
+bin/scp-gws2025.sh
+
+shima@gws2025:~$
+cd ~/ubuntu-22/edulinux/reset-password
+sudo --user=reset-password cp dot.forward ~/.forward
+sudo --user=reset-password cp  ~/.forward
+sudo mv dot.forward 
+
+/home/reset-password/.forwardの内容
+"| /home/reset-password/handle-mail.sh "
+
+sudo apt install -y nkf
+

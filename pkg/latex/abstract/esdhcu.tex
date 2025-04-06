@@ -1,0 +1,103 @@
+\makeatletter
+
+ \renewcommand\@maketitle{%
+  %\newpage\null
+  \vspace{-13mm}%
+  \begin{center}%
+  \let\footnote\thanks
+    %{\LARGE \@title \par}%
+    {\Large {\bf \@title} \par}
+    %\vskip 1.5em%
+    \vskip 0.5em
+    {\large
+      \lineskip 0.5em%
+      \begin{tabular}[t]{c}%
+        {\bf \@author }
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@date}%
+  \end{center}%
+  \par \vskip 0.5em
+}
+
+\renewcommand\maketitle{\par
+  \begingroup
+    \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
+    \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+    \long\def\@makefntext##1{\parindent 1em\noindent
+            \hb@xt@1.8em{%
+                \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+    \if@twocolumn
+      \ifnum \col@number=\@ne
+        \@maketitle
+      \else
+        \twocolumn[\@maketitle]%
+      \fi
+    \else
+      \newpage
+      \global\@topnum\z@   % Prevents figures from going at top of page.
+      \@maketitle
+    \fi
+    \thispagestyle{myheadings}\@thanks
+  \endgroup
+  \setcounter{footnote}{0}%
+  \global\let\thanks\relax
+  \global\let\maketitle\relax
+  \global\let\@maketitle\relax
+  \global\let\@thanks\@empty
+  \global\let\@author\@empty
+  \global\let\@date\@empty
+  \global\let\@title\@empty
+  \global\let\@correspondence\@empty% added for manuscript.cls
+  \global\let\@affiliation\@empty% added for manuscript.cls
+  \global\let\title\relax
+  \global\let\author\relax
+  \global\let\date\relax
+  \global\let\and\relax
+  \global\let\correspondence\relax% added for manuscript.cls
+  \global\let\affiliation\relax% added for manuscript.cls
+}
+\makeatletter
+
+\makeatletter
+% \def\section{\@startsection {section}{1}{\z@}{-2.5ex plus -1ex minus -.2ex}{2.5 ex plus .2ex}{\Large\bf}}
+\def\section{\@startsection {section}{1}{\z@}{0ex plus -1ex minus -.2ex}{.5ex plus .2ex}{\Large\bf}}
+\def\subsection{\@startsection {subsection}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{2.3 ex plus .2ex}{\Large\bf}}
+\def\subsubsection{\@startsection {subsubsection}{1}{\z@}{-2.5ex plus -1ex minus -.2ex}{.3 ex plus .2ex}{\large \bf $\spadesuit$ }}
+\makeatother
+
+% 参考文献
+\makeatletter
+  \renewenvironment{thebibliography}[1]{%
+    \global\let\presectionname\relax
+    \global\let\postsectionname\relax
+    \section*{\refname}\@mkboth{\refname}{\refname}%
+    \list{\@biblabel{\@arabic\c@enumiv}}%
+          {\settowidth\labelwidth{\@biblabel{#1}}%
+          \leftmargin\labelwidth
+          \advance\leftmargin\labelsep
+          % 文字サイズ？
+          \setlength\baselineskip{9pt}
+          % アイテム間のマージン
+          \setlength\itemsep{.3zh}
+          \@openbib@code
+          \usecounter{enumiv}%
+          \let\p@enumiv\@empty
+          \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+    \sloppy
+    \clubpenalty4000
+    \@clubpenalty\clubpenalty
+    \widowpenalty4000%
+    \sfcode`\.\@m}
+    {\def\@noitemerr
+      {\@latex@warning{Empty `thebibliography' environment}}%
+    \endlist}
+\makeatother
+
+\makeatletter
+\def\@listi{\leftmargin\leftmargini
+\parsep \z@
+\topsep 0\baselineskip \@plus 0.1\baselineskip \@minus 0.1\baselineskip
+\itemsep \z@ \relax}
+\let\@listI\@listi
+\makeatother

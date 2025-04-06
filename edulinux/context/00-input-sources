@@ -1,0 +1,2 @@
+[desktop/ibus/general/hotkey]
+triggers=['<Control><Shift>space']

@@ -1,0 +1,264 @@
+This is e-pTeX, Version 3.14159265-p3.7.1-161114-2.6 (utf8.euc) (TeX Live 2017/Debian) (preloaded format=platex 2021.1.14)  27 SEP 2024 23:22
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**paper
+(./paper.tex
+pLaTeX2e <2017/10/28>+4 (based on LaTeX2e <2017-04-15>)
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+(/usr/share/texlive/texmf-dist/tex/platex/base/jarticle.cls
+Document Class: jarticle 2017/09/19 v1.7g Standard pLaTeX class
+\c@@paper=\count82
+(/usr/share/texlive/texmf-dist/tex/platex/base/jsize10.clo
+File: jsize10.clo 2017/09/19 v1.7g Standard pLaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\symmincho=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `mincho' in version `bold'
+(Font)                  JY1/mc/m/n --> JY1/gt/m/n on input line 613.
+\toclineskip=\dimen118
+\@lnumwidth=\dimen119
+\bibindent=\dimen120
+\heisei=\count91
+) (./26thHISS.sty
+"24thHISS.sty"
+) (/usr/share/texlive/texmf-dist/tex/platex/base/ascmac.sty
+Package: ascmac 2017/12/17 v2.0f ascmac wrapper (community edition) 
+
+(/usr/share/texlive/texmf-dist/tex/platex/base/tascmac.sty
+Package: tascmac 2017/12/17 v2.0f ascmac package (community edition) 
+\@savetbaselineshift=\dimen121
+\@saveybaselineshift=\dimen122
+\scb@x=\box42
+\scscb@x=\box43
+\@bw=\dimen123
+\@nbox=\box44
+\@nbody=\box45
+\@scw=\dimen124
+\@itemh=\dimen125
+\@iboxpos=\toks15
+\@iboxstr=\box46
+\@bwsp=\box47
+\@@bwsp=\box48
+\@bcal=\count92
+\shaderule=\dimen126
+))
+(/usr/share/texlive/texmf-dist/tex/latex/diagbox/diagbox.sty
+Package: diagbox 2016/12/28 v2.2 Making table heads with diagonal lines
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/usr/share/texlive/texmf-dist/tex/latex/pict2e/pict2e.sty
+Package: pict2e 2016/02/05 v0.3b Improved picture commands (HjG,RN,JT)
+
+(/usr/share/texlive/texmf-dist/tex/latex/pict2e/pict2e.cfg
+File: pict2e.cfg 2016/02/05 v0.1u pict2e configuration for teTeX/TeXLive
+)
+Package pict2e Info: Driver file: dvips.def on input line 119.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+)
+Package pict2e Info: Driver file for pict2e: p2e-dvips.def on input line 121.
+
+(/usr/share/texlive/texmf-dist/tex/latex/pict2e/p2e-dvips.def
+File: p2e-dvips.def 2016/02/05 v0.1u Driver-dependant file (RN,HjG,JT)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+\pIIe@GRAPH=\toks17
+\@arclen=\dimen127
+\@arcrad=\dimen128
+\@tempdimd=\dimen129
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp.sty
+Package: fp 1995/04/02
+
+`Fixed Point Package', Version 0.8, April 2, 1995 (C) Michael Mehlich
+(/usr/share/texlive/texmf-dist/tex/latex/fp/defpattern.sty
+Package: defpattern 1994/10/12
+\actioncount=\count93
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-basic.sty
+Package: fp-basic 1996/05/13
+\FP@xs=\count94
+\FP@xia=\count95
+\FP@xib=\count96
+\FP@xfa=\count97
+\FP@xfb=\count98
+\FP@rega=\count99
+\FP@regb=\count100
+\FP@regs=\count101
+\FP@times=\count102
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-addons.sty
+Package: fp-addons 1995/03/15
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-snap.sty
+Package: fp-snap 1995/04/05
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-exp.sty
+Package: fp-exp 1995/04/03
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-trigo.sty
+Package: fp-trigo 1995/04/14
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-pas.sty
+Package: fp-pas 1994/08/29
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-random.sty
+Package: fp-random 1995/02/23
+\FPseed=\count103
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-eqn.sty
+Package: fp-eqn 1995/04/03
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-upn.sty
+Package: fp-upn 1996/10/21
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fp/fp-eval.sty
+Package: fp-eval 1995/04/03
+))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count104
+\calc@Bcount=\count105
+\calc@Adimen=\dimen130
+\calc@Bdimen=\dimen131
+\calc@Askip=\skip43
+\calc@Bskip=\skip44
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count106
+\calc@Cskip=\skip45
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/array.sty
+Package: array 2016/10/06 v2.4d Tabular extension package (FMi)
+\col@sep=\dimen132
+\extrarowheight=\dimen133
+\NC@list=\toks18
+\extratabsurround=\skip46
+\backup@length=\skip47
+)
+\diagbox@boxa=\box49
+\diagbox@boxb=\box50
+\diagbox@boxm=\box51
+\diagbox@wd=\dimen134
+\diagbox@ht=\dimen135
+\diagbox@insepl=\dimen136
+\diagbox@insepr=\dimen137
+\diagbox@outsepl=\dimen138
+\diagbox@outsepr=\dimen139
+)
+
+LaTeX Warning: Unused global option(s):
+    [9pt].
+
+(./paper.aux)
+\openout1 = `paper.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 24.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 24.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 29.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 29.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 63.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 63.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 68.
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 68.
+
+Underfull \hbox (badness 2261) in paragraph at lines 68--69
+[]\JY1/mc/m/n/10 利用した \OT1/cmr/m/n/10 Chat-GPT \JY1/mc/m/n/10 のモデル \OT1
+/cmr/m/n/10 : ChatGPT-
+ []
+
+[1
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 91--95
+[]\JY1/mc/m/n/10 実験の結果は次のようにな っ た ． \OT1/cmr/m/n/10 C++\JY1/mc/m
+/n/10 では
+ []
+
+
+Underfull \hbox (badness 2261) in paragraph at lines 108--109
+[]\JY1/mc/m/n/10 利用した \OT1/cmr/m/n/10 Chat-GPT \JY1/mc/m/n/10 のモデル \OT1
+/cmr/m/n/10 : ChatGPT-
+ []
+
+
+Overfull \hbox (6.89867pt too wide) in paragraph at lines 118--129
+ [][] 
+ []
+
+[2]
+
+LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
+(Font)              using `JT1/mc/m/n' instead on input line 265.
+
+
+LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
+(Font)              using `JY1/mc/m/n' instead on input line 265.
+
+
+Underfull \hbox (badness 1173) in paragraph at lines 267--268
+\JY1/mc/m/it/10 ミング授業の課題の解答生成の評価\OT1/cmr/m/n/10 "\JY1/mc/m/it/1
+0 信学技報
+ []
+
+[3] (./paper.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1549 strings out of 493640
+ 18037 string characters out of 6150528
+ 104637 words of memory out of 5000000
+ 5150 multiletter control sequences out of 15000+600000
+ 9627 words of font info for 39 fonts, out of 8000000 for 9000
+ 929 hyphenation exceptions out of 8191
+ 31i,15n,29p,300b,297s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on paper.dvi (3 pages, 22376 bytes).

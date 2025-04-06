@@ -1,0 +1,8 @@
+#!/bin/bash
+dir="$HOME/P3R$(($(date +%Y)-2018))"
+mkdir -p $dir
+cd $dir
+chmod 705 .
+if [ ! -d .git ]
+then git init
+fi

@@ -1,0 +1,38 @@
+\begin{thebibliography}{1}
+
+\bibitem{Hughes1989}
+J. Hughes:
+Why functional programming matters,
+The Computer Journal - Special issue on Lazy functional programming archive,
+vol.32, no.2, pp.98--107, April 1989.
+
+\bibitem{Fujiwara2015}
+藤原暁宏：
+はじめて学ぶオートマトンと言語理論，
+森北出版株式会社，2015年7月．
+
+\bibitem{Sano202010}
+\underline{佐野勇樹}，{横本勇希}，{小島渚}，{島和之}：
+継続渡しスタイルの関数型言語における非決定性プログラムに関する考察，
+電子情報通信学会技術研究報告 (SS2020-13)，
+vol.120，no.193，pp.49--54，2020年10月．
+
+\bibitem{Yokomoto201910}
+{横本勇希}，{小島渚}，{島和之}：
+四天王問題の一般化と継続渡しスタイルの関数型言語における非決定性計算による解法プログラム，
+電子情報通信学会技術研究報告 (SS2019-18)，
+vol.119，no.246，pp.31--36，2019年10月．
+
+\bibitem{Sussman1998}
+G.J. Sussman and G.L.S. Jr.:
+Scheme: A interpreter for extended lambda calculus,
+Higher-Order and Symbolic Computation,
+pp.405--439, Nov.\ 1998.
+
+\bibitem{Reynolds1993}
+J.C. Reynolds:
+The discoveries of continuations,
+Lisp and Symbolic Computation,
+vol.6, pp.233--247, Nov.\ 1993.
+
+\end{thebibliography}

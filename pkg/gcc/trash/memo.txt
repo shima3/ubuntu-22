@@ -1,0 +1,18 @@
+2024/7/31 Wed
+update-alternatives: warning: skip creation of /usr/share/man/man1/c++.1.gz because associated file /usr/share/man/man1/g++.1.gz (of link group c++) doesn't exist
+
+2024/7/30 Tue
+FROM ubuntu
+VERSION="24.04 LTS (Noble Numbat)"
+gcc-9 から gcc-13 まで
+
+kshima/amd64.pkg:gcc13-ubuntu24
+kshima/arm64.pkg:gcc13-ubuntu24
+kshima/pkg:gcc13-ubuntu24
+kshima/gcc.pkg:ubuntu24
+
+5-ubuntu16
+7-ubuntu18
+9-ubuntu20
+11-ubuntu22
+13-ubuntu24

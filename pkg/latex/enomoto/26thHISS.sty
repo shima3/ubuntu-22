@@ -1,0 +1,61 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%%                24thHISS.sty              %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\typeout{"24thHISS.sty"}
+%
+
+\def\field#1{\gdef\@field{#1}}
+\def\@maketitle{%
+\thispagestyle{empty}
+ \vskip -1cm
+%  \newpage\null
+  \vskip -1.5cm%
+  \begin{center}%
+  \let\footnote\thanks
+    {\Large \@title \par}%
+%    \vskip 1.5em%
+    {
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+  \end{center}%
+  \par\vskip 1.5em}
+\vskip -5mm
+
+%
+%
+%% 参考文献 %%
+\renewenvironment{thebibliography}[1]
+{\section*{\refname\@mkboth{\refname}{\refname}}%
+   \list{\@biblabel{\@arabic\c@enumiv}}%
+        {\settowidth\labelwidth{\@biblabel{#1}}%
+         \leftmargin\labelwidth
+         \advance\leftmargin\labelsep
+         \@openbib@code
+         \usecounter{enumiv}%
+         \let\p@enumiv\@empty
+         \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+   \sloppy
+   \clubpenalty4000
+   \@clubpenalty\clubpenalty
+   \widowpenalty4000%
+   \sfcode`\.\@m}
+  {\def\@noitemerr
+    {\@latex@warning{Empty `thebibliography' environment}}%
+   \endlist}
+\let\@openbib@code\@empty
+
+%% 制御 %%
+\def\section{\@startsection{section}{1}{\z@}%
+   {0.1\Cvs \@plus.1\Cdp \@minus.1\Cdp}%
+   {.1\Cvs \@plus.1\Cdp}%
+   {\large\gt\bf}}%
+
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+   {0.01\Cvs \@plus.1\Cdp \@minus.1\Cdp}%
+   {.1\Cvs \@plus.1\Cdp}%
+   {\normalsize\gt\bf}}%
+

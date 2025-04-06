@@ -1,0 +1,195 @@
+% \documentclass[twocolumn,a4paper]{ieicejsp}
+\documentclass[10pt,a4j,twocolumn,oneside]{jsarticle}
+\setlength{\textwidth}{24zw}
+%余白の設定ここから
+\setlength{\topmargin}{25mm}
+\addtolength{\topmargin}{-1in}
+\setlength{\oddsidemargin}{15mm}
+\addtolength{\oddsidemargin}{-1.1in}
+\setlength{\evensidemargin}{20mm}
+\addtolength{\evensidemargin}{-1in}
+\setlength{\textwidth}{182mm}
+\setlength{\textheight}{265mm}
+\setlength{\headsep}{0mm}
+\setlength{\headheight}{0mm}
+\setlength{\topskip}{0mm}
+%余白の設定ここまで
+%twocolumn（2列）の間の空白の大きさ設定
+\columnsep=8mm
+\setlength{\baselineskip}{16pt}
+\setlength{\headsep}{-5mm}
+\renewcommand{\baselinestretch}{0.85}
+% 図と図の間のスペース
+\setlength\floatsep{0truemm}
+% 本文と図の間のスペース
+\setlength\textfloatsep{0truemm}
+% 本文中の図のスペース
+\setlength\intextsep{0pt}
+% 図とキャプションの間のスペース
+\setlength\abovecaptionskip{0truemm}
+\setlength{\leftmargini}{10pt} 
+\input{esdhcu}
+
+\usepackage{newenum}
+%\usepackage{epsfig}
+%\usepackage{ascmac}
+%\usepackage{amsmath}
+%\usepackage{nccmath}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{newtxtext}
+\usepackage{textcomp}
+%\usepackage{newtxmath}
+%\usepackage{svg}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{fancyvrb}
+\usepackage{multicol}
+
+\renewcommand{\lstlistingname}{リスト}
+\lstset{language=,%
+        basicstyle=\ttfamily\footnotesize,%
+        commentstyle=\textit,%
+        classoffset=1,%
+        keywordstyle=\bfseries,%
+	% frame=single,
+	frame=tRBl,
+        framesep=5pt,%
+	showstringspaces=false,%
+        numbers=left,stepnumber=1,numberstyle=\footnotesize%
+	}%
+
+% ぶら下げ
+\newenvironment{hang}[1][\parindent]
+  {\def\item{\par\hangindent=#1\noindent}}
+  {\par}
+
+% カンマの後，改行を許す
+\def\,{,\allowbreak}
+% 縦棒の後，改行を許す
+\def\|{$|$\allowbreak}
+% circumflex accent, caret, up arrow, hat, chevron
+\def\hat{\mbox{\^{ }}}
+% 鍵括弧
+\def\sb#1{[#1]}
+% 二重鍵括弧
+\def\db#1{[\![#1]\!]}
+% 三重鍵括弧
+\def\tb#1{[\![\![#1]\!]\!]}
+% 角括弧
+\def\sa#1{\langle#1\rangle}
+% 二重角括弧
+\def\da#1{\langle\!\langle#1\rangle\!\rangle}
+% 矢印
+\def\->{\allowbreak\mbox{$\rightarrow$}\allowbreak}
+% ・・・
+\def\c...{\mbox{$\cdots\mbox{}$}}
+% :=
+\newcommand{\defeq}{\mathrel{\mathop:}=}
+
+\title{
+{\bf 継続渡しスタイルの関数型プログラミング言語における \\ 並行処理の設計と実装}
+}
+\author{組込みデザイン研究室  小島渚 \quad （指導教員　島和之）}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section{まえがき}
+
+近年，プロセッサの動作クロックは技術的な限界によって4GHz弱で頭打ちとなる一方，多数のコアを持つプロセッサが開発されている．
+多数のコアを有効に活用するためには並行処理が必要となり，マルチスレッドを用いる場合が多い．
+しかし，マルチスレッドを用いたプログラミングでは，競合状態やデッドロックが起こりやすく，信頼性の高いソフトウェアの開発が難しい．
+
+そこで，アクターモデルに基づくプログラミング言語やライブラリが注目されている．
+アクターモデルとは，アクター間の非同期メッセージパッシングに基づき，並行システムをモデル化する数学的理論である\cite{Hewitt1974, Hewitt2010, Agha1986}．
+各アクターは受信メッセージを一度に１つずつ処理するので，競合状態やデッドロックが起こりにくいという特長がある．
+
+ただし，アクターモデルにおいて同期メッセージパッシングを行うためには継続渡しスタイルを用いる必要があり，通常のプログラミング言語では分かりにくくなる．
+関数からの復帰において計算結果を継続に渡す様式を継続渡しスタイル（Continuation Passing Style, CPS）という\cite{Sussman1998, Reynolds1993}．
+% 継続（計算の続きを行う関数）
+% Continuation Passing Style，
+同期メッセージパッシングが多いほど，継続が多く複雑になり，処理の流れが分断されるので分かりにくくなる．
+
+本研究では，関数型プログラミング言語\cite{Shima201612}においてアクターモデルを実装した\cite{Kojima201709,Kojima201801}．
+この言語はCPSを簡潔に表現できるが，並行処理への対応は今後の課題であった．
+本論文では，アクターモデルのために実装した組込みの関数，および，それらの関数を使って，同期メッセージパッシングを簡潔に表現するために定義した関数を示す．
+
+\section{CPSを簡潔に表現できる言語}
+
+CPSを簡潔に表現する言語の構文を EBNF で示す．%\cite{ISO-EBNF}．
+\begin{hang}\tt % \item 019IOlq
+\item definition='('\,'defineCPS'\,var\,'.'\,exp\,')';
+\item exp=var\|hat-exp\|lambda-exp;
+\item hat-exp='('\,'\hat'\,param\,body\,')';
+\item param=var\|'('\,var\,\{var\}\,['.'\,var]\,')'
+\item body=exp\,\{exp\}\,['.'\,exp];
+\end{hang}
+{\tt (defineCPS var . exp)}は変数{\tt var}に式{\tt exp}を束縛する．
+これは{\tt var}を関数名，{\tt exp}を本体とする関数定義を意味する．
+S式のドット記法により，{\tt (defineCPS var exp \c...)}は{\tt (defineCPS var . (exp \c...))}と等しい．
+{\tt lambda-exp}はSchemeのラムダ式であり，処理系の機能を呼び出すために用いる．
+{\tt hat-exp}はハット項（hat terms）であり，継続渡しスタイルのラムダ式を簡潔に表現するための記法である．
+
+\section{アクターモデルの設計と実装}
+
+アクターモデルでは，アクター間のメッセージパッシングに基づき，並行システムをモデル化する．
+各アクターは固有のアドレス，メールボックス，振舞を持つ．
+アクターのアドレスに送信されたメッセージはメールボックスに入れられる．
+アクターはメールボックスからメッセージを受信したとき，以下の動作からなる振舞を実行できる．
+\begin{itemize}
+	\setlength{\itemsep}{0pt}      %2. ブロック間の余白
+	\setlength{\parskip}{0pt}      %4. 段落間余白．
+	\setlength{\itemindent}{0pt}   %5. 最初のインデント
+	\setlength{\labelsep}{5pt}     %6. item と文字の間
+\item アクターのアドレスへメッセージを送信する．
+\item 新しいアクターを生成する．
+\item 次にメッセージを受信したときの振舞を指定する．
+\end{itemize}
+アクターは以下のアドレスを知ることができる．
+\begin{itemize}
+	\setlength{\itemsep}{0pt}      %2. ブロック間の余白
+	\setlength{\parskip}{0pt}      %4. 段落間余白．
+	\setlength{\itemindent}{0pt}   %5. 最初のインデント
+	\setlength{\labelsep}{5pt}     %6. item と文字の間
+\item 自分自身のアドレス
+\item 受信したメッセージに含まれたアドレス
+\item 自分が生成したアクターのアドレス
+\end{itemize}
+アクターは既知のアドレスにのみメッセージを送信できる．
+
+\begin{table}
+\begin{lstlisting}[caption=同期メッセージパッシングのための関数,label=message-passing-function,frame=single,xleftmargin=2mm,xrightmargin=0mm]
+(defineCPS sendSync ^(actor message . return)
+  currentActor ^(from)
+  sendAsync actor (message from return) . end)
+(defineCPS RplyRqstd ^(message from return bhvr)
+  message bhvr ^ r
+  sendAsync from (^(b) actorNext ^( ) r return))
+(defineCPS sendRplySync ^(actor message)
+  sendSync actor (RplyRqstd message))
+\end{lstlisting}
+\end{table}
+
+同期メッセージパッシングのための関数の定義をリスト\ref{message-passing-function}に示す．
+sendRplySync（7行目）は同期メッセージパッシングでアクターにメッセージを送信し，返信メッセージを受信し，戻り値を得る．
+RplyRqstd（4行目）は返信を要求するメッセージを生成する．
+sendSync（1行目）は同期メッセージパッシングでメッセージを送信する．
+組込み関数 currentActor（2行目）は現在実行中のアクターを戻り値として返す．
+sendAsync（3, 6行目）は非同期メッセージパッシングでアクターにメッセージを送信する．
+actorNext（6行目）はアクターに届いた次のメッセージの処理を開始する．
+
+\section{まとめと今後の課題}
+
+本論文では，CPSを簡潔に表現する関数型プログラミング言語におけるアクターモデルの設計，および，それに基づく並行処理のために実装した非同期メッセージパッシングのための関数と同期メッセージパッシングのための関数を示した．
+今後の課題としては，提案言語におけるブロック構造の簡略化，モジュール分割，並列分散処理への応用などが挙げられる．
+
+% \bibliographystyle{jplain}
+% \bibliographystyle{junsrt}
+\bibliographystyle{esdhcu}
+% \bibliographystyle{ieice}
+% \bibliographystyle{plain}
+\small
+\bibliography{references}
+\end{document}

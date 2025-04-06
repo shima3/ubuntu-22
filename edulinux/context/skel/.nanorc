@@ -1,0 +1,9 @@
+set autoindent
+set cutfromcursor
+set linenumbers
+include "/usr/share/nano/html.nanorc"
+include "/usr/share/nano/java.nanorc"
+include "/usr/share/nano/javascript.nanorc"
+include "/usr/share/nano/python.nanorc"
+include "/usr/share/nano/sh.nanorc"
+include "/usr/share/nano/tex.nanorc"

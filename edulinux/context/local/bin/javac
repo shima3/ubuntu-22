@@ -1,0 +1,8 @@
+#!/bin/bash
+args="$*"
+/usr/bin/javac $args
+status="$?"
+if git add *.java 2> /dev/null > /dev/null
+then git commit --message="Status $status: javac $args" 2> /dev/null > /dev/null
+fi
+exit "$status"

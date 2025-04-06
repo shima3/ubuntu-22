@@ -1,0 +1,5 @@
+# apt-get install --yes --no-download --no-install-recommends gcc-${ver} g++-${ver}
+apt-get install --yes --no-download --no-install-recommends gcc g++
+GccVersion="$(gcc -v 2>&1 | awk '/^gcc version /{print $3;}')"
+ver="${GccVersion%%.*}"
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${ver}* ${ver}0 --slave /usr/bin/g++ g++ /usr/bin/g++-${ver}* --slave /usr/bin/gcov gcov /usr/bin/gcov-${ver}*

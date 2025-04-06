@@ -1,0 +1,188 @@
+% \documentclass[twocolumn,a4paper]{ieicejsp}
+\documentclass[10pt,a4j,twocolumn,oneside]{jsarticle}
+\setlength{\textwidth}{24zw}
+%余白の設定ここから
+\setlength{\topmargin}{25mm}
+\addtolength{\topmargin}{-1in}
+\setlength{\oddsidemargin}{15mm}
+\addtolength{\oddsidemargin}{-1.1in}
+\setlength{\evensidemargin}{20mm}
+\addtolength{\evensidemargin}{-1in}
+\setlength{\textwidth}{182mm}
+\setlength{\textheight}{265mm}
+\setlength{\headsep}{0mm}
+\setlength{\headheight}{0mm}
+\setlength{\topskip}{0mm}
+%余白の設定ここまで
+%twocolumn（2列）の間の空白の大きさ設定
+\columnsep=8mm
+\setlength{\baselineskip}{16pt}
+\setlength{\headsep}{-5mm}
+\renewcommand{\baselinestretch}{0.85}
+% 図と図の間のスペース
+\setlength\floatsep{0truemm}
+% 本文と図の間のスペース
+\setlength\textfloatsep{0truemm}
+% 本文中の図のスペース
+\setlength\intextsep{0pt}
+% 図とキャプションの間のスペース
+\setlength\abovecaptionskip{0truemm}
+\setlength{\leftmargini}{10pt} 
+\input{esdhcu}
+
+\usepackage{newenum}
+%\usepackage{epsfig}
+%\usepackage{ascmac}
+%\usepackage{amsmath}
+%\usepackage{nccmath}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{newtxtext}
+\usepackage{textcomp}
+%\usepackage{newtxmath}
+%\usepackage{svg}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{fancyvrb}
+\usepackage{multicol}
+
+\renewcommand{\lstlistingname}{リスト}
+\lstset{language=,%
+        basicstyle=\ttfamily\footnotesize,%
+        commentstyle=\textit,%
+        classoffset=1,%
+        keywordstyle=\bfseries,%
+	% frame=single,
+	frame=tRBl,
+        framesep=5pt,%
+	showstringspaces=false,%
+        numbers=left,stepnumber=1,numberstyle=\footnotesize%
+	}%
+
+% ぶら下げ
+\newenvironment{hang}[1][\parindent]
+  {\def\item{\par\hangindent=#1\noindent}}
+  {\par}
+
+% カンマの後，改行を許す
+\def\,{,\allowbreak}
+% 縦棒の後，改行を許す
+\def\|{$|$\allowbreak}
+% circumflex accent, caret, up arrow, hat, chevron
+\def\hat{\mbox{\^{ }}}
+% 鍵括弧
+\def\sb#1{[#1]}
+% 二重鍵括弧
+\def\db#1{[\![#1]\!]}
+% 三重鍵括弧
+\def\tb#1{[\![\![#1]\!]\!]}
+% 角括弧
+\def\sa#1{\langle#1\rangle}
+% 二重角括弧
+\def\da#1{\langle\!\langle#1\rangle\!\rangle}
+% 矢印
+\def\->{\allowbreak\mbox{$\rightarrow$}\allowbreak}
+% ・・・
+\def\c...{\mbox{$\cdots\mbox{}$}}
+% :=
+\newcommand{\defeq}{\mathrel{\mathop:}=}
+
+\title{
+{\bf $n$天王問題 \\ 非決定性計算の提案とプログラムの複雑性評価}
+}
+\author{組込みデザイン研究室  佐野勇樹 \quad （指導教員　島和之）}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section{まえがき}
+
+ソフトウェアの生産性と品質のため，再利用可能なモジュールを組み合わせてソフトウェアを開発することが重要である．
+ラムダ計算を理論的基礎とする関数型プログラミング言語では，関数をモジュールとし，高階関数や遅延評価によって高度に組
+み合わせることができる．
+このため，リストや木構造の操作，数値計算，αβ法などの抽象的なアルゴリズムを再利用可能なモジュールとして記述し易い\cite{Hughes1989}．
+
+関数からの復帰において計算結果を継続に渡す様式を継続渡しスタイル（Continuation Passing Style, CPS）という\cite{Sussman1998,Reynolds1993}．
+CPS は末尾再帰，コルーチン，例外処理などにおける制御の流れを表現できるので，コンパイラによる最適化や関数の抽出に利用されている\cite{Sumii2004,Hirota2013,Steele1978,Haynes1984}．
+CPS に対し，計算結果を呼び出し元に返す通常の様式を直接スタイル（Direct Style, DS）という．
+
+本研究では，一般化四天王問題を解くプログラムにおける非決定性計算の有用性を示すことを目的とする．
+四天王問題とは，4人の強さに関する条件から4人を強い順に並べる問題である．
+これをプログラミングによって解くため，定式化したものを一般化四天王問題と呼ぶ．
+
+非決定性計算を用いると多重ループを避けることができ，ネストが深くならないので構造が単純になる．
+ある状態と入力の組に対して複数の状態遷移が定められているオートマトンを非決定性オートマトンという\cite{Fujiwara2015}．
+このことから，一つの計算から複数の結果を得ることを非決定性計算と呼ぶ．
+Hat言語の言語仕様としては，非決定性計算のための文法や特別な機能は持たない．
+しかし，継続渡しスタイルに基づいているため，非決定性計算のための関数を定義することができる．
+
+\section{非決定性計算}
+
+非決定性計算を用いると多重ループを避けることができ，ネストが深くならないので構造を単純にできる．
+Scheme言語とHat言語は，言語仕様として非決定性計算のための文法や特別な機能は持たないが，継続を用いることによって非決定性計算をシミュレートできる．
+Hat言語では任意の関数呼び出しにおいて継続を関数に渡すので，呼び出された関数で継続を利用できる．
+
+% Hat言語における非決定性計算の実装
+
+\begin{table}[tb]
+\begin{lstlisting}[caption=Hat言語における非決定性計算のための関数定義,label=functions-for-nondeterministic-in-hat,frame=single,xleftmargin=3mm,xrightmargin=0mm]
+( defineCPS forEach ^(list action . return)
+  fix
+  ( ^(loop back rest)
+    unless (isPair rest) return ^()
+    splitPair rest ^(el rest)
+    moveAll back rest ^(others)
+    action el others ^()
+    makePair el back ^(back)
+    loop back rest )
+  ( ) list )
+
+( defineCPS amb ^(list . cont)
+  forEach list cont )
+\end{lstlisting}
+\end{table}
+
+リスト\ref{functions-for-nondeterministic-in-hat}はHat言語で非決定性計算を実現するための関数の定義である．
+関数 forEach は，通常の引数 list, action と継続の引数 return を受け取る．
+list の各要素を一つずつ選び、その要素を第1引数、それ以外の要素からなるリストを第2引数とし、action を呼び出すことを繰り返す．
+全ての要素を選び終わったら，return で示される継続へと戻る．
+
+関数 amb は，通常の引数 list と継続の引数 cont を受け取る．
+list を forEach の list，cont を forEach の action へと渡す．
+すなわち，forEach は list の各要素を一つずつ選び，選んだ要素と残りのリストを amb の cont へ繰り返し渡す．
+このため，amb の呼び出し元では，amb が list の要素を非決定的に一つ選び、その要素を第1戻り値、それ以外の要素からなるリストを第2戻り値として返すように見える．
+
+
+\section{四天王問題}
+
+四天王問題とは，会話から４名A，B，C，Dを強い順に並べる問題である．
+
+この問題をプログラミングによって解く場合，プログラマが会話からどの程度意味を解釈し，コード化して良いかが曖昧である．
+極端な場合，条件を満たす順列をプログラマが予め考え，その結果を出力するだけのプログラムでも良いかもしれない．
+一方，会話の文字列を入力し，条件を自動的に抽出することを要求すると，順列の問題よりも自然言語解析の問題の比重が大きくなりすぎる．
+また，条件を満たす順列が複数存在する場合，一つだけ出力すれば良いのか，全て出力する必要があるのか曖昧である．
+
+一般化四天王問題では，以下の書式で条件を入力し，条件を満たす順列を全て出力するものとする．
+\begin{quote}
+左辺 比較演算子 右辺 コメント
+\end{quote}
+左辺と右辺は a, b, c, d または 1, 2, 3, 4 のいずれかである．
+a, b, c, d は，それぞれ A, B, C, D の強さの順位（強いほど小さい）を示す．
+比較演算子は <, >, =, <=, >=, != のいずれかである．
+コメントは無視される．
+左辺，比較演算子，右辺，コメントの間には１つ以上の空白が必要である．
+
+\section{まとめと今後の課題}
+
+本論文では，継続渡しスタイルの関数型プログラミング言語Hatにおいて非決定性計算を実現する方法，およびその有用性を示すため一般化四天王問題を解いた．
+今後の予定としてはHat言語の処理速度の改善などが挙げられる．
+
+% \bibliographystyle{jplain}
+% \bibliographystyle{junsrt}
+\bibliographystyle{esdhcu}
+% \bibliographystyle{ieice}
+% \bibliographystyle{plain}
+\small
+\bibliography{references}
+\end{document}

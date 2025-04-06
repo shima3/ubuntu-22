@@ -1,0 +1,49 @@
+This is pBibTeX, Version 0.99d-j0.33 (utf8.euc) (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: paper.aux
+The style file: esdhcu.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: references.bib
+You've used 6 entries,
+            4028 wiz_defined-function locations,
+            881 strings with 6323 characters,
+and the built_in function-call counts, 7325 in all, are:
+= -- 837
+> -- 42
+< -- 0
++ -- 18
+- -- 12
+* -- 409
+:= -- 749
+add.period$ -- 6
+call.type$ -- 6
+change.case$ -- 5
+chr.to.int$ -- 0
+cite$ -- 6
+duplicate$ -- 136
+empty$ -- 631
+format.name$ -- 40
+if$ -- 1921
+int.to.chr$ -- 0
+int.to.str$ -- 6
+missing$ -- 7
+newline$ -- 38
+num.names$ -- 6
+pop$ -- 60
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 330
+stack$ -- 0
+substring$ -- 1544
+swap$ -- 37
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 38
+width$ -- 7
+write$ -- 55
+is.kanji.str$ -- 378

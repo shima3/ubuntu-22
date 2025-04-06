@@ -1,0 +1,59 @@
+This is pBibTeX, Version 0.99d-j0.33 (utf8.euc) (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: paper.aux
+The style file: esdhcu.bst
+I found no \bibdata command---while reading file paper.aux
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Warning--I didn't find a database entry for "katsuyou"
+Warning--I didn't find a database entry for "hirata"
+Warning--I didn't find a database entry for "imai"
+Warning--I didn't find a database entry for "Deep"
+Warning--I didn't find a database entry for "watanabe"
+Warning--I didn't find a database entry for "hanawa"
+Warning--I didn't find a database entry for "kisyou"
+Warning--I didn't find a database entry for "jisseki"
+Warning--I didn't find a database entry for "hinan"
+You've used 0 entries,
+            4028 wiz_defined-function locations,
+            843 strings with 5445 characters,
+and the built_in function-call counts, 22 in all, are:
+= -- 0
+> -- 0
+< -- 0
++ -- 0
+- -- 0
+* -- 2
+:= -- 11
+add.period$ -- 0
+call.type$ -- 0
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 0
+duplicate$ -- 0
+empty$ -- 1
+format.name$ -- 0
+if$ -- 1
+int.to.chr$ -- 0
+int.to.str$ -- 0
+missing$ -- 0
+newline$ -- 3
+num.names$ -- 0
+pop$ -- 0
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 1
+stack$ -- 0
+substring$ -- 0
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 0
+width$ -- 0
+write$ -- 2
+is.kanji.str$ -- 0
+(There was 1 error message)

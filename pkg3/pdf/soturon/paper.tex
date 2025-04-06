@@ -1,0 +1,37 @@
+\input{header}
+\renewcommand{\appendixname}{付録}
+\usepackage{multirow}
+\usepackage{here}
+\usepackage{url}
+\newcommand{\bhline}[1]{\noalign{\hrule height #1}}  
+\newcommand{\bvline}[1]{\vrule width #1}  
+
+\begin{document}
+%行間の変更、必要ならば変えること
+\setlength{\baselineskip}{8mm}
+%タイトル製作用
+%特に問題がないと思われるが、問題があれば 表紙.tex を編集すること
+\input{cover}
+%目次製作用
+%目次のスタイルを変えたい場合は、目次.texを編集すること
+% \section{title} などで章等を追加した場合、勝手に目次も変更される
+\input{toc}
+%
+%
+%ここから本文書き始め
+%本文.texで論文を書く
+%本文.texで書く場合、 \begin{document} と \end{document}　は不要
+%なお、ここに直接本文を書いても良い
+\input{body}
+%本文ここまで
+\clearpage
+
+%参考文献
+\addcontentsline{toc}{section}{\refname}
+\begin{thebibliography}{99}
+\input{references}
+\end{thebibliography}
+
+\input{thanks}
+
+\end{document}

@@ -1,0 +1,44 @@
+%ここから表紙開始
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%名前等，適度に変更すること
+\renewcommand{\thepage}{}
+
+\def\thethesis{令和\rensuji{5}年度 卒業論文}
+\def\thetitle{深層学習を用いた\\セマンティックセグメンテーションによる\\水面領域抽出の精度評価}
+\def\theauthor{中島　慶}
+
+\def\thecover{
+  \begin{center}
+    {\huge
+      \vspace*{4cm}
+      \LARGE{\thethesis\\ }
+    }\vspace{8mm}
+    {\huge
+      \LARGE{\thetitle}\\\vspace{2mm}
+    }
+  \end{center}
+  \vspace{4cm}
+  \begin{center}
+    {\Large
+      \noindent 広島市立大学　情報科学部　システム工学科 \\
+      \vspace{3em}
+      \noindent \hspace{4em}氏名\hspace{3em}　\theauthor　　\\
+      \hspace{4em}指導教員\hspace{3em}島 和之　准教授\\
+      \vspace{2em}
+      2024年1月31日　提出\\
+  }\end{center}
+}
+
+% ファイルの表紙と背見出し
+\newgeometry{left=0cm,right=9mm,top=0cm}
+\marginpar{\parbox<t>{11.5in}{\def\\{}\large\thethesis\hfill\thetitle\hfill\theauthor}}
+\vspace{1in}
+\thecover
+\restoregeometry
+\clearpage
+
+% ファイル内表紙
+\thecover
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%表紙ここまで
