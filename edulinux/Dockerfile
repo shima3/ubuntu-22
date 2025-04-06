@@ -97,5 +97,13 @@ RUN sed -i.bak '/pam_motd\.so/ s/^/#/' /etc/pam.d/sshd
 
 # 英語キーボードを削除する。
 COPY dconf /etc/skel/.config/dconf
+
 # Ctrl+SpaceでIME有効化/無効化
 COPY mozc /etc/skel/.config/mozc
+
+# coreファイルの出力を無効化する。
+# RUN echo '* hard core 0' >> /etc/security/limits.conf
+# 効かなかった。
+
+# coreファイルの出力を無効化する。
+COPY 99ulimit /etc/X11/Xsession.d/

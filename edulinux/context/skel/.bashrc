@@ -14,7 +14,8 @@ export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S "
 export PROMPT_COMMAND='history -a; history -c; history -r'
 
 # コアダンプを無効化
-ulimit -c 0
+# ulimit -c 0
+# /etc/X11/Xsession.d/99ulimitで設定する。
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
