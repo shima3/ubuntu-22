@@ -32,8 +32,8 @@ function pkg_pull(){
 }
 # for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do pkg_pull $pkg; done
 
-if ! docker build --tag "test:$base" --target test-stage --build-arg "PACKAGE=$PACKAGE" --file Dockerfile context; then exit 1; fi
+if ! docker build --tag "test:$base" --target test-stage --build-arg "PACKAGE=$PACKAGE" context; then exit 1; fi
 
-if ! docker build --tag "pkg:$base" --target package-stage --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" --file Dockerfile context; then exit 1; fi
+if ! docker build --tag "pkg:$base" --target package-stage --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" context; then exit 1; fi
 
 # docker-remove-nameless-images
