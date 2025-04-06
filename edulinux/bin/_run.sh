@@ -35,7 +35,6 @@ docker run \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
-       --ulimit core=0 \
        "$@"
 
 #       --name "$base" --hostname "$(hostname)" \

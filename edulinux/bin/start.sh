@@ -60,6 +60,7 @@ $bin/_run.sh \
     --mount "type=volume,src=$base-var-tmp,dst=/var/tmp" \
     --mount "type=volume,src=$base-backup,dst=/backup" \
     --mount "type=volume,src=$base-etc,dst=/etc" \
+    --ulimit core=0 \
     "$edulinux_img"
 
 #    "$base"
