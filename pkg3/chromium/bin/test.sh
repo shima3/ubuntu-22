@@ -11,7 +11,7 @@ if [ "$list" != "" ]; then
     echo stop $list
     docker stop $list
 fi
-docker-remove-containers-not-running
+# docker-remove-containers-not-running
 
 docker run -dit \
        --name "$base" --hostname "$base" \
