@@ -12,6 +12,8 @@ if [ "$list" != "" ]; then
     docker stop $list
 fi
 # docker-remove-containers-not-running
+list=`docker ps -q -f status=exited; docker ps -q -f status=created`
+if [ "$list" != "" ]; then docker rm $list; fi
 
 docker run -dit \
        --name "$base" --hostname "$base" \
