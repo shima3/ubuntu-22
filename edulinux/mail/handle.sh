@@ -1,7 +1,4 @@
 #!/bin/bash
-# cd
-# cat >> log.txt
-# printenv >> /tmp/log.txt
 IFS=$'\n' data=($(awk 'NR==1{print $2;}/^From: /{print substr($0, 7);}' | nkf))
 email="${data[0]}"
 name="${data[1]% <*}"
