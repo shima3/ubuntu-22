@@ -28,12 +28,16 @@ ARG PACKAGE
 
 # RUN wget --output-document=/chromium.deb "http://ftp.debian.org/debian/pool/main/c/chromium/chromium_134.0.6998.117-1_$TARGETARCH.deb"
 RUN apt-get install --yes --download-only --fix-missing $PACKAGE
-COPY 99keyring /etc/X11/Xsession.d/99keyring
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/X11/Xsession.d/99keyring
+# COPY 99keyring /etc/X11/Xsession.d/99keyring
+# RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/X11/Xsession.d/99keyring
+COPY chromium.sh /usr/bin/
+RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /usr/bin/chromium.sh
 
 RUN echo 'add-apt-repository ppa:xtradeb/apps -y' > /install
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' >> /install
 RUN echo "apt-get install --yes --no-download $PACKAGE" >> /install
+RUN echo 'mv /usr/bin/chromium /usr/bin/chromium.org' >> /install
+RUN echo 'mv /usr/bin/chromium.sh /usr/bin/chromium' >> /install
 RUN echo 'apt-get autoclean' >> /install
 RUN chmod +x /install
 
