@@ -106,6 +106,5 @@ COPY mozc /etc/skel/.config/mozc
 # 効かなかった。
 
 # coreファイルの出力を無効化する。
-COPY 99ulimit /etc/X11/Xsession.d/
-
+# COPY 99ulimit /etc/X11/Xsession.d/
 RUN ulimit -c 0
