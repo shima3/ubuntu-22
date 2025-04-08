@@ -55,11 +55,11 @@ docker pull "$edulinux_img"
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
-    --mount "type=volume,src=$base-home,dst=/home" \
     --mount "type=volume,src=$base-var-log,dst=/var/log" \
     --mount "type=volume,src=$base-var-tmp,dst=/var/tmp" \
     --mount "type=volume,src=$base-backup,dst=/backup" \
     --mount "type=volume,src=$base-etc,dst=/etc" \
+    --mount "type=volume,src=$base-home,dst=/home" \
     --ulimit core=0 \
     "$edulinux_img"
 
