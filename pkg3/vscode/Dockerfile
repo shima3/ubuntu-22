@@ -7,9 +7,11 @@ RUN apt-get clean
 COPY --from=pkg:xrdp / /
 RUN /install && rm /install
 
+# COPY --from=pkg:mate / /
+# RUN /install && rm /install
+
 # COPY --from=pkg:japanese / /
 # RUN /install && rm /install
-# ENV LANG=ja_JP.UTF-8
 
 RUN apt-get clean && apt-get update -y
 
