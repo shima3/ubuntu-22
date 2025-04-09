@@ -30,7 +30,9 @@ if [ "$list" != "" ]; then docker rm $list; fi
 docker run \
        --name "$base" \
        --hostname "$base" \
-       -p "$xrdp_port:3389" -p "$http_port:80" -p "$ssh_port:22" \
+       -p "0.0.0.0:$xrdp_port:3389" \
+       -p "0.0.0.0:$http_port:80" \
+       -p "0.0.0.0:$ssh_port:22" \
        --device /dev/fuse --cap-add SYS_ADMIN \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
