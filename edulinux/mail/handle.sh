@@ -3,6 +3,7 @@ IFS=$'\n' data=($(awk 'NR==1{print $2;}/^From: /{print substr($0, 7);}' | nkf))
 email="${data[0]}"
 name="${data[1]% <*}"
 domain="${email#*@}"
+umask 007
 date "+%F %T%t$email%t$name" >> $HOME/handle.log
 if [ "$domain" == "e.hiroshima-cu.ac.jp" -o "$domain" == "hiroshima-cu.ac.jp" ]
 then
