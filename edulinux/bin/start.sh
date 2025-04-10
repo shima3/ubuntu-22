@@ -27,16 +27,16 @@ if [[ "$list" != "" ]]; then
     docker rm -f "$list"
 fi
 
-# /etc/{passwd,shadow,group} を /home/.etc.tar に保存する。
+# /etc/{passwd,shadow,group,gshadow} を /home/.etc.tar に保存する。
 etctar="/home/.etc.tar"
 # volume="$(docker volume ls --filter name=$base-etc --quiet)"
 volume="$(docker volume inspect --format '{{.Name}}' $base-etc 2> /dev/null)"
 if [ "$volume" != "" ]; then
     # if [[ "$(docker inspect --format '{{.Config.Image}}' $base 2> /dev/null)" == "$edulinux_img" ]]; then
     # echo "backup volume: $base-etc"
-    echo backup: '/etc/{passwd,shadow,group} ->' $etctar
+    echo backup: '/etc/{passwd,shadow,group,gshadow} ->' $etctar
     # docker exec -i "$base" tar cf "$etctar" -C /etc passwd shadow group
-    docker run --rm --mount "type=volume,src=$base-home,dst=/mnt/home" --mount "type=volume,src=$base-etc,dst=/mnt/etc" "$ubuntu_img" tar cf "/mnt/$etctar" -C /mnt/etc passwd shadow group
+    docker run --rm --mount "type=volume,src=$base-home,dst=/mnt/home" --mount "type=volume,src=$base-etc,dst=/mnt/etc" "$ubuntu_img" tar cf "/mnt/$etctar" -C /mnt/etc passwd shadow group gshadow
     echo -n "remove volume: "
     docker volume rm "$base-etc"
 fi
@@ -68,9 +68,9 @@ $bin/_run.sh \
 # echo -n 'pause container: '
 # docker pause "$base"
 
-# $etctar から /etc/{passwd,shadow,group} を復元する。
+# $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 # docker run --rm --mount "type=volume,src=$base-home,dst=/tmp/home" --mount "type=volume,src=$base-etc,dst=/tmp/etc" -i ubuntu bash -c "if [ -f $etctar ]; then echo restore volume: $base-etc; rm -fr /tmp/etc/ssh; tar xf $etctar -C /tmp/etc; fi"
-docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group}'; tar xf "$etctar" -C /etc; fi"
+docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf "$etctar" -C /etc; fi"
 
 # $vartar から /var/{log,tmp} を復元する。
 # echo "restore volume: $base-var"
