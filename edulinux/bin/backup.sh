@@ -8,4 +8,4 @@ date="$(date +%Y%m%d)"
 # docker exportではマウントしたボリュームが保存されない。
 # docker export "$base" --output "$base-$date.tar"
 
-time docker cp --archive "$base:/" - > "$base-$date.tar"
+time docker cp --archive "$base:." - > "$base-$date.tar"
