@@ -41,7 +41,9 @@ COPY dbus.conf /etc/supervisor/conf.d/
 # ただし、XRDPログインの場合、接続元が不明
 
 # /var/log/xrdp-sesman.logからlast風のログイン・ログアウト情報を出力するスクリプト
-COPY xrdp-last.sh /usr/local/sbin/
+COPY xrdp_last.sh /usr/local/sbin/
+# /var/log/xrdp.logからXRDPに接続し、ログインしなかった接続元を出力するスクリプト
+COPY xrdp_check.sh /usr/local/sbin/
 
 RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /opt/pulseaudio-module-xrdp /etc/supervisor/conf.d /usr/local/sbin/
 
