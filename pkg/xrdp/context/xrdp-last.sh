@@ -6,7 +6,7 @@ tz="$(date +%:z)"
 # ログの解析用変数
 declare -A map
 declare -A login_time_map
-declare -A ip_map
+declare -A session_map
 # declare -A logout_time_map
 
 # 日時フォーマット変換関数
@@ -29,7 +29,7 @@ while IFS= read -r line; do
         ip="${BASH_REMATCH[5]}"
         user="${BASH_REMATCH[6]}"
         ip="${ip#::ffff:}"
-        ip_map["$ip"]="$session"
+        session_map["$ip"]="$session"
         ip="${ip%:*}"
         map["$session"]="$user\t$display\t$ip"
         login_time_map["$session"]="$timestamp"
@@ -39,7 +39,7 @@ while IFS= read -r line; do
         session="${BASH_REMATCH[5]}"
         ip="${BASH_REMATCH[6]}"
         ip="${ip#::ffff:}"
-        ip_map["$ip"]="$session"
+        session_map["$ip"]="$session"
         ip="${ip%:*}"
         map["$session"]="$user\t$display\t$ip"
     elif [[ "$line" =~ ^\[([0-9]+)-([0-9:]+)\].*terminated\ session:.*username[[:space:]]+([^,]+),.*display[[:space:]]+([^,]+),.*session_pid[[:space:]]+([0-9]+),.*ip[[:space:]]+([^[:space:]]+) ]]; then
@@ -56,10 +56,13 @@ done < "$log_file"
 
 LC_ALL=C netstat --numeric --tcp | while read Proto RecvQ SendQ LocalAddress ForeignAddress State; do
     if [[ "$LocalAddress" =~ [0-9]+.[0-9]+.[0-9]+.[0-9]+:3389 ]]; then
-        session="${ip_map[$ForeignAddress]}"
-        echo -e "${map[$session]}\t${login_time_map[$session]}   still logged in"
+        session="${session_map[$ForeignAddress]}"
+        login_time="${login_time_map[$session]}"
+        if [[ "$login_time" != "" ]]; then
+            echo -e "${map[$session]}\t$login_time   still logged in"
+            unset login_time_map["$session"]
+        fi
         unset map["$session"]
-        unset login_time_map["$session"]
     fi
 done
     
