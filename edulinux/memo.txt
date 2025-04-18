@@ -1,3 +1,38 @@
+2025/4/17 Thu
+2025年度前期　学生数
+プログラミングIII	44人
+プログラミングIII演習	53人
+高度プログラミングC	26人
+2024年度後期　学生数
+ソフトウェア工学概論	56人
+ソフトウェア品質評価特論	12人
+計 191人（プログラミングIII重複あり）147人
+
+gws2025:/$ df -h
+/dev/sda1       7.3T  150G  7.2T   3% /data1
+
+gdep2021:/$ df -h
+/dev/sdc1       1.8T   13G  1.8T   1% /data2
+
+7.2T - 1.8T = 5.4T
+5.4T / 147 = 37G
+7.2T / 147 = 48G
+
+2025/4/11 Fri
+keyboard
+Windows App
+メニューバー Windows App
+Settings... > General > Use Mac shortcuts ... をオフにする。
+メニューバー Connections
+
+Keyboard Mode: Scancode の場合
+setxkbmap -layout usとすると、英語キーボード
+setxkbmap -layout jpとすると、日本語キーボードだが、\を入力できない。
+
+Keyboard Mode: Unicode の場合
+setxkbmap -layout usとすると、日本語キーボード、
+setxkbmap -layout jpとすると、英語キーボード
+
 2025/4/6 Sun
 症状：Chromiumを起動したとき、「認証が必要です」というダイアログが出てパスワードの入力を求められます。
 Macホストではでない。Ubuntuホストで起こる。
