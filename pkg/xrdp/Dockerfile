@@ -36,7 +36,14 @@ COPY --from=build-stage /opt/pulseaudio-module-xrdp/instfiles/pulseaudio-xrdp.de
 COPY xrdp.conf /etc/supervisor/conf.d/
 COPY dbus.conf /etc/supervisor/conf.d/
 
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /opt/pulseaudio-module-xrdp /etc/supervisor/conf.d
+# ログイン・ログアウト時にログを記録するスクリプト
+# COPY session-log.sh /usr/local/sbin/
+# ただし、XRDPログインの場合、接続元が不明
+
+# /var/log/xrdp-sesman.logからlast風のログイン・ログアウト情報を出力するスクリプト
+COPY xrdp-last.sh /usr/local/sbin/
+
+RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /opt/pulseaudio-module-xrdp /etc/supervisor/conf.d /usr/local/sbin/
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 COPY config.sh /tmp/

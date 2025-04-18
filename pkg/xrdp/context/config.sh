@@ -15,3 +15,11 @@ echo "pulseaudio --start" > /etc/profile.d/pulseaudio.sh
 # mv /tmp/xrdp.ini /etc/xrdp/
 mkdir -p /var/run/dbus
 dbus-uuidgen > /var/run/dbus/machine-id
+
+# ログイン・ログアウト時にログを記録するスクリプトを起動する。
+# echo 'session optional pam_exec.so /usr/local/sbin/session-log.sh' >> /etc/pam.d/common-session
+# ただし、XRDPログインの場合、接続元が不明
+
+# wtmpへの記録を追加する。
+# echo 'session	required	pam_utmp.so' >> /etc/pam.d/xrdp-sesman
+# 無効
