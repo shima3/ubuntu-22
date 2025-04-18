@@ -1,0 +1,27 @@
+2025/4/14 Mon
+症状：SSHログインは/var/log/wtmpに記録されるが、XRDPログインは記録されない。
+
+理由：
+・utmp, wtmp, btmp のレガシー性
+これらのログファイルは UNIX 時代から使われてきた 古い形式であり、固定長レコードベースのファイルです。
+複数プロセスによる同時書き込みに対応しておらず、ロック機構が脆弱です。
+
+・wtmpに記録するpam_utmp.soは推奨されない。
+pam_utmp.so は utmp や wtmp に対して直接ファイル書き込みを行いますが、これはsetuid root権限で動作することが多く、攻撃対象になりうるため、最小権限の原則に反します。
+書き込み先が直接 /var/log/wtmp のような共有ファイルであるため、ファイル破損や改ざんのリスクがあります。
+特に複数ユーザーの並行ログインやGUIセッションでは、 pam_utmp.so による記録が不完全だったり、エラーを引き起こすことがあります。
+Wayland環境、仮想端末、非POSIX互換のGUIセッション（XRDPなど）では pam_utmp.so は非推奨。
+
+代替策：pkg/xrdp
+pam_exec.so を使ってログイン・ログアウトを記録
+
+/usr/local/sbin/session-log.shに以下を記述する。
+echo "$(date): $PAM_USER $PAM_TYPE from $PAM_RHOST" >> /var/log/session.log
+
+/etc/pam.d/common-sessionに以下を追記する。
+session optional pam_exec.so /usr/local/sbin/session-log.sh
+
+2025/4/12 Sat
+ビルドを効率化するため、アプリごとにパッケージをダウンロード済みのイメージを作る。
+これを Package Image と呼ぶ。
+
