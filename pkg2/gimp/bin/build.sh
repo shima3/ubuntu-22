@@ -33,4 +33,3 @@ function pkg_pull(){
 
 # if ! docker build --build-arg "PACKAGE=$PACKAGE" --tag "test:$base" --target test-stage context; then exit 1; fi
 if ! docker build --build-arg "PACKAGE=$PACKAGE" --tag "pkg:$base" --target package-stage --label "OS-Ver=$osver" context; then exit 1; fi
-if ! docker build --tag "test:$base" trash; then exit 1; fi
