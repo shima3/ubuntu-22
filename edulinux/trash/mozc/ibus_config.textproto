@@ -1,5 +1,0 @@
-engines {
-  name : "mozc-jp"
-  longname : "Mozc"
-  layout : "default"
-}

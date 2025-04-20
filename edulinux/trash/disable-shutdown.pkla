@@ -1,6 +1,0 @@
-[Disable Shutdown for Normal Users]
-Identity=unix-user:*
-Action=org.freedesktop.login1.power-off;org.freedesktop.login1.reboot
-ResultActive=no
-ResultInactive=no
-ResultAny=no
