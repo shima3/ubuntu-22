@@ -19,7 +19,7 @@ function inspect(){
 local_img="pkg:$base"
 echo "local image: $local_img"
 
-local_created="$(inspect --format {{.Created}} $local_img)"
+local_created="$(inspect --format {{.Created}} $local_img 2> /dev/null)"
 echo "local created: $local_created"
 
 arch="$(inspect --format {{.Architecture}} ubuntu)"
@@ -28,7 +28,8 @@ echo "arch: $arch"
 remote_img="$reg/$osver-pkg:${base}_$arch"
 echo "remote image: $remote_img"
 
-remote_created="$(docker manifest inspect $remote_img 2> /dev/null | jq -r '.manifests[0].digest' | xargs -I {} docker image inspect {} --format '{{.Created}}')"
+# remote_created="$(docker manifest inspect $remote_img 2> /dev/null | jq -r '.manifests[0].digest' | xargs -I {} docker image inspect {} --format '{{.Created}}')"
+remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq -r '.Created')"
 echo "remote created: $remote_created"
 
 function pull_test(){
