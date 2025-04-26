@@ -29,7 +29,7 @@ remote_img="$reg/$osver-pkg:${base}_$arch"
 echo "remote image: $remote_img"
 
 # remote_created="$(docker manifest inspect $remote_img 2> /dev/null | jq -r '.manifests[0].digest' | xargs -I {} docker image inspect {} --format '{{.Created}}')"
-remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq -r '.Created')"
+remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq --raw-output '.Created')"
 echo "remote created: $remote_created"
 
 function pull_test(){

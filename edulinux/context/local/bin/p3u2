@@ -1,0 +1,18 @@
+#!/bin/bash
+p3r="P3R$(($(date +%Y)-2018))"
+export GIT_DIR="$HOME/$p3r/.git"
+if [[ ! -d "$GIT_DIR" ]]; then
+    echo "先に . p3r を実行してください。"
+    exit 1
+fi
+client_wt="$HOME/client/$p3r"
+if [[ ! -d "$client_wt" ]]; then
+    echo "$client_wt がありません。"
+    exit 1
+fi
+if [[ ! -f "$client_wt/.git" ]]; then
+    git worktree add -B client "$client_wt"
+fi
+git add . && git commit --all --message 'before upload'
+git checkout client -- .
+git add . && git commit --all --message 'upload'

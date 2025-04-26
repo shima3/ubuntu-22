@@ -49,6 +49,9 @@ EXPOSE 80
 COPY --from=pkg:gimp / /
 RUN /install
 
+COPY --from=pkg:python / /
+RUN /install
+
 # RUN rm /install
  
 # Ctrl+Shift+SpaceでIME切り替え
@@ -64,6 +67,10 @@ RUN /install
 # COPY profile.d/screensaver.sh /etc/profile.d/
 COPY screensaver.sh /etc/X11/Xsession.d/99screensaver
 
+# リダイレクトフォルダがあればデスクトップからリンクする。
+# COPY client_folder.sh /etc/X11/Xsession.d/99client_folder
+COPY client_folder.desktop /etc/skel/.config/autostart/
+
 # PATH, history, nano, clientの設定
 COPY skel/ /etc/skel/
 # thinclient_drives -> .thinclient_drives
@@ -72,7 +79,7 @@ COPY sesman.ini /etc/xrdp/
 # 授業用スクリプト
 COPY local/ /usr/local/
 
-# シャットダウンメニューを非表示にしようとしたが失敗した。
+# シャットダウンメニューを非表示にしようとしたが上手くいかなかった。
 # COPY disable-shutdown.pkla /etc/polkit-1/localauthority/50-local.d/
 # COPY polkit.conf /etc/supervisor/conf.d/
 # COPY dbus.conf /etc/supervisor/conf.d/

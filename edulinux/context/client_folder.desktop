@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/usr/local/bin/client_folder.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=ClientFolder
+Comment=クライアントのフォルダへのリンクをデスクトップに作成する。

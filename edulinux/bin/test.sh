@@ -7,6 +7,7 @@ base="${PWD##*/}"
 
 bin/_run.sh \
     -dit \
+    -v $PWD/context/local/bin:/usr/local/bin \
     "$base"
 
 #       --name "$base" --hostname "$base" \
@@ -16,11 +17,8 @@ bin/_run.sh \
 
 # docker exec "$base" useradd -g users -m -s /bin/bash student
 # echo 'student:1883shima' | docker exec -i "$base" chpasswd
-docker exec "$base" reset-password.sh student 1883shima
-echo 'Shima Group Student' | docker exec --interactive --user student "$base" config-git.sh shima@hiroshima-cu.ac.jp
-
-docker exec "$base" useradd -g users -m -s /bin/bash shima
-echo 'shima:18830743' | docker exec -i "$base" chpasswd
+docker exec "$base" reset-password.sh a20999 18830743
+echo 'Dummy User' | docker exec --interactive --user a20999 "$base" config-git.sh a20999@e.hiroshima-cu.ac.jp
 
 docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK

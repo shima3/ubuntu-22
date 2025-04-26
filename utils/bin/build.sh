@@ -18,6 +18,8 @@ PACKAGE="\
   xz-utils \
   "
 
+# python3-pip
+
 # bin="$(dirname $0)"
 # cd "$bin/.."
 cd "${0%/*}/.."

@@ -28,8 +28,9 @@ RUN apt-get install --yes --download-only --fix-broken --fix-missing $PACKAGE
 # RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/X11/Xsession.d/99keyboard-layout
 # COPY keyboard /etc/default/
 # RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/default/keyboard
-COPY kbdtg /usr/local/bin/
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /usr/local/bin/kbdtg
+# COPY kbdtg /usr/local/bin/
+# RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /usr/local/bin/kbdtg
+RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists
 
 RUN echo 'apt-get clean' > /install
 RUN echo 'tar Jxf /pkg.tar.xz' >> /install

@@ -1,3 +1,17 @@
+2025/4/24 Thu
+GIT_DIR=~/P3R7/.git
+GIT_WORK_TREE=~/client/P3R7
+git add .
+git commit -m upload
+GIT_WORK_TREE=~/P3R7
+git clean -d --force
+git checkout --force
+
+if [[ ! -d "GIT_WORK_TREE" ]]; then
+  echo "$GIT_WORK_TREE がありません。"
+  exit 1
+fi
+
 2025/4/17 Thu
 2025年度前期　学生数
 プログラミングIII	44人
