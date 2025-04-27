@@ -35,7 +35,7 @@ function pkg_pull(){
         echo "Skip: $remote <= $local"
     fi
 }
-for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do pkg_pull $pkg; done
+# for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do pkg_pull $pkg; done
 
 list="$(docker ps --filter ancestor=$base -q)"
 if [ "$list" != "" ]; then docker rm -f "$list"; fi
