@@ -1,0 +1,29 @@
+#!/bin/bash
+dir="${PWD#/home/*/}"
+dir="${dir%%/*}"
+if [[ "$dir" != '.thinclient_drives' ]]; then
+    echo 'デスクトップのホームにある client からクライアントのフォルダで「端末の中に開く」を選び、開いた端末で実行してください。'
+    exit 1
+fi
+client_wt="$PWD"
+script="${0##*/}"
+p3r="P3R$(($(date +%Y)-2018))"
+server_wt="$HOME/$p3r"
+export GIT_DIR="$server_wt/.git"
+if [[ ! -d "$GIT_DIR" ]]; then
+    echo "先に . p3r を実行してください。"
+    exit 1
+fi
+
+echo "$client_wt -> history"
+cd "$client_wt"
+git add . && git commit --all --message "$script: $client_wt" > /dev/null && git tag --force backup
+
+echo "$server_wt -> history"
+cd "$server_wt"
+git add . && git commit --all --message "$script: $server_wt" > /dev/null
+
+echo "history -> $client_wt"
+cd "$client_wt"
+git clean -d --force --quiet .
+git checkout --force --quiet .

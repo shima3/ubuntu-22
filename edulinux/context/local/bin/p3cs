@@ -14,13 +14,16 @@ if [[ ! -d "$GIT_DIR" ]]; then
     echo "先に . p3r を実行してください。"
     exit 1
 fi
-cd "$server_wt"
+
 echo "$server_wt -> history"
-git add . && git commit --all --message "$script: $server_wt" > /dev/null
+cd "$server_wt"
+git add . && git commit --all --message "$script: $server_wt" > /dev/null && git tag --force backup
+
 echo "$client_wt -> history"
 cd "$client_wt"
 git add . && git commit --all --message "$script: $client_wt" > /dev/null
-cd "$server_wt"
+
 echo "history -> $server_wt"
+cd "$server_wt"
 git clean -d --force --quiet .
 git checkout --force --quiet .

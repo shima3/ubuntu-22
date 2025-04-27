@@ -2,7 +2,7 @@
 # echo -n 'client_folder.sh: start at ' >> /tmp/a.log
 # date >> /tmp/a.log
 target_dir="$HOME/.thinclient_drives"
-link_name="$HOME/デスクトップ/MyPC"
+link_name="$HOME/デスクトップ/client"
 if [ -L "$link_name" ]; then
     rm "$link_name"
 fi
