@@ -6,8 +6,8 @@ ARG PACKAGE
 RUN rm /etc/dpkg/dpkg.cfg.d/excludes
 RUN echo "Y" | unminimize
 
-RUN apt-get clean && apt-get update
-RUN apt-get install --yes --fix-missing locales tzdata
+RUN apt-get clean
+RUN apt-get update && apt-get install --yes --fix-missing locales tzdata
 
 # ENV TZ=Japan
 ENV TZ=Asia/Tokyo
