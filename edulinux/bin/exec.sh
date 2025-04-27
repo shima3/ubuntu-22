@@ -4,4 +4,8 @@ script="$(readlink -f $0)"
 bin="${script%/*}"
 cd "$bin/.."
 base=$(basename $PWD)
-docker exec -it $base bash
+if [[ "$*" == "" ]]
+then cmd="bash"
+else cmd="$*"
+fi
+docker exec -it $base $cmd
