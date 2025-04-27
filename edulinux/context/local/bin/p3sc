@@ -2,7 +2,7 @@
 dir="${PWD#/home/*/}"
 dir="${dir%%/*}"
 if [[ "$dir" != '.thinclient_drives' ]]; then
-    echo 'デスクトップのホームにある client からクライアントのフォルダで「端末の中に開く」を選び、開いた端末で実行してください。'
+    echo 'クライアントのフォルダで実行してください。'
     exit 1
 fi
 client_wt="$PWD"
