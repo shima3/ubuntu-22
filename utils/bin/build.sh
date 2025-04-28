@@ -1,6 +1,6 @@
 #!/bin/bash
 PACKAGE="\
-  apt-file apt-transport-https autoconf \
+  apt-file apt-transport-https apt-utils autoconf \
   bash build-essential \
   coreutils curl \
   dconf-editor dnsutils dpkg-dev \

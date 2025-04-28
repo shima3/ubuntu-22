@@ -20,5 +20,9 @@ bin/_run.sh \
 docker exec "$base" reset-password.sh a20999 18830743
 echo 'Dummy User' | docker exec --interactive --user a20999 "$base" config-git.sh a20999@e.hiroshima-cu.ac.jp
 
+bin/exec.sh useradd -m -s /bin/bash shima
+bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
+echo 'Kazuyuki Shima' | docker exec --interactive --user shima "$base" config-git.sh shima@hiroshima-cu.ac.jp
+
 docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK

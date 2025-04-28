@@ -1,9 +1,8 @@
 #!/bin/bash
-args="$*"
-/usr/bin/python3 $args
+# args=("$@")
+/usr/bin/python3 "$@"
 status="$?"
-if [[ "$status" == "0" ]]; then
-    git add *.py 2> /dev/null > /dev/null
-    git commit --message="Status $status: python $args" 2> /dev/null > /dev/null
+if git add *.py 2> /dev/null > /dev/null
+then git commit --message="Status $status: python $*" 2> /dev/null > /dev/null
 fi
 exit "$status"
