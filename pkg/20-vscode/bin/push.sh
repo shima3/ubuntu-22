@@ -3,26 +3,26 @@ reg="kshima"
 script="$(readlink -f $0)"
 # bin="$(dirname $0)"
 bin="${script%/*}"
-cd $bin/..
-base="${PWD##*/}"
+cd "$bin/.."
+# base="$(basename $PWD)"
+base="${PWD##*/[0-9]?-}"
 osver="$(basename ${PWD%/*/*})"
-# pkgname="$(basename $PWD)"
-# pkgrepo="pkg_$pkgname"
+# pkg_base="pkg_$base"
 pkg="pkg:$base"
 
-# imgid="$(docker images -q $pkgrepo)"
-# UbuntuVersion="$(docker inspect --format '{{.Config.Labels.UbuntuVersion}}' $imgid)"
-# Architecture="$(docker inspect --format '{{.Architecture}}' $imgid)"
-# if [ "$UbuntuVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
+# img="$pkg_base:latest"
+# OSVersion="$(docker inspect --format '{{.Config.Labels.OSVersion}}' $img)"
+# Architecture="$(docker inspect --format '{{.Architecture}}' $img)"
+# if [ "$OSVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
 id=($(docker images "$pkg" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 
-# img="$reg/$pkgrepo:ubuntu${UbuntuVersion%%.*}$Architecture"
+# img="$reg/$pkg_base:${OSVersion%%.*}$Architecture"
 img="$reg/$osver-${pkg}_$arch"
 imgym="$reg/$osver-${pkg}_$ym$arch"
 
-# docker tag "$pkgrepo" "$img"
+# docker tag "$pkg_base" "$img"
 docker tag "$pkg" "$img"
 docker tag "$pkg" "$imgym"
 

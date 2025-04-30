@@ -1,4 +1,5 @@
-FROM utils AS download-stage
+# FROM utils AS download-stage
+FROM base AS download-stage
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PACKAGE
 
@@ -21,8 +22,8 @@ COPY --from=download-stage /pkg.tar.xz /
 COPY --from=download-stage /install /
 
 # ------------------------------------------------------------------
-# FROM xz-utils AS install-stage
-FROM utils AS test-stage
+# FROM utils AS test-stage
+FROM base AS test-stage
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY --from=package-stage / /

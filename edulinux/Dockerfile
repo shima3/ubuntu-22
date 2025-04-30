@@ -1,4 +1,5 @@
-FROM utils
+# FROM utils
+FROM base
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean
@@ -50,6 +51,9 @@ COPY --from=pkg:gimp / /
 RUN /install
 
 COPY --from=pkg:python / /
+RUN /install
+
+COPY --from=pkg:utils / /
 RUN /install
 
 # RUN rm /install

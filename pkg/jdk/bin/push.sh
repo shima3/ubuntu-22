@@ -1,18 +1,25 @@
 #!/bin/bash
 reg="kshima"
-# bin="$(dirname $0)"
-# cd "$bin/.."
-# base="$(basename $PWD)"
-# pkg_base="pkg_$base"
-cd "${0%/*}/.."
+script="$(readlink -f $0)"
+bin="${script%/*}"
+# cd "${0%/*}/.."
+cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*/*})"
+pkg="pkg:$base"
 
-# OSVersion="$(docker inspect --format '{{.Config.Labels.OSVersion}}' --type=image $pkg_base)"
-# Architecture="$(docker inspect --format '{{.Architecture}}' $pkg_base)"
-# if [ "$OSVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
+id=($(docker images "$pkg" --format '{{.ID}}'))
+arch="$(docker inspect $id --format '{{.Architecture}}')"
+ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 
-img="$reg/$osver-pkg:${base}_$Architecture"
-docker tag "pkg:$base" "$img"
+# img="$reg/$osver-pkg:${base}_$Architecture"
+img="$reg/$osver-${pkg}_$arch"
+imgym="$reg/$osver-${pkg}_$ym$arch"
+
+# docker tag "pkg:$base" "$img"
+docker tag "$pkg" "$img"
+docker tag "$pkg" "$imgym"
+
 docker-login.sh
 docker push "$img"
+docker push "$imgym"

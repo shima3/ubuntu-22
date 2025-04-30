@@ -1,5 +1,5 @@
-# FROM ubuntu AS update-stage
-FROM utils AS download-stage
+# FROM utils AS download-stage
+FROM base AS download-stage
 ARG DEBIAN_FRONTEND="noninteractive"
 # ARG PACKAGES="apache2 php"
 ARG PACKAGE
@@ -28,8 +28,8 @@ COPY --from=download-stage /context.tar.xz /
 COPY --from=download-stage /install /
 
 # ------------------------------------------------------------------
-# FROM update-stage AS install-stage
-FROM utils AS test-stage
+# FROM utils AS test-stage
+FROM base AS test-stage
 ARG DEBIAN_FRONTEND="noninteractive"
 
 # COPY --from=pkg_locales / /

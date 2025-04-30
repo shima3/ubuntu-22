@@ -1,21 +1,14 @@
 #!/bin/bash
-# bin=$(dirname $0)
-# cd "$bin/.."
-cd "${0%/*}/.."
-# base="$(basename $PWD)"
-base="${PWD##*/}"
-osver="$(basename ${PWD%/*})"
-
-# ubuntu="ubuntu:22.04"
-# docker pull "$ubuntu"
-# docker tag "$ubuntu" ubuntu
-
-img="${osver/-/:}.04"
-docker pull "$img"
-docker tag "$img" ubuntu
+script="$(readlink -f $0)"
+# cd "${0%/*}/.."
+bin="${script%/*}"
+cd "$bin/.."
+# base="${PWD##*/}"
+base="${PWD##*/[0-9]?-}"
+osver="$(basename ${PWD%/*/*})"
 
 # OSVersion="$(docker inspect --format '{{json .Config.Labels}}' --type=image ubuntu:latest | jq --raw-output --join-output '.["org.opencontainers.image.ref.name"], .["org.opencontainers.image.version"]')"
-# Architecture="$(docker inspect --format '{{.Architecture}}' --type=image ubuntu:latest)"
+Architecture="$(docker inspect --format '{{.Architecture}}' ubuntu:latest)"
 # if [ "$OSVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
 
 # tag="${OSVersion%%.*}$Architecture"
@@ -38,14 +31,15 @@ function pkg_pull(){
 # for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do pkg_pull $pkg; done
 
 list="$(docker ps --filter ancestor=$base -q)"
-if [ "$list" != "" ]; then docker stop $list; fi
+if [ "$list" != "" ]; then docker rm -f "$list"; fi
 
-docker build --tag "$base" --label "OS-Ver=$osver" --file Dockerfile context
+cd context
+rm vscode.deb
+ln -s code_*_${Architecture}.deb vscode.deb
+cd ..
+
+if ! docker build --tag "test:$base" --target test-stage -f Dockerfile context; then exit 1; fi
+if ! docker build --tag "pkg:$base" --target package-stage --label "OS-Ver=$osver" -f Dockerfile context; then exit 1; fi
 
 # docker-remove-nameless-images
-list=`docker ps -q -f status=exited; docker ps -q -f status=created`
-if [ "$list" != "" ]; then docker rm $list; fi
-list="$(docker images -f dangling=true -q)"
-if [ "$list" != "" ]; then docker rmi $list; fi
-
-echo -e "\a\a\a"
+exit 0

@@ -1,18 +1,22 @@
 #!/bin/bash
-# bin=$(dirname $0)
-# cd "$bin/.."
-cd "${0%/*}/.."
-# base="$(basename $PWD)"
-base="${PWD##*/}"
-osver="$(basename ${PWD%/*})"
+PACKAGE="\
+  fonts-ipafont fonts-noto-cjk fonts-noto-cjk-extra fonts-takao \
+  ibus ibus-mozc \
+  language-pack-ja language-pack-ja-base language-pack-gnome-ja \
+  libreoffice-help-ja libreoffice-l10n-ja \
+  mozc-utils-gui \
+  "
 
-# ubuntu="ubuntu:22.04"
-# docker pull "$ubuntu"
-# docker tag "$ubuntu" ubuntu
+# fcitxはインジケーターをクリックするとハングアップする。
+# fcitx fcitx-mozc fcitx-anthy fcitx-config-gtk fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-ui-classic
 
-img="${osver/-/:}.04"
-docker pull "$img"
-docker tag "$img" ubuntu
+script="$(readlink -f $0)"
+# cd "${0%/*}/.."
+bin="${script%/*}"
+cd "$bin/.."
+# base="${PWD##*/}"
+base="${PWD##*/[0-9]?-}"
+osver="$(basename ${PWD%/*/*})"
 
 # OSVersion="$(docker inspect --format '{{json .Config.Labels}}' --type=image ubuntu:latest | jq --raw-output --join-output '.["org.opencontainers.image.ref.name"], .["org.opencontainers.image.version"]')"
 # Architecture="$(docker inspect --format '{{.Architecture}}' --type=image ubuntu:latest)"
@@ -37,15 +41,9 @@ function pkg_pull(){
 }
 # for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do pkg_pull $pkg; done
 
-list="$(docker ps --filter ancestor=$base -q)"
-if [ "$list" != "" ]; then docker stop $list; fi
-
-docker build --tag "$base" --label "OS-Ver=$osver" --file Dockerfile context
+if ! docker build --tag "pkg:$base" --target package-stage --build-arg "PACKAGE=$PACKAGE" --label "OS-Ver=$osver" --file Dockerfile context; then exit 1; fi
+if ! docker build --tag "test:$base" --target test-stage --build-arg "PACKAGE=$PACKAGE" --file Dockerfile context; then exit 1; fi
 
 # docker-remove-nameless-images
-list=`docker ps -q -f status=exited; docker ps -q -f status=created`
-if [ "$list" != "" ]; then docker rm $list; fi
-list="$(docker images -f dangling=true -q)"
-if [ "$list" != "" ]; then docker rmi $list; fi
 
 echo -e "\a\a\a"

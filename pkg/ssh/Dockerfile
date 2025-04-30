@@ -1,12 +1,6 @@
-# FROM ubuntu AS update-stage
-FROM utils AS update-stage
+# FROM utils AS update-stage
+FROM base AS update-stage
 
-# RUN apt-get clean
-
-# COPY --from=pkg_xz-utils / /
-# RUN /install && rm /install
-
-# RUN apt-get update
 RUN apt-get clean && apt-get update
 
 # ------------------------------------------------------------------
