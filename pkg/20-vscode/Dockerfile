@@ -25,8 +25,8 @@ FROM scratch AS package-stage
 LABEL maintainer="Kazuyuki Shima <shima@hiroshima-cu.ac.jp>"
 
 # COPY --from=download-stage /pkg.tar.xz /
-# COPY --from=download-stage /vscode.deb /
-COPY vscode.deb /
+COPY --from=download-stage /vscode.deb /
+# COPY vscode.deb /
 COPY --from=download-stage /install /
 
 # -----------------------------------------------------------------------------
