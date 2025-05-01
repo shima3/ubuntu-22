@@ -19,8 +19,7 @@ osver="${root##*/}"
 
 $root/base/bin/pull.sh
 # for dir in $root/pkg/*; do $dir/bin/pull.sh; done
-for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); d
-o $pkg/bin/pull.sh; done
+for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do $pkg/bin/pull.sh; done
 
 list="$(docker ps --filter ancestor=$base -q)"
 if [ "$list" != "" ]; then docker stop $list; fi
