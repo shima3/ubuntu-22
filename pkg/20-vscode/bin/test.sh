@@ -1,10 +1,6 @@
 #!/bin/bash
-# TZ=Asia/Tokyo
-# bin=$(dirname $0)
-# cd "$bin/.."
-# name=$(basename $PWD)
 cd "${0%/*}/.."
-base="${PWD##*/}"
+base="${PWD##*/[0-9]?-}"
 
 xrdp_port=3333
 list=$(docker ps --format json | jq --raw-output 'select(.Ports | test("^.*:'$xrdp_port'->.*/tcp$")) | .ID')
@@ -24,8 +20,11 @@ docker run \
 
 # -e TZ=$TZ \
 
-docker exec "$base" useradd -m -s /bin/bash student
-echo student:1883shima | docker exec -i "$base" chpasswd
+# docker exec "$base" useradd -m -s /bin/bash student
+# echo student:1883shima | docker exec -i "$base" chpasswd
+user=a20999
+bin/exec.sh useradd -g users -m -s /bin/bash "$user"
+bin/exec.sh usermod --password '$y$j9T$C5nrs3yRKRbxWJbXQDE17/$T4k4l0PZtaJOVk.9gvuJsFXJOBX4esUbbkqWGq1XVeD' "$user"
 
 docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK

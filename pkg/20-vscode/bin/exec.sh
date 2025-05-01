@@ -1,5 +1,12 @@
 #!/bin/bash
-bin=$(dirname $0)
+script="$(readlink -f $0)"
+# bin=$(dirname $0)
+bin="${script%/*}"
 cd "$bin/.."
-name=$(basename $PWD)
-docker exec -it $name bash
+base="${PWD##*/[0-9]?-}"
+if [[ "$*" == "" ]]
+then cmd="bash"
+else cmd="$*"
+fi
+docker exec -it $base $cmd
+
