@@ -1,23 +1,37 @@
 #!/bin/bash
-img="$1"
+reg="kshima"
+script="$(readlink -f $0)"
+bin="${script%/*}"
+cd "$bin/.."
+base="${PWD##*/}"
+osver="$(basename ${PWD%/*})"
+local_img="$base"
 
-if [ "$img" == "" ]; then
-    echo 'Usage: pull.sh IMAGE'
-    exit 0
+os_img="${osver/-/:}.04"
+docker pull "$os_img"
+id=($(docker images "$os_img" --format '{{.ID}}'))
+arch="$(docker inspect $id --format '{{.Architecture}}')"
+# echo "$arch"
+remote_img="$reg/$osver-$local_img:$arch"
+# echo "$img"
+
+# if ! remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq --raw-output .Created)"; then
+remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq --raw-output .Created)"
+if [[ "$remote_created" == "" ]] ; then
+    echo "$remote_img is not found"
+    exit 1
+fi
+echo "$remote_created: $remote_img"
+
+# if local_created="$(docker image inspect $local_img --format '{{.Created}}' 2> /dev/null)"; then
+local_created="$(docker image inspect $local_img --format '{{.Created}}' 2> /dev/null)"
+if [[ "$local_created" != "" ]] ; then
+    echo "$local_created: $local_img"
+    if ! [[ "$local_created" < "$remote_created" ]]; then
+        echo "$local_img is newer than or equal to $remote_img"
+        exit 0
+    fi
 fi
 
-# REMOTE_CREATED=$(docker manifest inspect "$img" | jq -r '.manifests[0].digest' | xargs -I {} docker image inspect {} --format '{{.Created}}' 2>/dev/null || echo "not_found")
-REMOTE_CREATED="$(skopeo inspect docker://$img 2> /dev/null | jq --raw-output '.Created' || echo not_found)"
-LOCAL_CREATED=$(docker image inspect "$img" --format '{{.Created}}' 2> /dev/null || echo "not_found")
-
-if [ "$REMOTE_CREATED" == "not_found" ]; then
-    echo "リモートイメージ情報を取得できませんでした。"
-elif [ "$LOCAL_CREATED" == "not_found" ]; then
-    echo "ローカルイメージが存在しません。pull します。"
-    docker pull "$img"
-elif [[ "$REMOTE_CREATED" > "$LOCAL_CREATED" ]]; then
-    echo "リモートの方が新しいため更新します。"
-    docker pull "$img"
-else
-    echo "ローカルの方が新しい、または同じため更新しません。"
-fi
+docker pull "$remote_img"
+docker tag "$remote_img" "$local_img"
