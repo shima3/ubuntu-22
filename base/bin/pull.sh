@@ -7,7 +7,9 @@ base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
 local_img="$base"
 
-id=($(docker images "${osver/-/:}.04" --format '{{.ID}}'))
+os_img="${osver/-/:}.04"
+docker pull "$os_img"
+id=($(docker images "$os_img" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"
 # echo "$arch"
 remote_img="$reg/$osver-$local_img:$arch"

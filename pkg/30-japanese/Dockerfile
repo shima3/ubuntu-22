@@ -1,8 +1,5 @@
-# FROM utils AS update-stage
 FROM base AS update-stage
 ARG DEBIAN_FRONTEND="noninteractive"
-# ENV LANG="ja_JP.UTF-8"
-# ENV TZ="Japan"
 
 RUN apt-get clean
 
@@ -13,7 +10,6 @@ COPY --from=pkg:mate / /
 RUN /install
 
 RUN apt-get clean
-# RUN apt-get update
 
 # ------------------------------------------------------------------
 FROM update-stage AS download-stage
@@ -23,7 +19,7 @@ ARG PACKAGE
 # RUN apt-get install --yes --download-only $PACKAGE
 # RUN apt-get install --yes --download-only --fix-missing $PACKAGE
 # RUN apt-get install --yes --download-only --fix-broken --fix-missing $PACKAGE
-RUN apt-get clean && apt-get install --yes --download-only --fix-broken --fix-missing $PACKAGE
+RUN apt-get update && apt-get install --yes --download-only --fix-broken --fix-missing $PACKAGE
 # RUN apt-get clean && apt-get install --yes --download-only --fix-missing $PACKAGE
 # COPY 99keyboard-layout /etc/X11/Xsession.d/
 # RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/X11/Xsession.d/99keyboard-layout
