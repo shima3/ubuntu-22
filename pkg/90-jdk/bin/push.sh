@@ -21,6 +21,6 @@ imgym="$reg/$osver-${pkg}_$ym$arch"
 docker tag "$pkg" "$img"
 docker tag "$pkg" "$imgym"
 
-docker-login.sh
+# docker-login.sh
 docker push "$img"
 docker push "$imgym"
