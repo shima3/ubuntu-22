@@ -1,28 +1,25 @@
 #!/bin/bash
 reg="kshima"
-# bin="$(dirname $0)"
 script="$(readlink -f $0)"
 bin="${script%/*}"
-cd "$bin/.."
-# base="$(basename $PWD)"
+cd $bin/..
+# base="${PWD##*/}"
 base="${PWD##*/[0-9]?-}"
 osver="$(basename ${PWD%/*/*})"
-# pkg_base="pkg_$base"
 pkg="pkg:$base"
 
 id=($(docker images "$pkg" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 
-# img="$reg/$pkg_base:${OSVersion%%.*}$Architecture"
+# img="$reg/$pkgrepo:ubuntu${UbuntuVersion%%.*}$Architecture"
 img="$reg/$osver-${pkg}_$arch"
 imgym="$reg/$osver-${pkg}_$ym$arch"
 
-# docker tag "$pkg_base" "$img"
+# docker tag "$pkgrepo" "$img"
 docker tag "$pkg" "$img"
 docker tag "$pkg" "$imgym"
 
 docker-login.sh
 docker push "$img"
 docker push "$imgym"
-

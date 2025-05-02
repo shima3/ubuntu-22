@@ -17,13 +17,19 @@ function inspect(){
     IMAGE_ID=($(docker images "$last_arg" --format "{{.ID}}"))
     docker image inspect ${args_except_last[@]} "$IMAGE_ID"
 }
+# Architecture="$(inspect --format '{{.Architecture}}' $pkg)"
 
-# Architecture="$(docker inspect --format '{{.Architecture}}' --type=image pkg:$base)"
-Architecture="$(inspect --format '{{.Architecture}}' $pkg)"
+id=($(docker images "$pkg" --format '{{.ID}}'))
+arch="$(docker inspect $id --format '{{.Architecture}}')"
+ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 
-# img="$reg/$osver-pkg:${base}_$Architecture"
-img="$reg/$osver-${pkg}_$Architecture"
-# docker tag "pkg:$base" "$img"
+# img="$reg/$osver-${pkg}_$Architecture"
+img="$reg/$osver-${pkg}_$arch"
+imgym="$reg/$osver-${pkg}_$ym$arch"
+
 docker tag "$pkg" "$img"
+docker tag "$pkg" "$imgym"
+
 docker-login.sh
 docker push "$img"
+docker push "$imgym"

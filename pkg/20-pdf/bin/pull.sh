@@ -29,3 +29,4 @@ fi
 
 docker pull "$remote_img"
 docker tag "$remote_img" "$local_img"
+exit 0

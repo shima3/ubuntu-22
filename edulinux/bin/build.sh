@@ -1,6 +1,8 @@
 #!/bin/bash
+# 実行中ではないコンテナを削除する。
 list=`docker ps -q -f status=exited; docker ps -q -f status=created`
 if [ "$list" != "" ]; then docker rm $list; fi
+# 名前のないイメージを削除する。
 list="$(docker images -f dangling=true -q)"
 if [ "$list" != "" ]; then docker rmi $list; fi
 
@@ -19,7 +21,7 @@ osver="${root##*/}"
 
 $root/base/bin/pull.sh
 # for dir in $root/pkg/*; do $dir/bin/pull.sh; done
-for pkg in $(awk '/^COPY --from=pkg_/{ print substr($2, 12); }' Dockerfile); do $pkg/bin/pull.sh; done
+for name in $(awk '/^COPY --from=pkg:/{ print substr($2, 12); }' Dockerfile); do for dir in $root/pkg/[0-9]?-$name $root/pkg/$name
 
 list="$(docker ps --filter ancestor=$base -q)"
 if [ "$list" != "" ]; then docker stop $list; fi

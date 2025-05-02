@@ -3,6 +3,7 @@ reg="kshima"
 script="$(readlink -f $0)"
 bin="${script%/*}"
 cd "$bin/.."
+# base="${PWD##*/}"
 base="${PWD##*/[0-9]?-}"
 osver="$(basename ${PWD%/*/*})"
 local_img="pkg:$base"
@@ -29,4 +30,3 @@ fi
 
 docker pull "$remote_img"
 docker tag "$remote_img" "$local_img"
-exit 0

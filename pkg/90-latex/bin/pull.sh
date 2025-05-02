@@ -3,6 +3,7 @@ reg="kshima"
 script="$(readlink -f $0)"
 bin="${script%/*}"
 cd "$bin/.."
+# base="${PWD##*/}"
 base="${PWD##*/[0-9]?-}"
 osver="$(basename ${PWD%/*/*})"
 local_img="pkg:$base"
@@ -17,10 +18,10 @@ if ! remote_created="$(skopeo inspect docker://$remote_img 2> /dev/null | jq --r
     echo "$remote_img is not found"
     exit 1
 fi
-echo "$remote_created: $remote_img"
 
 if local_created="$(docker image inspect $local_img --format '{{.Created}}' 2> /dev/null)"; then
     echo "$local_created: $local_img"
+    echo "$remote_created: $remote_img"
     if ! [[ "$local_created" < "$remote_created" ]]; then
         echo "$local_img is newer than or equal to $remote_img"
         exit 0

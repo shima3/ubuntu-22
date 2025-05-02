@@ -1,20 +1,13 @@
 #!/bin/bash
 reg="kshima"
 script="$(readlink -f $0)"
-# bin="$(dirname $0)"
 bin="${script%/*}"
 cd "$bin/.."
-# base="$(basename $PWD)"
 base="${PWD##*/[0-9]?-}"
 osver="$(basename ${PWD%/*/*})"
 # pkg_base="pkg_$base"
 pkg="pkg:$base"
 
-# OSVersion="$(docker inspect --format '{{.Config.Labels.OSVersion}}' --type=image $pkg_base)"
-# Architecture="$(docker inspect --format '{{.Architecture}}' $pkg_base)"
-# if [ "$OSVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
-
-# echo "pkg: $pkg"
 id=($(docker images "$pkg" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"

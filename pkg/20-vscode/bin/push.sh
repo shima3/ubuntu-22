@@ -10,19 +10,13 @@ osver="$(basename ${PWD%/*/*})"
 # pkg_base="pkg_$base"
 pkg="pkg:$base"
 
-# img="$pkg_base:latest"
-# OSVersion="$(docker inspect --format '{{.Config.Labels.OSVersion}}' $img)"
-# Architecture="$(docker inspect --format '{{.Architecture}}' $img)"
-# if [ "$OSVersion" == "" -o "$Architecture" == "" ]; then echo "Try again"; exit 1; fi
 id=($(docker images "$pkg" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 
-# img="$reg/$pkg_base:${OSVersion%%.*}$Architecture"
 img="$reg/$osver-${pkg}_$arch"
 imgym="$reg/$osver-${pkg}_$ym$arch"
 
-# docker tag "$pkg_base" "$img"
 docker tag "$pkg" "$img"
 docker tag "$pkg" "$imgym"
 
