@@ -15,7 +15,7 @@ img="$reg/$osver-$base:$arch"
 # img="$reg/$osver-$base:$Architecture"
 docker tag "$base" "$img"
 
-docker-login.sh
+# docker-login.sh
 docker push "$img"
 
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
