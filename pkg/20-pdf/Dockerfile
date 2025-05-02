@@ -2,10 +2,7 @@
 FROM base AS update-stage
 ARG DEBIAN_FRONTEND="noninteractive"
 
-RUN apt-get clean
-
-# COPY --from=pkg_xz-utils / /
-# RUN /install && rm /install
+# RUN apt-get clean
 
 COPY --from=pkg:xrdp / /
 RUN /install && rm /install
