@@ -19,9 +19,10 @@ osver="${root##*/}"
 # docker pull "$img"
 # docker tag "$img" ubuntu
 
-$root/base/bin/pull.sh
-# for dir in $root/pkg/*; do $dir/bin/pull.sh; done
-for name in $(awk '/^COPY --from=pkg:/{ print substr($2, 12); }' Dockerfile); do for dir in $root/pkg/[0-9]?-$name $root/pkg/$name
+# $root/base/bin/pull.sh
+$root/base/bin/ensure.sh
+# for name in $(awk '/^COPY --from=pkg:/{ print substr($2, 12); }' Dockerfile); do $root/pkg/[0-9]?-$name/bin/pull.sh; done
+for name in $(awk '/^COPY --from=pkg:/{ print substr($2, 12); }' Dockerfile); do $root/pkg/[0-9]?-$name/bin/ensure.sh; done
 
 list="$(docker ps --filter ancestor=$base -q)"
 if [ "$list" != "" ]; then docker stop $list; fi
