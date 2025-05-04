@@ -1,4 +1,9 @@
 #!/bin/bash
+if ! which skopeo > /dev/null; then
+    echo 'skopeo: コマンドが見つかりません'
+    exit 1
+fi
+
 # 実行中ではないコンテナを削除する。
 list=`docker ps -q -f status=exited; docker ps -q -f status=created`
 if [ "$list" != "" ]; then docker rm $list; fi
