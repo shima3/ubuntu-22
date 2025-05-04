@@ -1,4 +1,9 @@
 #!/bin/bash
+if ! which skopeo > /dev/null; then
+    echo 'skopeo: コマンドが見つかりません'
+    exit 1
+fi
+
 reg="kshima"
 script="$(readlink -f $0)"
 bin="${script%/*}"
@@ -35,3 +40,4 @@ fi
 
 docker pull "$remote_img"
 docker tag "$remote_img" "$local_img"
+exit 0

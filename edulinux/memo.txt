@@ -1,3 +1,7 @@
+2025/5/4 Sun
+イメージを更新する前にフルバックアップをとる。
+bin/backup.sh
+
 2025/4/24 Thu
 GIT_DIR=~/P3R7/.git
 GIT_WORK_TREE=~/client/P3R7

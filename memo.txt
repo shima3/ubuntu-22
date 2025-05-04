@@ -1,3 +1,6 @@
+base, pkg, edulinuxのビルドに関するメモ
+edulinuxの運用方法などについては、edulinux/memo.txtに記入する。
+
 2025/4/29 Tue
 utilsをbaseとpkg/90-utilsに分ける。
 アプリのインストールに必要なツールはbaseでインストールする。
