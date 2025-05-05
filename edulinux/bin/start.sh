@@ -10,10 +10,11 @@ if ! which jq > /dev/null; then
     exit 1
 fi
 
-ubuntu_img="${osver/-/:}.04"
-docker pull "$ubuntu_img"
-arch="$(docker inspect --format '{{.Architecture}}' --type=image $ubuntu_img)"
-edulinux_img="$reg/$osver-$base:$arch"
+## Ubuntu のアーキテクチャを調べる。
+# ubuntu_img="${osver/-/:}.04"
+# docker pull "$ubuntu_img"
+# arch="$(docker inspect --format '{{.Architecture}}' --type=image $ubuntu_img)"
+# edulinux_img="$reg/$osver-$base:$arch"
 
 ## /etc/{passwd,shadow,group,gshadow} を $etctar に保存する。
 # etctar="/home/.etc.tar"
@@ -35,13 +36,15 @@ if [[ "$list" != "" ]]; then
     docker rm -f "$list"
 fi
 
+## ボリューム $base-etc を削除する。
 volume="$(docker volume inspect --format '{{.Name}}' $base-etc 2> /dev/null)"
 if [ "$volume" != "" ]; then
     echo -n "remove volume: "
     docker volume rm "$base-etc"
 fi
 
-docker pull "$edulinux_img"
+# docker pull "$edulinux_img"
+$bin/ensure.sh
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
@@ -51,7 +54,9 @@ $bin/_run.sh \
     --mount "type=volume,src=$base-etc,dst=/etc" \
     --mount "type=volume,src=$base-home,dst=/home" \
     --ulimit core=0 \
-    "$edulinux_img"
+    $base
+
+#    "$edulinux_img"
 
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
