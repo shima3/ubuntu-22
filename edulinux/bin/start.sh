@@ -4,6 +4,7 @@ bin="${0%/*}"
 cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
+ubuntu_img="${osver/-/:}.04"
 
 if ! which jq > /dev/null; then
     echo 'jq: コマンドが見つかりません'
@@ -11,7 +12,6 @@ if ! which jq > /dev/null; then
 fi
 
 ## Ubuntu のアーキテクチャを調べる。
-# ubuntu_img="${osver/-/:}.04"
 # docker pull "$ubuntu_img"
 # arch="$(docker inspect --format '{{.Architecture}}' --type=image $ubuntu_img)"
 # edulinux_img="$reg/$osver-$base:$arch"
@@ -21,12 +21,13 @@ fi
 etctar="/backup/etc.tar"
 if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg name $base-etc '.[] | select(.Name==$name)')" != "" ]]; then
     echo backup: '/etc/{passwd,shadow,group,gshadow} ->' $etctar
-    docker run --rm \
+    if ! docker run --rm \
     --mount "type=volume,src=$base-etc,dst=/mnt/etc" \
     --mount "type=volume,src=$base-backup,dst=/mnt/backup" \
     "$ubuntu_img" \
-    tar cf "/mnt$etctar" -C /mnt/etc passwd shadow group gshadow
-    
+    tar cf "/mnt$etctar" -C /mnt/etc passwd shadow group gshadow; then
+        exit 1
+    fi
 fi
 
 ## 前回起動したコンテナを削除する。
