@@ -5,6 +5,9 @@ cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
 ubuntu_img="${osver/-/:}.04"
+tmpvol="$base-var-tmp"
+tmpdir="/var/tmp"
+etctar="$tmpdir/etc.tar"
 
 if ! which jq > /dev/null; then
     echo 'jq: コマンドが見つかりません'
@@ -18,14 +21,13 @@ fi
 
 ## /etc/{passwd,shadow,group,gshadow} を $etctar に保存する。
 # etctar="/home/.etc.tar"
-etctar="/backup/etc.tar"
 if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg name $base-etc '.[] | select(.Name==$name)')" != "" ]]; then
     echo backup: '/etc/{passwd,shadow,group,gshadow} ->' $etctar
     if ! docker run --rm \
     --mount "type=volume,src=$base-etc,dst=/mnt/etc" \
-    --mount "type=volume,src=$base-backup,dst=/mnt/backup" \
+    --mount "type=volume,src=$tmpvol,dst=$tmpdir" \
     "$ubuntu_img" \
-    tar cf "/mnt$etctar" -C /mnt/etc passwd shadow group gshadow; then
+    tar cf "$etctar" -C /mnt/etc passwd shadow group gshadow; then
         exit 1
     fi
 fi
