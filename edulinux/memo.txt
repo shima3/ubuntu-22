@@ -1,3 +1,19 @@
+2025/5/7 Wed
+ホストが再起動したとき、Dockerのコンテナも再起動するが、
+リモートデスクトップ接続すると、画面が真っ黒になる。
+参照：../memo.txt
+
+# service xrdp start
+ * Starting Remote Desktop Protocol server                                                                                                                        xrdp-sesman is already running.
+if it's not running, try removing /var/run/xrdp/xrdp-sesman.pid
+                                                                                                                                                           [fail]
+
+# service xrdp start
+ * Starting Remote Desktop Protocol server                                                                                                                 [fail] 
+
+rm /var/run/xrdp/xrdp-sesman.pid
+service xrdp start
+
 2025/5/4 Sun
 イメージを更新する前にフルバックアップをとる。
 bin/backup.sh

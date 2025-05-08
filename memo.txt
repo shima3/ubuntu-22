@@ -1,6 +1,14 @@
 base, pkg, edulinuxのビルドに関するメモ
 edulinuxの運用方法などについては、edulinux/memo.txtに記入する。
 
+2025/5/8 Thu
+症状：ホストを再起動した時、コンテナは再起動するが、xrdpとxrdp-sesmanが再起動しない。
+原因：/var/run/xrdpにxrdp.pidとxrdp-sesman.pidが残っているので、すでにプロセスが起動していると誤判定される。
+通常のUbuntuでは、/var/runのリンク先/runはtmpfsなので、再起動した時、自動的に消去される。
+ubuntu:22.04ベースのコンテナの場合、tmpfsになっていない。
+対処：docker runで起動する時、--tmpfs /run --tmpfs /run/lock オプションを加え、tmpfsにする。
+/runだけtmpfsとすると、/var/lockのリンク先/run/lockがないのでエラーになる。
+
 2025/4/29 Tue
 utilsをbaseとpkg/90-utilsに分ける。
 アプリのインストールに必要なツールはbaseでインストールする。
