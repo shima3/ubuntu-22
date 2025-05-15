@@ -1,13 +1,18 @@
 #!/bin/bash
 reg="kshima"
-bin="${0%/*}"
+script="$(readlink -f $0)"
+# bin="${0%/*}"
+bin="${script%/*}"
 cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
 ubuntu_img="${osver/-/:}.04"
-tmpvol="$base-var-tmp"
-tmpdir="/var/tmp"
-etctar="$tmpdir/etc.tar"
+# tmpvol="$base-var-tmp"
+tmpvol="$base-home"
+# tmpdir="/var/tmp"
+tmpdir="/home"
+# etctar="$tmpdir/etc.tar"
+etctar="$tmpdir/.etc.tar"
 
 if ! which jq > /dev/null; then
     echo 'jq: コマンドが見つかりません'
@@ -20,7 +25,6 @@ fi
 # edulinux_img="$reg/$osver-$base:$arch"
 
 ## /etc/{passwd,shadow,group,gshadow} を $etctar に保存する。
-# etctar="/home/.etc.tar"
 if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg name $base-etc '.[] | select(.Name==$name)')" != "" ]]; then
     echo backup: '/etc/{passwd,shadow,group,gshadow} ->' $etctar
     if ! docker run --rm \
