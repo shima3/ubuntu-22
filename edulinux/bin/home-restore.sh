@@ -7,8 +7,9 @@ etctar="/home/.etc.tar"
 # docker volume rm "$base-etc"
 # docker run --rm --mount "type=volume,src=$base-etc,dst=/volume" --mount "type=bind,src=$PWD,dst=/backup" base tar Jxf /backup/$base-etc.tar.xz -C /volume
 
-docker volume rm "$base-home"
-docker run --rm \
-       --mount "type=volume,src=$base-home,dst=/home" \
-       --mount "type=bind,src=$PWD,dst=/backup" \
-       base tar Jxf /backup/$base-home.tar.xz -C /home
+if docker volume create "$base-home"; then \
+    docker run --rm \
+           --mount "type=volume,src=$base-home,dst=/home" \
+           --mount "type=bind,src=$PWD,dst=/backup" \
+           base tar Jxf /backup/$base-home.tar.xz -C /home
+fi
