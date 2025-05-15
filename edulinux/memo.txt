@@ -1,3 +1,37 @@
+2025/5/12 Mon
+自宅	122.218.16.30
+iPad	27.253.251.208
+自宅+VPN	165.242.43.123
+SPW...+VPN	165.242.43.123
+SPW...	124.209.83.126
+edurome	210.137.32.246
+hunet-mob2	165.242.230.194
+2001:2f8:1c2:3204:74d9:557f:a085:ec32
+hunet-mob2+VPN	165.242.216.240
+
+https://speedtest.gate02.ne.jp/
+
+hunet-mob2+VPN
+DOWNLOAD 80.27, 59.92, 103.33 Median 80.27Mbps 
+UPLOAD 70.49, 70.53, 98.74 Median 70.53Mbps
+
+edurome
+DOWNLOAD 30.67, 23.00, 37.43 Median 30.67Mbps
+UPLOAD 42.69, 51.07, 83.19 Median 51.07Mbps
+
+2025/5/11 Sun
+参照 ~/sync/memo/Ubuntu.txt 2017/8/22
+
+shima@gws2025:~$ edulinux-exec.sh 
+root@edulinux:/# 
+
+a2enmod cgi
+a2enmod cgid
+service apache2 restart
+
+root@edulinux:/# cat /etc/apache2/conf-enabled/serve-cgi-bin.conf
+ScriptAlias /cgi-bin/ "/usr/lib/cgi-bin"
+
 2025/5/7 Wed
 ホストが再起動したとき、Dockerのコンテナも再起動するが、
 リモートデスクトップ接続すると、画面が真っ黒になる。
