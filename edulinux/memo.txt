@@ -1,3 +1,51 @@
+2025/5/15 Thu
+awk '$4=="Starting" && $16=="client"{split($18, a, ":"); print a[4];}' /var/log/xrdp-sesman.log | sort | uniq
+
+106.146.209.144	g. [Organization]               KDDI CORPORATION
+116.81.8.88	g. [Organization]               Enecom,Inc.
+122.218.16.0/24	g. [Organization]               UCOM Corporation
+124.209.0.0/16	g. [Organization]               KDDI CORPORATION
+125.195.57.64	g. [Organization]               BIGLOBE Inc.
+125.51.161.205	g. [Organization]               DION (KDDI CORPORATION)
+126.109.164.224	descr:          Japan Nation-wide Network of Softbank Corp.
+133.165.144.189	g. [Organization]               So-net Service
+14.13.1.129	g. [Organization]               KDDI CORPORATION
+153.165.0.0/16	g. [Organization]               Open Computer Network
+160.86.248.90	descr:          Sony Network Communications Inc.
+
+165.242.212.117
+165.242.212.233
+
+165.242.213.190
+165.242.213.33
+
+165.242.216.240
+
+165.242.43.123
+165.242.43.50
+165.242.43.79
+
+sarah 実験室
+165.242.88.86
+
+sos
+165.242.90.29
+165.242.90.48
+165.242.90.59
+165.242.90.86
+
+shima845deco
+165.242.98.51
+
+ローカル
+172.17.0.1
+
+203.168.73.227	g. [Organization]               Enecom,Inc.
+210.137.32.246	[Organization]                  Research Organization of Information and Systems, National Institute of Informatics
+210.146.157.219	g. [Organization]               ARTERIA Networks Corporation
+60.154.72.135	descr:          Japan Nation-wide Network of Softbank Corp.
+60.90.188.235	descr:          Japan Nation-wide Network of Softbank Corp.
+
 2025/5/12 Mon
 自宅	122.218.16.30
 iPad	27.253.251.208
