@@ -1,7 +1,8 @@
 #!/bin/bash
 bin="${0%/*}"
 cd "$bin/.."
-base="${PWD##*/}"
+# base="${PWD##*/}"
+base="${PWD##*/[0-9]?-}"
 
 ssh_port=2222
 list="$(docker ps --format json | jq --raw-output 'select(.Ports | test("^.*:'$ssh_port'->.*/tcp$")) | .ID')"

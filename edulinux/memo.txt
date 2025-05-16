@@ -1,3 +1,11 @@
+2025/5/17 Sat
+症状：sshサービスが起動しない。
+原因：/run/sshdがない。
+/runをtmpfsとしてマウントしている。
+対処：sshdの起動時に/run/sshdを作成する。
+/etc/supervisord/conf.d/sshd.confに次の行を記述した。
+command=bash -c 'mkdir -p /run/sshd && chmod 755 /run/sshd && /usr/sbin/sshd -D'
+
 2025/5/15 Thu
 awk '$4=="Starting" && $16=="client"{split($18, a, ":"); print a[4];}' /var/log/xrdp-sesman.log | sort | uniq
 
