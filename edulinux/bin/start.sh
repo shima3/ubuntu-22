@@ -61,7 +61,7 @@ $bin/_run.sh \
     --mount "type=volume,src=$base-etc,dst=/etc" \
     --mount "type=volume,src=$base-home,dst=/home" \
     --ulimit core=0 \
-    --tmpfs /run --tmpfs /run/lock --tmpfs /run/sshd \
+    --tmpfs /run --tmpfs /run/lock \
     $base
 
 #    "$edulinux_img"
