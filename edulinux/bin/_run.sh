@@ -32,6 +32,7 @@ docker run \
        --hostname "$base" \
        -p "0.0.0.0:443:3389" \
        -p "0.0.0.0:$xrdp_port:3389" \
+       -p "0.0.0.0:80:80" \
        -p "0.0.0.0:$http_port:80" \
        -p "0.0.0.0:$ssh_port:22" \
        --device /dev/fuse --cap-add SYS_ADMIN \
@@ -40,7 +41,6 @@ docker run \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        "$@"
 
-#       -p "0.0.0.0:80:80" \
 #       --name "$base" --hostname "$(hostname)" \
 #       --privileged=true \
 #       -e TZ="Japan" \
