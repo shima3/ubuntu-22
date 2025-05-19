@@ -123,7 +123,7 @@ COPY mozc /etc/skel/.config/mozc
 # COPY 99ulimit /etc/X11/Xsession.d/
 # RUN ulimit -c 0
 
-# COPY userdir.conf /etc/apache2/mods-available/
+COPY userdir.conf /etc/apache2/mods-available/
 RUN a2enmod userdir
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
