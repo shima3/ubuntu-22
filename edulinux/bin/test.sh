@@ -8,6 +8,7 @@ base="${PWD##*/}"
 bin/_run.sh \
     -dit \
     -v $PWD/context/local/bin:/usr/local/bin \
+    --name test \
     "$base"
 
 #       --name "$base" --hostname "$base" \

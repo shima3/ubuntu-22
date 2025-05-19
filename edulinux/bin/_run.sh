@@ -28,7 +28,6 @@ list=`docker ps -q -f status=exited; docker ps -q -f status=created`
 if [ "$list" != "" ]; then docker rm $list; fi
 
 docker run \
-       --name "$base" \
        --hostname "$base" \
        -p "0.0.0.0:443:3389" \
        -p "0.0.0.0:$xrdp_port:3389" \
