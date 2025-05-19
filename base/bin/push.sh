@@ -13,11 +13,13 @@ arch="$(docker inspect $id --format '{{.Architecture}}')"
 img="$reg/$osver-$base:$arch"
 
 # img="$reg/$osver-$base:$Architecture"
-docker tag "$base" "$img"
+# docker tag "$base" "$img"
+docker build --tag "$img" --file Dockerfile.upgrade context
 
 # docker-login.sh
 docker push "$img"
 
+id=($(docker images "$img" --format '{{.ID}}'))
 ym="$(docker inspect $id --format '{{.Created}}' | cut -c1-7 | tr -d '-')"
 imgym="$reg/$osver-$base:$ym$arch"
 docker tag "$img" "$imgym"

@@ -40,6 +40,7 @@ docker run \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        "$@"
 
+#       -p "0.0.0.0:80:80" \
 #       --name "$base" --hostname "$(hostname)" \
 #       --privileged=true \
 #       -e TZ="Japan" \

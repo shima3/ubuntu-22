@@ -122,3 +122,10 @@ COPY mozc /etc/skel/.config/mozc
 # coreファイルの出力を無効化する。
 # COPY 99ulimit /etc/X11/Xsession.d/
 # RUN ulimit -c 0
+
+# COPY userdir.conf /etc/apache2/mods-available/
+RUN a2enmod userdir
+
+COPY cgi-bin/ /usr/lib/cgi-bin/
+RUN a2enmod cgi
+RUN a2enmod cgid
