@@ -12,3 +12,6 @@ COPY dovecot.conf /etc/dovecot/
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections && \
 echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
 dpkg-reconfigure -f noninteractive postfix
+
+COPY --from=pkg:utils / /
+RUN /install

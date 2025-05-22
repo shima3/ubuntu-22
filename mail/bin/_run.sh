@@ -10,7 +10,6 @@ osver="$(basename ${PWD%/*})"
 
 # TZ=Asia/Tokyo
 
-echo _run.sh 1
 # 前回起動したコンテナがあれば削除する。
 list="$(docker ps --all --filter ancestor=$base --quiet)"
 if [ "$list" != "" ]; then docker stop $list; docker rm $list; fi
@@ -19,7 +18,6 @@ if [ "$list" != "" ]; then docker stop $list; docker rm $list; fi
 # list=`docker ps -q -f status=exited; docker ps -q -f status=created`
 # if [ "$list" != "" ]; then docker rm $list; fi
 
-echo _run.sh 2
 docker run \
        --hostname "$base" \
        -p "0.0.0.0:25:25" \
@@ -37,5 +35,3 @@ docker run \
 #       -e "TZ=$TZ" \
 #       -p 3333:3389 \
 #       -p 2222:22 \
-
-echo _run.sh 3

@@ -5,7 +5,6 @@ bin="${script%/*}"
 cd "$bin/.."
 base="${PWD##*/}"
 
-echo test.sh 1
 bin/_run.sh \
     -dit \
     --name test \
@@ -21,7 +20,6 @@ bin/_run.sh \
 # docker exec "$base" reset-password.sh guest guest
 # echo 'Guest' | docker exec --interactive --user guest "$base" config-git.sh guest@e.hiroshima-cu.ac.jp
 
-echo test.sh 2
 user=a20999
 # bin/exec.sh useradd -g users -m -s /bin/bash "$user"
 bin/exec.sh useradd -g users -m -s /bin/bash "$user"
@@ -29,5 +27,3 @@ bin/exec.sh usermod --password '$y$j9T$C5nrs3yRKRbxWJbXQDE17/$T4k4l0PZtaJOVk.9gv
 
 # bin/exec.sh useradd -g sudo -m -s /bin/bash shima
 # bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
-
-echo test.sh 3
