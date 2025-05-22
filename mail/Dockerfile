@@ -15,3 +15,5 @@ dpkg-reconfigure -f noninteractive postfix
 
 COPY --from=pkg:utils / /
 RUN /install
+
+RUN sed -i 's/^\(myhostname\s*=.*\)$/# \1/' /etc/postfix/main.cf
