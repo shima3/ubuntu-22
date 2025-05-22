@@ -5,7 +5,7 @@ PACKAGE="\
   iputils-ping iproute2 \
   less lsb-release lsof \
   man-db \
-  nano net-tools netcat-openbsd \
+  nano net-tools netcat-openbsd nkf \
   pwgen \
   rsnapshot \
   shc \
