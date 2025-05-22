@@ -23,13 +23,13 @@ docker run \
        -p "0.0.0.0:25:25" \
        -p "0.0.0.0:110:110" \
        -p "0.0.0.0:143:143" \
+       --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        "$@"
 
 #       --hostname "$base" \
 #       --device /dev/fuse --cap-add SYS_ADMIN \
 #       --security-opt apparmor:unconfined \
 #       --shm-size="1gb" \
-#       --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
 #       --name "$base" --hostname "$(hostname)" \
 #       --privileged=true \
 #       -e TZ="Japan" \

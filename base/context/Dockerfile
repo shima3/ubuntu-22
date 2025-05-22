@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND="noninteractive"
 ARG PACKAGE
 
 RUN rm /etc/dpkg/dpkg.cfg.d/excludes
-RUN echo "Y" | unminimize
+# RUN echo "Y" | unminimize
 
 RUN apt-get clean
 RUN apt-get update && apt-get install --yes --fix-missing locales tzdata

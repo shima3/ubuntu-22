@@ -3,7 +3,7 @@
 bin="${0%/*}"
 cd "$bin/.."
 # base="$(basename $PWD)"
-base="${PWD##*/}"
+base="${PWD##*/[0-9]*-}"
 
 # docker run -it --rm -v "$PWD:/$PWD" -w "$PWD" -v "$PWD/context/bin:/usr/local/bin" "$base"
 docker run -it --rm -v "$PWD:/$PWD" -w "$PWD" "test:$base" bash

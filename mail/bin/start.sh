@@ -1,28 +1,16 @@
 #!/bin/bash
 reg="kshima"
 script="$(readlink -f $0)"
-# bin="${0%/*}"
 bin="${script%/*}"
 cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
 ubuntu_img="${osver/-/:}.04"
-# tmpvol="$base-var-tmp"
 tmpvol="$base-home"
-# tmpdir="/var/tmp"
 tmpdir="/home"
-# etctar="$tmpdir/etc.tar"
 etctar="$tmpdir/.etc.tar"
 
-if ! which jq > /dev/null; then
-    echo 'jq: コマンドが見つかりません'
-    exit 1
-fi
-
-## Ubuntu のアーキテクチャを調べる。
-# docker pull "$ubuntu_img"
-# arch="$(docker inspect --format '{{.Architecture}}' --type=image $ubuntu_img)"
-# edulinux_img="$reg/$osver-$base:$arch"
+if ! which jq > /dev/null; then echo 'jq: コマンドが見つかりません'; exit 1; fi
 
 ## /etc/{passwd,shadow,group,gshadow} を $etctar に保存する。
 if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg name $base-etc '.[] | select(.Name==$name)')" != "" ]]; then
@@ -38,10 +26,7 @@ fi
 
 ## 前回起動したコンテナを削除する。
 list="$(docker ps --filter name=$base --quiet)"
-if [[ "$list" != "" ]]; then
-    echo -n "remove $base container "
-    docker rm -f "$list"
-fi
+if [[ "$list" != "" ]]; then echo -n "remove $base container "; docker rm -f "$list"; fi
 
 ## ボリューム $base-etc を削除する。
 volume="$(docker volume inspect --format '{{.Name}}' $base-etc 2> /dev/null)"
@@ -50,14 +35,12 @@ if [ "$volume" != "" ]; then
     docker volume rm "$base-etc"
 fi
 
-# docker pull "$edulinux_img"
 $bin/ensure.sh
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
     --mount "type=volume,src=$base-var-log,dst=/var/log" \
     --mount "type=volume,src=$base-var-tmp,dst=/var/tmp" \
-    --mount "type=volume,src=$base-backup,dst=/backup" \
     --mount "type=volume,src=$base-etc,dst=/etc" \
     --mount "type=volume,src=$base-home,dst=/home" \
     --ulimit core=0 \
@@ -65,7 +48,9 @@ $bin/_run.sh \
     --name "$base" \
     $base
 
-#    "$edulinux_img"
-
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
+
+# $y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD
+docker exec "$base" useradd --gid sudo --no-user-group --password '$y$j9T$TZI2qVVjbYATACN2brqSa1$d3ClHj/6yTbHWW4asITrfGWelSjyr2BFxlpz5DA1DIC' --shell /bin/bash --uid "$(id -u)" --create-home "$USER"
+# docker exec "$base" usermod --create-home "$USER"
