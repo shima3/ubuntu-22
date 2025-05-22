@@ -26,7 +26,7 @@ bin/exec.sh useradd -g users -m -s /bin/bash "$user"
 bin/exec.sh usermod --password '$y$j9T$C5nrs3yRKRbxWJbXQDE17/$T4k4l0PZtaJOVk.9gvuJsFXJOBX4esUbbkqWGq1XVeD' "$user"
 
 list="$(docker ps --all --filter ancestor=$base --quiet)"
-echo '"| cat > $HOME/lastmail.txt"' | docker exec $list dd of=/home/a20999/.forward
+echo '"| cat > $HOME/lastmail.txt"' | docker exec -i $list dd of=/home/a20999/.forward
 
 # bin/exec.sh useradd -g sudo -m -s /bin/bash shima
 # bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
