@@ -19,12 +19,13 @@ list=`docker ps -q -f status=exited; docker ps -q -f status=created`
 if [ "$list" != "" ]; then docker rm $list; fi
 
 docker run \
-       --hostname "$base" \
+       --hostname "$(hostname)" \
        -p "0.0.0.0:25:25" \
        -p "0.0.0.0:110:110" \
        -p "0.0.0.0:143:143" \
        "$@"
 
+#       --hostname "$base" \
 #       --device /dev/fuse --cap-add SYS_ADMIN \
 #       --security-opt apparmor:unconfined \
 #       --shm-size="1gb" \
