@@ -5,7 +5,6 @@ bin="${script%/*}"
 cd "$bin/.."
 base=$(basename $PWD)
 
-# 前回起動したコンテナがあれば削除する。
 list="$(docker ps --all --filter ancestor=$base --quiet)"
 
 if [[ "$*" == "" ]]
