@@ -3,7 +3,7 @@ PACKAGE="\
   dconf-editor dnsutils dpkg-dev \
   file findutils \
   iputils-ping iproute2 \
-  less lsb-release \
+  less lsb-release lsof \
   man-db \
   nano net-tools netcat-openbsd \
   pwgen \
