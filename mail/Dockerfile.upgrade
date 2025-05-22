@@ -1,0 +1,5 @@
+FROM edulinux
+ARG DEBIAN_FRONTEND=noninteractive
+
+# security update
+RUN apt-get update && apt-get upgrade --yes && apt-get clean
