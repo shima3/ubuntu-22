@@ -15,8 +15,8 @@ list="$(docker ps --all --filter ancestor=$base --quiet)"
 if [ "$list" != "" ]; then docker stop $list; docker rm $list; fi
 
 # 停止しているコンテナを削除する。
-# list=`docker ps -q -f status=exited; docker ps -q -f status=created`
-# if [ "$list" != "" ]; then docker rm $list; fi
+list=`docker ps -q -f status=exited; docker ps -q -f status=created`
+if [ "$list" != "" ]; then docker rm $list; fi
 
 docker run \
        --hostname "$base" \
