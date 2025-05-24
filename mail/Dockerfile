@@ -17,3 +17,8 @@ COPY --from=pkg:utils / /
 RUN /install
 
 RUN sed -i 's/^\(myhostname\s*=.*\)$/# \1/' /etc/postfix/main.cf
+
+# RUN useradd --home-dir HOME_DIR --gid GROUP --system _mailrecord
+RUN useradd --create-home --system _mailrecord
+COPY _mailrecord.sh /usr/local/bin/
+COPY dot.forward /home/_mailrecord/.forward

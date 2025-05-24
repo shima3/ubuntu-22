@@ -30,7 +30,7 @@ $root/base/bin/ensure.sh
 for name in $(awk '/^COPY --from=pkg:/{ print substr($2, 12); }' Dockerfile); do $root/pkg/[0-9]?-$name/bin/ensure.sh; done
 
 list="$(docker ps --filter ancestor=$base -q)"
-if [ "$list" != "" ]; then docker stop $list; fi
+# if [ "$list" != "" ]; then docker stop $list; fi
 
 docker build --tag "$base" --label "OS-Ver=$osver" --file Dockerfile context
 
