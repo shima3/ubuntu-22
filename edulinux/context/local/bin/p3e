@@ -28,7 +28,6 @@ then
     if [ "${list%%/*}" == "*" ]
     then echo "$programを作成したユーザは、まだいません。"
     else
-	echo "使い方: ${0##*/} $program [ユーザ名]"
 	echo "以下のユーザ名から１つずつ指定できます。"
 	for file in "${list[@]}"
 	do echo -n "${file%%/*} "

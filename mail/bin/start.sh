@@ -3,54 +3,30 @@ reg="kshima"
 script="$(readlink -f $0)"
 bin="${script%/*}"
 cd "$bin/.."
-base="${PWD##*/}"
+# base="${PWD##*/}"
+base="mail"
 osver="$(basename ${PWD%/*})"
 ubuntu_img="${osver/-/:}.04"
 tmpvol="$base-home"
 tmpdir="/home"
 etctar="$tmpdir/.etc.tar"
 
-if ! which jq > /dev/null; then echo 'jq: コマンドが見つかりません'; exit 1; fi
-
-## /etc/{passwd,shadow,group,gshadow} を $etctar に保存する。
-if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg name $base-etc '.[] | select(.Name==$name)')" != "" ]]; then
-    echo backup: '/etc/{passwd,shadow,group,gshadow} ->' $etctar
-    if ! docker run --rm \
-    --mount "type=volume,src=$base-etc,dst=/mnt/etc" \
-    --mount "type=volume,src=$tmpvol,dst=$tmpdir" \
-    "$ubuntu_img" \
-    tar cf "$etctar" -C /mnt/etc passwd shadow group gshadow; then
-        exit 1
-    fi
-fi
+# if ! which jq > /dev/null; then echo 'jq: コマンドが見つかりません'; exit 1; fi
 
 ## 前回起動したコンテナを削除する。
-list="$(docker ps --filter name=$base --quiet)"
-if [[ "$list" != "" ]]; then echo -n "remove $base container "; docker rm -f "$list"; fi
+list="$(docker ps --all --filter name=$base --quiet)"
+if [[ "$list" != "" ]]; then echo -n "remove $base container "; docker rm --force "$list"; fi
 
-## ボリューム $base-etc を削除する。
-volume="$(docker volume inspect --format '{{.Name}}' $base-etc 2> /dev/null)"
-if [ "$volume" != "" ]; then
-    echo -n "remove volume: "
-    docker volume rm "$base-etc"
-fi
-
-$bin/ensure.sh
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
-    --mount "type=volume,src=$base-var-log,dst=/var/log" \
-    --mount "type=volume,src=$base-var-tmp,dst=/var/tmp" \
-    --mount "type=volume,src=$base-etc,dst=/etc" \
-    --mount "type=volume,src=$base-home,dst=/home" \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
-    $base
+    --mount "type=bind,src=/Volumes/Sync/Backup/MailRecord,dst=/home/_mailrecord/MailRecord" \
+    "$base"
 
-## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
-docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
-
-# $y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD
-docker exec "$base" useradd --gid sudo --no-user-group --password '$y$j9T$TZI2qVVjbYATACN2brqSa1$d3ClHj/6yTbHWW4asITrfGWelSjyr2BFxlpz5DA1DIC' --shell /bin/bash --uid "$(id -u)" --create-home "$USER"
+# docker exec "$base" useradd --gid users --no-user-group --shell /bin/bash --uid "$(id -u)" --create-home "$USER"
 # docker exec "$base" usermod --create-home "$USER"
+# --password '$y$j9T$TZI2qVVjbYATACN2brqSa1$d3ClHj/6yTbHWW4asITrfGWelSjyr2BFxlpz5DA1DIC'
+# $y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD
