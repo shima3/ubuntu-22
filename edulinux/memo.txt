@@ -1,3 +1,10 @@
+2025/5/29 Thu
+edulinux/mail/handle.sh
+*.hiroshima-cu.ac.jpからのメールを受け付けるようにした。
+
+ユーザ test から edulinux にメールを送る。
+sudo -u test mail edulinux
+
 2025/5/17 Sat
 症状：sshサービスが起動しない。
 原因：/run/sshdがない。

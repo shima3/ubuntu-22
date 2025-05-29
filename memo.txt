@@ -1,13 +1,6 @@
 base, pkg, edulinuxのビルドに関するメモ
 edulinuxの運用方法などについては、edulinux/memo.txtに記入する。
 
-2025/5/29 Thu
-edulinux/mail/handle.sh
-*.hiroshima-cu.ac.jpからのメールを受け付けるようにした。
-
-ユーザ test から edulinux にメールを送る。
-sudo -u test mail edulinux
-
 2025/5/8 Thu
 症状：ホストを再起動した時、コンテナは再起動するが、xrdpとxrdp-sesmanが再起動しない。
 原因：/var/run/xrdpにxrdp.pidとxrdp-sesman.pidが残っているので、すでにプロセスが起動していると誤判定される。
