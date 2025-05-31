@@ -8,4 +8,6 @@ if [[ "$*" == "" ]]
 then cmd="bash"
 else cmd="$*"
 fi
-docker exec -it $base $cmd
+list="$(docker ps --all --filter ancestor=$base --quiet)"
+# docker exec -it $base $cmd
+docker exec -it $list $cmd
