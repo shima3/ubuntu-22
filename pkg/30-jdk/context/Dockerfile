@@ -17,7 +17,7 @@ RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /var/www/html
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 # RUN echo "apt-get install --no-install-recommends --yes --no-download $PACKAGE" >> /install
 RUN echo "apt-get install --yes --no-download $PACKAGE" >> /install
-# RUN echo 'apt-get remove --yes openjdk-11-jre-headless' >> /install
+RUN echo 'apt-get remove --yes openjdk-11-jre-headless' >> /install
 RUN echo 'apt-get autoclean' >> /install
 
 RUN chmod +x /install
