@@ -1,2 +1,0 @@
-#!/bin/bash
-kill -TERM $(cat /var/run/apache2/apache2.pid)

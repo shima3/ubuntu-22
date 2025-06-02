@@ -17,7 +17,7 @@ PACKAGE="\
   coreutils curl \
   dpkg-dev \
   git \
-  libtool \
+  libarchive-tools libtool \
   snapd software-properties-common sudo supervisor \
   wget \
   xz-utils \
