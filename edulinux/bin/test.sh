@@ -35,5 +35,7 @@ bin/exec.sh useradd -g users -m -s /bin/bash "$user"
 bin/exec.sh usermod --password '$y$j9T$4nNEnBJJRMYu9XGqCCTl/0$a9hGDNeBuh4OL4wB5AaHv2.AN2peG8A5uYoK7nwP0U7' "$user"
 echo 'Dummy User b' | docker exec --interactive --user "$user" "$base" config-git.sh "$user@e.hiroshima-cu.ac.jp"
 
+bin/exec.sh sudo -u shima mkdir -p /home/shima/public_html/pcr7
+
 docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK
