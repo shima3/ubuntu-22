@@ -1,0 +1,43 @@
+#!/usr/local/sbin/sush /bin/bash
+if [ "$0" == "bash" ]
+then
+    $BASH_SOURCE
+    return
+fi
+
+# logdir=/var/log/p3
+# mkdir -p "$logdir"
+# date +"%Y/%m/%d %H/%M:%S%t$0%t$*" >> "$logdir/$USER"
+
+p3r="P3R$(($(date +%Y)-2018))"
+program="$1"
+user="$2"
+
+if [[ "$program" == "" ]]
+then
+    echo "使い方: ${0##*/} プログラム名 [ユーザ名]"
+    echo "プログラム名とユーザ名を指定した場合、そのユーザが作成した、そのプログラムを実行します。"
+    echo "プログラム名を指定し、ユーザ名を指定しなかった場合、そのプログラムを作成したユーザ名を出力します。"
+    exit 0
+fi
+
+cd /backup/daily.0/home
+if [ "$user" == "" ]
+then
+    list=(*/$p3r/$program.class)
+    if [ "${list%%/*}" == "*" ]
+    then echo "$programを作成したユーザは、まだいません。"
+    else
+	echo "以下のユーザ名から１つずつ指定できます。"
+	for file in "${list[@]}"
+	do echo -n "${file%%/*} "
+	done
+	echo
+    fi
+else
+    cd "$user/$p3r"
+    xhost + > /dev/null
+    sudo --user="$user" java "$program"
+    # su --command "cd; cd $p3r; java $program" "$user"
+    # su --command "java $program" "$user"
+fi
