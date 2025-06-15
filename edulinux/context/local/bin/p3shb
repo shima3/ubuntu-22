@@ -1,0 +1,38 @@
+#!/usr/local/sbin/sush /bin/bash
+if [ "$0" == "bash" ]
+then
+    $BASH_SOURCE
+    return
+fi
+
+p3r="P3R$(($(date +%Y)-2018))"
+file="$1"
+user="$2"
+
+if [[ "$file" == "" ]]
+then
+    echo "使い方: ${0##*/} ファイル名 [ユーザ名]"
+    echo "ファイル名とユーザ名を指定した場合、そのユーザが作成したファイルを表示します。"
+    echo "ファイル名を指定し、ユーザ名を指定しなかった場合、そのファイルを作成したユーザ名を出力します。"
+    exit 0
+fi
+
+cd /backup/daily.0/home
+if [ "$user" == "" ]
+then
+    list=(*/$p3r/$file)
+    if [ "${list%%/*}" == "*" ]
+    then echo "$fileを作成したユーザは、まだいません。"
+    else
+	echo "以下のユーザ名から１つずつ指定できます。"
+	for f in "${list[@]}"
+	do echo -n "${f%%/*} "
+	done
+	echo
+    fi
+else
+    cd "$user/$p3r"
+    # xhost + > /dev/null
+    # sudo --user="$user" java "$program"
+    cat "$file"
+fi
