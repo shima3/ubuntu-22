@@ -100,7 +100,7 @@ COPY cron.d/rsnapshot /etc/cron.d/
 
 # RUN groupadd fuse
 
-RUN cd /usr/local && cc src/sush.c -o sbin/sush && chmod 4755 sbin/sush bin/p3e
+RUN cd /usr/local && cc src/sush.c -o sbin/sush && chmod 4755 sbin/sush bin/p3e bin/p3eb
 
 # security update
 # RUN apt-get update && apt-get upgrade --yes && apt-get clean
