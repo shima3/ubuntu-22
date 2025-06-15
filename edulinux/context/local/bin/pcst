@@ -1,0 +1,28 @@
+#!/bin/bash
+# fullname="$(getent passwd $USER | while IFS=':' read -r user passwd uno gno name home shell; do echo "$name"; done)"
+fullname="$(awk -v user=$USER -F: '$1==user { print $5; }' /etc/passwd)"
+email="$USER@e.hiroshima-cu.ac.jp"
+
+# dir="$(cd ${0%/*}; pwd)"
+# year="${dir##*/}"
+year="pcr$(($(date +%Y)-2018))"
+dir="/home/z2d999/public_html/$year"
+pub="$HOME/public_html/$year"
+# tno="$1"
+# team="t$tno"
+team="$1"
+
+git config --global user.name "$fullname"
+git config --global user.email "$email"
+git config --global core.editor nano
+git config --global push.default simple
+git config --global pull.rebase false
+
+mkdir -p "$pub"
+cd "$pub"
+datename.sh index.html hangman tmpl "$team"
+
+sed -e "s/<<tno>>/$team/g" -e "s/<<fullname>>/$fullname/g" -e "s/<<email>>/$email/g" -e "s/<<year>>/$year/g" $dir/index.html > index.html
+cp -r $dir/hangman .
+cp -r $dir/tmpl .
+git clone "$dir/$team.git"

@@ -1,3 +1,11 @@
+2025/6/7 Sat
+# time rsnapshot daily
+WARNING: Some files and/or directories in /home only transferred partially during rsync operation
+
+real	0m6.469s
+user	0m2.662s
+sys	0m3.421s
+
 2025/5/29 Thu
 edulinux/mail/handle.sh
 *.hiroshima-cu.ac.jpからのメールを受け付けるようにした。
