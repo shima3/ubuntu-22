@@ -1,0 +1,3 @@
+#!/bin/bash
+# 課題用フォルダへのカレントディレクトリの変更
+cd "$HOME/public_html/pcr$(($(date +%Y)-2018))"

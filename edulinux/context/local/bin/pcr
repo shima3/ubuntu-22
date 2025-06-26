@@ -1,0 +1,31 @@
+#!/bin/bash
+# 課題用フォルダの作成
+team="${1^^}"
+if [[ "$team" == "" ]]; then
+  echo "使い方: ${0##*/} チーム名"
+  exit 0
+fi
+year="r$(($(date +%Y)-2018))"
+src="/home/apc/public_html/$year"
+dst="$HOME/public_html/pc$year"
+rep="$src/$team"
+fullname="$(awk -v user=$USER -F: '$1==user { print $5; }' /etc/passwd)"
+email="$USER@e.hiroshima-cu.ac.jp"
+git config --global push.default simple
+git config --global pull.rebase false
+git config --global --replace-all safe.directory '*'
+mkdir -p "$dst"
+# cd "$dst"; datename.sh index.html hangman tmpl "$team"
+cd "$src"
+if [[ ! -e "$dst/index.html" ]]; then sed -e "s/{{team}}/$team/g" -e "s/{{fullname}}/$fullname/g" -e "s/{{email}}/$email/g" -e "s/{{year}}/$year/g" index.html > $dst/index.html; fi
+if [[ ! -e "$dst/hangman" ]]; then cp -r hangman "$dst"; fi
+if [[ ! -e "$dst/tmpl" ]]; then cp -r tmpl "$dst"; fi
+cd "$dst"
+if [[ ! -e "$team" ]]; then git clone "$rep"; fi
+# デスクトップにclientフォルダへのリンクを自動作成する。
+as=".config/autostart"
+cf="$as/client_folder.desktop"
+if [[ ! -e "$HOME/$cf" ]]; then
+  mkdir -p "$HOME/$as"
+  cp -r "/etc/skel/$cf" "$HOME/$cf"
+fi
