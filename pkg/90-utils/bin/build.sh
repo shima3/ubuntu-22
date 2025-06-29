@@ -9,7 +9,7 @@ PACKAGE="\
   pwgen \
   rsnapshot \
   shc \
-  traceroute \
+  tmux traceroute \
   "
 
 script="$(readlink -f $0)"

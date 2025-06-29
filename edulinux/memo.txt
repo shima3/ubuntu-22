@@ -1,3 +1,8 @@
+2025/6/28 Sat
+/usr/local/bin
+/usr/local/sbin
+/usr/lib/cgi-bin/
+
 2025/6/7 Sat
 # time rsnapshot daily
 WARNING: Some files and/or directories in /home only transferred partially during rsync operation

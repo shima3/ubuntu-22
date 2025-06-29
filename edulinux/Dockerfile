@@ -53,6 +53,9 @@ RUN /install
 COPY --from=pkg:python / /
 RUN /install
 
+COPY --from=pkg:meld / /
+RUN /install
+
 COPY --from=pkg:utils / /
 RUN /install
 
