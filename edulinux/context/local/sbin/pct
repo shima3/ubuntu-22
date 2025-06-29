@@ -1,0 +1,8 @@
+#!/bin/bash
+# チーム共有リポジトリの作成
+team="${1^^}"
+git init --shared=0664 --template=tmpl/.git "$team"
+cd "$team"
+chmod g+ws .
+git restore .
+cd "$dir"

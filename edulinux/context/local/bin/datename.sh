@@ -1,4 +1,5 @@
 #!/bin/bash
+# ファイル名に日付をつけて退避する。
 for name in $*
 do
     if [ -e $name ]
