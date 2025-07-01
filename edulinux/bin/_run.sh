@@ -33,6 +33,7 @@ docker run \
        -p "0.0.0.0:$xrdp_port:3389" \
        -p "0.0.0.0:80:80" \
        -p "0.0.0.0:$http_port:80" \
+       -p "0.0.0.0:22:22" \
        --device /dev/fuse --cap-add SYS_ADMIN \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
