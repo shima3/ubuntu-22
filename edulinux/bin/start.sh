@@ -63,6 +63,9 @@ $bin/_run.sh \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
+    -p "0.0.0.0:443:3389" \
+    -p "0.0.0.0:80:80" \
+    -p "0.0.0.0:22:22" \
     $base
 
 #    "$edulinux_img"
