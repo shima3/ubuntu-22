@@ -1,3 +1,100 @@
+2025/7/7 Mon
+パスワードを初期化してもログインできない現象が生じたので、16時ごろサーバを再起動した。
+iptablesでSSHポートへのアクセスを禁止していたが、再起動時に解除された。
+再起動後、しばらくはSSHポートへのアクセスはなかったが、22時ごろからアクセスが再開した。
+
+shima@gws2025:~$ ssh_check.sh
+COMMAND START	2025-07-07 20:39:09
+[sudo] shima のパスワード: 
+Jul  7 22:00:58  91.218.66.85       1  91.218.66.0/24      1  91.218.0.0/16     1
+Jul  7 22:11:04  91.218.66.85       2  91.218.66.0/24      2  91.218.0.0/16     2
+Jul  7 22:14:43  91.218.66.85       3  91.218.66.0/24      3  91.218.0.0/16     3
+Jul  7 22:18:33  91.218.66.85       4  91.218.66.0/24      4  91.218.0.0/16     4
+Jul  7 22:22:15  91.218.66.85       5  91.218.66.0/24      5  91.218.0.0/16     5
+
+2025/7/4 Fri
+rsync DIR/BASE BACKUP/DIR
+
+cat << 'EOF' > /usr/local/sbin/backup.sh 
+#!/bin/bash
+day="$(date +%F)"
+for file in /etc /home /opt /root /usr /var
+do
+  if [[ "$file" == */ ]]
+  then dir="/"
+  else
+    dir="$(dirname $file)"
+    base="$(basename $file)"
+    if [[ "$dir" == "." ]]; then dir=""; fi
+    if [[ "$dir" != /* ]]; then dir="/$dir"; fi
+  fi
+  dest="/backup/$day$dir"
+  mkdir -p "$dest"
+  rsync --archive --delete --link-dest="/backup/daily.0$dir" --exclude='.cache' --exclude='.thinclient_drives' "$file" "$dest"
+done
+EOF
+
+cat << 'EOF' > /etc/rsnapshot.conf 
+config_version	1.2
+cmd_rsync	/usr/bin/rsync
+snapshot_root	/backup/
+retain	daily	7
+retain	weekly	4
+retain	monthly	3
+backup	/etc	.
+backup	/home	.
+backup	/opt	.
+backup	/root	.
+backup	/usr	.
+backup	/var	.
+EOF
+
+2025/7/3 Thu
+# cat /usr/local/sbin/backup.sh 
+#!/bin/bash
+day="$(date +%F)"
+for file in /etc /home /var/log /usr
+do
+  if [[ "$file" == */ ]]
+  then sub="/"
+  else
+    sub="${file#.}"
+    if [[ "$sub" != /* ]]; then sub="/$sub"; fi
+  fi
+  dest="/backup/$day$sub"
+  mkdir -p "$dest"
+  rsync --archive --delete --link-dest="/backup/daily.0$sub" "$file" "$dest"
+done
+
+[A-Za-z0-9]*
+[A-Za-z0-9]*/
+[A-Za-z0-9]*/[A-Za-z0-9]*
+/[A-Za-z0-9]*
+/[A-Za-z0-9]*/
+/[A-Za-z0-9]*/[A-Za-z0-9]*
+./[A-Za-z0-9]*
+./[A-Za-z0-9]*/
+./[A-Za-z0-9]*/[A-Za-z0-9]*
+
+/etc	/etc
+/var/log	/var/log
+/home/	/
+/	/
+etc	/etc
+var/log	/var/log
+home/	/
+./etc	/etc
+./var/log	/var/log
+./home/	/
+
+root@edulinux:/usr/local/sbin# backup.sh 
+rsync: [sender] readlink_stat("/home/j90001/.cache/gvfs") failed: Permission denied (13)
+rsync: [sender] readlink_stat("/home/j90001/.cache/doc") failed: Permission denied (13)
+IO error encountered -- skipping file deletion
+rsync: [sender] readlink_stat("/home/z2d001/.cache/gvfs") failed: Permission denied (13)
+rsync: [sender] readlink_stat("/home/z2d001/.cache/doc") failed: Permission denied (13)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1338) [sender=3.2.7]
+
 2025/6/28 Sat
 /usr/local/bin
 /usr/local/sbin
