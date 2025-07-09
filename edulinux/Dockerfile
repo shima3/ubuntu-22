@@ -132,3 +132,5 @@ RUN a2enmod userdir
 COPY cgi-bin/ /usr/lib/cgi-bin/
 RUN a2enmod cgi
 RUN a2enmod cgid
+
+RUN chgrp sudo /var/www/html
