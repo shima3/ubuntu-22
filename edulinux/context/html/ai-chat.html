@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chat</title>
+  <title>AI Chat with Timestamp</title>
   <style>
     :root {
         --user-bg: #007bff;
@@ -52,9 +52,26 @@
         overflow-y: auto;
         border-bottom: 1px solid var(--border-color);
     }
-    .message-container { display: flex; margin-bottom: 15px; }
+    .message-container {
+        display: flex;
+        margin-bottom: 15px;
+        align-items: flex-end;
+        gap: 8px;
+    }
     .user-message-container { justify-content: flex-end; }
     .model-message-container { justify-content: flex-start; }
+    .error-message-container { justify-content: center; }
+
+    /* 変更点: タイムスタンプを2行表示に対応させる */
+    .timestamp {
+        font-size: 0.75rem;
+        color: #888;
+        white-space: pre-line; /* 改行を有効にする */
+        text-align: center;    /* 中央揃えにする */
+        line-height: 1.2;      /* 行間を詰める */
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
     .message {
         padding: 12px 18px;
         border-radius: 18px;
@@ -267,15 +284,43 @@
           }],
       };
       
+      /**
+       * 変更点: タイムスタンプのフォーマットを「月/日（改行）時:分」に変更
+       */
       function displayMessage(role, content, isHtml = false) {
           const container = document.createElement('div');
           container.classList.add('message-container', `${role}-message-container`);
+
           const messageDiv = document.createElement('div');
           messageDiv.classList.add('message', `${role}-message`);
           if (isHtml) { messageDiv.innerHTML = content; } else { messageDiv.textContent = content; }
-          container.appendChild(messageDiv);
+
+          if (role === 'user' || role === 'model') {
+              const timestampSpan = document.createElement('span');
+              timestampSpan.classList.add('timestamp');
+              const now = new Date();
+              const month = String(now.getMonth() + 1).padStart(2, '0');
+              const day = String(now.getDate()).padStart(2, '0');
+              const hours = String(now.getHours()).padStart(2, '0');
+              const minutes = String(now.getMinutes()).padStart(2, '0');
+              
+              // フォーマットを「月/日\n時:分」に変更
+              timestampSpan.textContent = `${month}/${day}\n${hours}:${minutes}`;
+
+              if (role === 'user') {
+                  container.appendChild(timestampSpan);
+                  container.appendChild(messageDiv);
+              } else {
+                  container.appendChild(messageDiv);
+                  container.appendChild(timestampSpan);
+              }
+          } else {
+              container.appendChild(messageDiv);
+          }
+
           chatHistoryElement.appendChild(container);
           chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+          
           if (isHtml) {
               if (window.MathJax) { window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err)); }
               addCopyButtons(messageDiv);
@@ -285,7 +330,7 @@
       function addCopyButtons(parentElement) {
           const codeContainers = parentElement.querySelectorAll('.code-container');
           codeContainers.forEach(container => {
-              if (container.querySelector('.copy-button')) return; // 既にボタンがあれば追加しない
+              if (container.querySelector('.copy-button')) return;
               const button = document.createElement('button');
               button.className = 'copy-button';
               button.textContent = 'コピー';
@@ -315,6 +360,7 @@
           const container = document.createElement('div');
           container.id = 'typing-indicator';
           container.classList.add('message-container', 'model-message-container');
+          container.style.gap = '0';
           container.innerHTML = `<div class="message model-message typing-indicator"><span></span><span></span><span></span></div>`;
           chatHistoryElement.appendChild(container);
           chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
@@ -389,7 +435,6 @@
           updateHeaderTitle();
           promptInput.disabled = false;
           sendButton.disabled = false;
-          // promptInput.placeholder = "メッセージを入力、またはファイルをドロップ（Ctrl+Enterで送信）";
           promptInput.placeholder = CONFIG.PROMPT;
           promptInput.focus();
 
