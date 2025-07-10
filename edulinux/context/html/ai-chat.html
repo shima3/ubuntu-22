@@ -36,11 +36,15 @@
     #header {
         padding: 15px 20px;
         border-bottom: 1px solid var(--border-color);
+        background-color: #fafafa;
     }
     #header h1 {
         margin: 0;
         font-size: 1.2rem;
         color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     #chat-history {
         flex-grow: 1;
@@ -48,10 +52,7 @@
         overflow-y: auto;
         border-bottom: 1px solid var(--border-color);
     }
-    .message-container {
-        display: flex;
-        margin-bottom: 15px;
-    }
+    .message-container { display: flex; margin-bottom: 15px; }
     .user-message-container { justify-content: flex-end; }
     .model-message-container { justify-content: flex-start; }
     .message {
@@ -81,15 +82,12 @@
     #prompt-input {
         flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
         resize: none; font-size: 1rem; min-height: 24px; max-height: 200px; overflow-y: auto;
-        transition: border-color 0.3s, background-color 0.3s; /* ドラッグオーバー時のアニメーション用 */
+        transition: border-color 0.3s, background-color 0.3s;
     }
-    /* ドラッグオーバー時のスタイル */
-    #prompt-input.drag-over {
-        border-color: var(--user-bg);
-        background-color: #f0f8ff;
-    }
+    #prompt-input.drag-over { border-color: var(--user-bg); background-color: #f0f8ff; }
     #send-button {
-        padding: 12px 20px; background-color: var(--user-bg); color: white;
+        transform: translateY(35%);
+        padding: 6px 20px; background-color: var(--user-bg); color: white;
         border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background-color 0.2s;
     }
     #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
@@ -106,210 +104,180 @@
         background-color: #fff; padding: 30px; border-radius: 8px;
         width: 90%; max-width: 500px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
-    .modal-content h2 { margin-top: 0; }
-    .modal-content p { color: #333; line-height: 1.6; }
-    .modal-content input {
-        width: calc(100% - 24px); padding: 12px; margin: 15px 0;
+    .modal-content h2 { margin-top: 0; margin-bottom: 10px; }
+    .modal-content p { color: #555; line-height: 1.6; margin-bottom: 20px; }
+    .modal-label {
+        display: block;
+        text-align: left;
+        margin: 15px 0 5px 0;
+        color: #333;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .modal-content input, .modal-content select {
+        width: 100%; box-sizing: border-box; padding: 12px;
         border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;
     }
+    .modal-content select { background-color: white; -webkit-appearance: none; appearance: none; }
     .modal-content button {
         width: 100%; padding: 12px; background-color: var(--user-bg); color: #fff;
-        border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 20px;
     }
-    .modal-note { font-size: 0.8rem; color: #666; margin-top: 15px; margin-bottom: 0; }
-    /* --- タイピングアニメーションのスタイル --- */
-    .typing-indicator {
-        padding: 18px !important;
-    }
-    .typing-indicator span {
-        height: 8px;
-        width: 8px;
-        background-color: #8e8e8e;
-        border-radius: 50%;
-        display: inline-block;
-        margin: 0 2px;
-        animation: bounce 1.2s infinite ease-in-out;
-    }
-    .typing-indicator span:nth-child(2) {
-        animation-delay: -1.0s;
-    }
-    .typing-indicator span:nth-child(3) {
-        animation-delay: -0.8s;
-    }
-    @keyframes bounce {
-        0%, 60%, 100% {
-            transform: translateY(0);
-        }
-        30% {
-            transform: translateY(-8px);
-        }
-    }
-    /* --- ソースコード表示用のスタイル --- */
-    .code-container {
-        background-color: #2d3748;
-        color: #e2e8f0;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-        font-size: 14px;
-        line-height: 1.6;
-        position: relative; /* ボタンを配置するための基準点 */
-    }
-    .code-container pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-    .copy-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: #4a5568;
-        color: #e2e8f0;
-        border: 1px solid #718096;
-        padding: 4px 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
-        opacity: 0.7;
-        transition: opacity 0.2s, background-color 0.2s;
-    }
-    .copy-button:hover {
-        opacity: 1;
-        background-color: #718096;
-    }
-    .copy-button.copied {
-        background-color: #38a169;
-        border-color: #6ee7b7;
-        color: white;
+    .modal-note {
+        padding-left: 20pt;
+        text-align: left;
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 15px;
+        margin-bottom: 0;
     }
     .input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
-        margin: 15px 0;
+        gap: 10px;
     }
     #modal-api-key-input {
-        width: 100%; /* widthを再調整 */
-        margin: 0; /* marginをリセット */
-        padding-right: 60px; /* ボタン分のスペースを確保 */
+        width: 100%;
+        margin: 0;
+        padding-right: 60px;
     }
     #toggle-visibility-button {
         position: absolute;
         right: 5px;
         top: 50%;
-        transform: translateY(-50%);
-        width: auto; /* 幅を自動に */
+        transform: translateY(-115%);
         padding: 6px 10px;
-        font-size: 0.8rem;
+        font-size: 1rem;
         background-color: #f0f0f0;
-        color: #333;
-        border: 1px solid #ccc;
+        color: #333; border: 1px solid #ccc;
+        border-radius: 4px;
+        width: auto;
+        line-height: 1;
+        white-space: nowrap;
     }
+    /* --- タイピングアニメーションのスタイル --- */
+    .typing-indicator { padding: 18px !important; }
+    .typing-indicator span {
+        height: 8px; width: 8px; background-color: #8e8e8e; border-radius: 50%;
+        display: inline-block; margin: 0 2px; animation: bounce 1.2s infinite ease-in-out;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: -1.0s; }
+    .typing-indicator span:nth-child(3) { animation-delay: -0.8s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+    /* --- ソースコード表示用のスタイル --- */
+    .code-container {
+        background-color: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px;
+        margin-bottom: 15px; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+        font-size: 14px; line-height: 1.6; position: relative;
+    }
+    .code-container pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+    .copy-button {
+        position: absolute; top: 10px; right: 10px; background-color: #4a5568;
+        color: #e2e8f0; border: 1px solid #718096; padding: 4px 8px;
+        border-radius: 4px; cursor: pointer; font-size: 12px; opacity: 0.7;
+        transition: opacity 0.2s, background-color 0.2s;
+    }
+    .copy-button:hover { opacity: 1; background-color: #718096; }
+    .copy-button.copied { background-color: #38a169; border-color: #6ee7b7; color: white; }
   </style>
-    <!-- MathJaxの読み込み -->
     <script>
-      MathJax = {
-        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-        svg: { fontCache: 'global' }
-      };
+      MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
 
-    <!-- APIキー入力モーダル -->
     <div id="api-key-modal-overlay" class="modal-overlay">
       <div class="modal-content">
         <h2>AI Chatへようこそ</h2>
         <p>
           Googleの生成AI「Gemini」とチャットするアプリです。<br>
-          チャットを開始するにはAPIキーが必要です。<br>
+          チャットを開始するにはモデルを選択し、APIキーを入力してください。
           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>で無料プランのAPIキーを１つ取得できます。
         </p>
+
+        <label for="model-select" class="modal-label">使用するモデルを選択:</label>
+        <select id="model-select">
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro（推奨）</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash（高速）</option>
+        </select>
+        
+        <label for="modal-api-key-input" class="modal-label">APIキーを入力:</label>
         <div class="input-wrapper">
           <input type="password" id="modal-api-key-input" placeholder="ここにAPIキーを貼り付け">
           <button type="button" id="toggle-visibility-button">表示</button>
         </div>
-        <button id="save-api-key-button">保存して開始</button>
-        <p class="modal-note">
-          ※ここで入力したAPIキーはブラウザ内にのみ保存され、外部には送信されません。<br>
-          ※無料プランのAPIキーでは、1日あたり1500回、1分あたり100万トークン<br>（日本語約150万文字、英語約400万文字）までチャットできます。
-        </p>
+        
+        <button id="save-settings-button">保存して開始</button>
+        <ul class="modal-note">
+          <li>ここで入力したAPIキーはブラウザ内にのみ保存され、外部には送信されません。
+          <li>無料プランのAPIキーでは、1日あたり1500回、1分あたり100万トークン<br>（日本語約150万文字、英語約400万文字）まで利用可能です。
+        </ul>
       </div>
     </div>
 
-    <!-- メインのチャットアプリUI -->
     <div id="app-container">
         <div id="header">
-            <h1>AI Chat (Powered by Google Gemini v2.5 Pro)</h1>
+            <h1 id="header-title">AI Chat</h1>
         </div>
         <div id="chat-history"></div>
         <form id="input-form">
-            <textarea id="prompt-input" placeholder="メッセージを入力（送信ボタンを押すか、またはCtrl+Enterで送信）" rows="1" disabled></textarea>
+            <textarea id="prompt-input" placeholder="メッセージを入力（送信ボタンを押すか、またはCtrl+Enterで送信）" rows="2" disabled></textarea>
             <button id="send-button" type="submit" disabled>送信</button>
         </form>
     </div>
 
-    <!-- メインのJavaScript -->
     <script type="module">
       import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+      
       const CONFIG = {
-          MODEL_NAME: "gemini-2.5-pro-latest",
-          API_KEY_STORAGE_KEY: 'gemini_api_key'
+          MODEL_STORAGE_KEY: 'gemini_model_name_v2',
+          DEFAULT_MODEL: 'gemini-2.5-pro',
+          API_KEY_STORAGE_KEY: 'gemini_api_key_v2',
+          PROMPT: 'メッセージを入力、またはファイルをドロップ\n（送信ボタンを押す、またはCtrl+Enterで送信）'
       };
       
-        // DOM要素の取得
         const modalOverlay = document.getElementById('api-key-modal-overlay');
         const modalApiKeyInput = document.getElementById('modal-api-key-input');
-        const saveApiKeyButton = document.getElementById('save-api-key-button');
+        const modelSelect = document.getElementById('model-select');
+        const saveSettingsButton = document.getElementById('save-settings-button');
         const chatHistoryElement = document.getElementById('chat-history');
         const inputForm = document.getElementById('input-form');
         const promptInput = document.getElementById('prompt-input');
         const sendButton = document.getElementById('send-button');
         const toggleVisibilityButton = document.getElementById('toggle-visibility-button');
+        const headerTitle = document.getElementById('header-title');
 
-        // アプリケーションの状態を管理する変数
         let chat;
         let apiKey = '';
+        let selectedModel = CONFIG.DEFAULT_MODEL;
 
-      // Geminiに渡すシステム指示
       const systemInstruction = {
           role: "system",
           parts: [{
               text: `あなたはWebデザインとコーディングを支援するAIです。以下のルールに従って回答してください。
-1. 回答は必ずHTML形式で生成し、\`\`\`html や \`\`\` といったマークダウンのコードブロックを含めず、単一のHTMLブロック内に収め、生のHTMLコードそのものだけを返してください。必要に応じてJavaScriptやCSSもHTML内に含めてください。
-2. ユーザにソースコードそのものを表示する場合は、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。特に、HTMLコードを表示するとき、エスケープ処理を忘れないでください。
-3. 数式はLaTeX形式（例: $ax^2$ や $$...$$）で記述してください。MathJaxライブラリがページに読み込まれています。
-4. グラフや図形はSVG形式で出力してください。
-5. テーブルは標準的なHTMLの <table> タグを使用してください。
-6. 特に指示がない限り、マウスオーバー（:hover）などのインタラクティブな効果は使用しないでください。`
+1. 回答は必ずHTML形式で生成し、必要に応じてJavaScriptやCSSもHTML内に含めてください。ブラウザが回答のHTMLを解釈し、ページに表示します。
+2. コードそのものを表示する場合は、マークダウンのコードブロックは使わず、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。
+3. ユーザがHTMLコードの表示を要求している場合、必ずHTMLエスケープ処理を行って回答してください。特に指示がない限り、直接ブラウザでの実行や確認ができる形式で提供する必要はありません。
+4. 数式はLaTeX形式（例: $ax^2$ や $$...$$）で記述してください。MathJaxライブラリがページに読み込まれています。
+5. グラフや図形はSVG形式で出力してください。
+6. テーブルは標準的なHTMLの <table> タグを使用してください。
+7. 特に指示がない限り、マウスオーバー（:hover）などのインタラクティブな効果は使用しないでください。`
           }],
       };
       
-      // メッセージをチャット履歴に表示する関数
       function displayMessage(role, content, isHtml = false) {
           const container = document.createElement('div');
           container.classList.add('message-container', `${role}-message-container`);
-          
           const messageDiv = document.createElement('div');
           messageDiv.classList.add('message', `${role}-message`);
-          
-          if (isHtml) {
-              messageDiv.innerHTML = content;
-          } else {
-              messageDiv.textContent = content;
-          }
-          
+          if (isHtml) { messageDiv.innerHTML = content; } else { messageDiv.textContent = content; }
           container.appendChild(messageDiv);
           chatHistoryElement.appendChild(container);
           chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
-          
-          if (isHtml && window.MathJax) {
-              window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err));
-          }
           if (isHtml) {
+              if (window.MathJax) { window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err)); }
               addCopyButtons(messageDiv);
           }
       }
@@ -317,85 +285,47 @@
       function addCopyButtons(parentElement) {
           const codeContainers = parentElement.querySelectorAll('.code-container');
           codeContainers.forEach(container => {
+              if (container.querySelector('.copy-button')) return; // 既にボタンがあれば追加しない
               const button = document.createElement('button');
               button.className = 'copy-button';
               button.textContent = 'コピー';
-
               button.addEventListener('click', () => {
                   const codeElement = container.querySelector('pre');
                   if (!codeElement) return;
-                  
                   const codeToCopy = codeElement.textContent;
-                  
-                  if (navigator.clipboard && window.isSecureContext) {
-                      navigator.clipboard.writeText(codeToCopy).then(() => {
-                          button.textContent = 'コピーしました！';
-                          button.classList.add('copied');
-                          setTimeout(() => {
-                              button.textContent = 'コピー';
-                              button.classList.remove('copied');
-                          }, 2000);
-                      }).catch(err => {
-                          console.error('クリップボードへのコピーに失敗しました:', err);
-                          alert('コピーに失敗しました。');
-                      });
-                  } else {
-                      const textArea = document.createElement('textarea');
-                      textArea.value = codeToCopy;
-                      textArea.style.position = 'fixed';
-                      textArea.style.left = '-9999px';
-                      document.body.appendChild(textArea);
-                      textArea.focus();
-                      textArea.select();
-                      try {
-                          document.execCommand('copy');
-                          button.textContent = 'コピーしました！';
-                          button.classList.add('copied');
-                          setTimeout(() => {
-                              button.textContent = 'コピー';
-                              button.classList.remove('copied');
-                          }, 2000);
-                      } catch (err) {
-                          console.error('クリップボードへのコピーに失敗しました:', err);
-                          alert('コピーに失敗しました。');
-                      }
-                      document.body.removeChild(textArea);
-                  }
+                  navigator.clipboard.writeText(codeToCopy).then(() => {
+                      button.textContent = 'コピーしました！';
+                      button.classList.add('copied');
+                      setTimeout(() => {
+                          button.textContent = 'コピー';
+                          button.classList.remove('copied');
+                      }, 2000);
+                  }).catch(err => {
+                      console.error('クリップボードへのコピーに失敗しました:', err);
+                      alert('コピーに失敗しました。');
+                  });
               });
-              
               container.appendChild(button);
           });
       }
 
-      // エラーメッセージを表示する関数
-      function displayError(message) {
-          displayMessage('error', `エラー: ${message}`);
-      }
+      function displayError(message) { displayMessage('error', `エラー: ${message}`); }
 
-      // --- タイピングアニメーション関連の関数 ---
       function displayTypingIndicator() {
           const container = document.createElement('div');
           container.id = 'typing-indicator';
           container.classList.add('message-container', 'model-message-container');
-    
-          container.innerHTML = `
-        <div class="message model-message typing-indicator">
-            <span></span><span></span><span></span>
-        </div>
-    `;
+          container.innerHTML = `<div class="message model-message typing-indicator"><span></span><span></span><span></span></div>`;
           chatHistoryElement.appendChild(container);
           chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
       }
       
       function removeTypingIndicator() {
           const indicator = document.getElementById('typing-indicator');
-          if (indicator) {
-              indicator.remove();
-          }
+          if (indicator) { indicator.remove(); }
       }
 
-      // フォーム送信時のメイン処理
-        async function handleFormSubmit(e) {
+      async function handleFormSubmit(e) {
             e.preventDefault();
             const prompt = promptInput.value.trim();
             if (!apiKey) {
@@ -405,7 +335,6 @@
             }
             if (!prompt) return;
 
-            // UIをローディング状態にする
             sendButton.disabled = true;
             sendButton.textContent = '...';
             const originalPrompt = promptInput.value;
@@ -418,10 +347,7 @@
             try {
                 if (!chat) {
                     const genAI = new GoogleGenerativeAI(apiKey);
-                    const model = genAI.getGenerativeModel({ 
-                        model: "gemini-2.5-pro", 
-                        systemInstruction: systemInstruction 
-                    });
+                    const model = genAI.getGenerativeModel({ model: selectedModel, systemInstruction });
                     chat = model.startChat({ history: [] });
                 }
                 
@@ -435,7 +361,7 @@
             } catch (error) {
                 console.error(error);
                 removeTypingIndicator();
-                displayError(error.message || "不明なエラーが発生しました。APIキーが正しいか確認してください。");
+                displayError(error.message || "不明なエラーが発生しました。APIキーまたはモデル名が正しいか確認してください。");
                 chat = null;
             } finally {
                 sendButton.disabled = false;
@@ -444,41 +370,61 @@
             }
         }
         
-      // --- モーダル関連の関数 ---
-      function showApiKeyModal() {
-          const savedKey = localStorage.getItem(CONFIG.API_KEY_STORAGE_KEY) || '';
-          modalApiKeyInput.value = savedKey;
-          
-          modalOverlay.classList.add('visible');
-          modalApiKeyInput.focus();
-      }
+      function showApiKeyModal() { modalOverlay.classList.add('visible'); modalApiKeyInput.focus(); }
+      function hideApiKeyModal() { modalOverlay.classList.remove('visible'); }
 
-        function hideApiKeyModal() {
-            modalOverlay.classList.remove('visible');
-        }
-
-        function saveApiKey() {
+      function saveSettings() {
           const key = modalApiKeyInput.value.trim();
-          if (!key) {
-            alert("APIキーを入力してください。");
-            return;
-          }
+          const model = modelSelect.value;
+          if (!key) { alert("APIキーを入力してください。"); return; }
+          
+          const modelChanged = selectedModel !== model;
+
           apiKey = key;
+          selectedModel = model;
           localStorage.setItem(CONFIG.API_KEY_STORAGE_KEY, key);
+          localStorage.setItem(CONFIG.MODEL_STORAGE_KEY, model);
+          
           hideApiKeyModal();
-        
+          updateHeaderTitle();
           promptInput.disabled = false;
           sendButton.disabled = false;
-          // placeholderを更新してドラッグ＆ドロップ機能を案内
-          promptInput.placeholder = "メッセージを入力、またはファイルをドロップ（Ctrl+Enterで送信）";
+          // promptInput.placeholder = "メッセージを入力、またはファイルをドロップ（Ctrl+Enterで送信）";
+          promptInput.placeholder = CONFIG.PROMPT;
           promptInput.focus();
-            
-          if (chatHistoryElement.children.length === 0) {
-            displayMessage('model', 'ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。');
+
+          if (modelChanged && chat) {
+              chat = null;
+              chatHistoryElement.innerHTML = '';
+              displayMessage('model', `モデルが「${getDisplayName(selectedModel)}」に変更されました。新しいチャットを開始します。`);
+          } else if (chatHistoryElement.children.length === 0) {
+              displayMessage('model', 'ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。');
           }
-        }
-        
-      // --- イベントリスナーの設定 ---
+      }
+
+      function getDisplayName(modelName) {
+          return modelName.replace(/-latest$/, '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      }
+      
+      function updateHeaderTitle() {
+          headerTitle.textContent = `AI Chat (Powered by Google ${getDisplayName(selectedModel)})`;
+      }
+
+      function initializeApp() {
+          const savedKey = localStorage.getItem(CONFIG.API_KEY_STORAGE_KEY);
+          const savedModel = localStorage.getItem(CONFIG.MODEL_STORAGE_KEY);
+
+          modalApiKeyInput.value = savedKey || '';
+          modelSelect.value = savedModel || CONFIG.DEFAULT_MODEL;
+
+          if (savedKey) {
+              apiKey = savedKey;
+              selectedModel = savedModel || CONFIG.DEFAULT_MODEL;
+              updateHeaderTitle();
+          }
+          promptInput.placeholder = CONFIG.PROMPT;
+          showApiKeyModal();
+      }
       
       toggleVisibilityButton.addEventListener('click', () => {
           if (modalApiKeyInput.type === 'password') {
@@ -491,73 +437,36 @@
       });
       
       inputForm.addEventListener('submit', handleFormSubmit);
+      promptInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); inputForm.requestSubmit(); } });
+      promptInput.addEventListener('input', () => { promptInput.style.height = 'auto'; promptInput.style.height = (promptInput.scrollHeight) + 'px'; });
+      saveSettingsButton.addEventListener('click', saveSettings);
+      modalApiKeyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveSettings(); } });
 
-        promptInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                inputForm.requestSubmit();
-            }
-        });
+      ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+          promptInput.addEventListener(eventName, (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (promptInput.disabled) return;
+              if (eventName === 'dragover') promptInput.classList.add('drag-over');
+              else promptInput.classList.remove('drag-over');
 
-        promptInput.addEventListener('input', () => {
-            promptInput.style.height = 'auto';
-            promptInput.style.height = (promptInput.scrollHeight) + 'px';
-        });
+              if (eventName === 'drop') {
+                  const files = e.dataTransfer.files;
+                  if (files.length > 0) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                          promptInput.value = event.target.result;
+                          promptInput.dispatchEvent(new Event('input'));
+                          promptInput.focus();
+                      };
+                      reader.onerror = () => displayError('ファイルの読み込みに失敗しました。');
+                      reader.readAsText(files[0], 'UTF-8');
+                  }
+              }
+          });
+      });
 
-        saveApiKeyButton.addEventListener('click', saveApiKey);
-        
-        modalApiKeyInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                saveApiKey();
-            }
-        });
-
-        // --- ドラッグ＆ドロップ機能 ---
-        promptInput.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!promptInput.disabled) {
-                promptInput.classList.add('drag-over');
-            }
-        });
-
-        promptInput.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            promptInput.classList.remove('drag-over');
-        });
-
-        promptInput.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            promptInput.classList.remove('drag-over');
-            
-            if (promptInput.disabled) return;
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                const file = files[0];
-                const reader = new FileReader();
-
-                reader.onload = (event) => {
-                    promptInput.value = event.target.result;
-                    // テキストエリアの高さを自動調整
-                    promptInput.style.height = 'auto';
-                    promptInput.style.height = promptInput.scrollHeight + 'px';
-                    promptInput.focus();
-                };
-
-                reader.onerror = (error) => {
-                    console.error("File reading error:", error);
-                    displayError('ファイルの読み込みに失敗しました。');
-                };
-
-                reader.readAsText(file, 'UTF-8');
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', showApiKeyModal);
+      window.addEventListener('DOMContentLoaded', initializeApp);
 
     </script>
 </body>
