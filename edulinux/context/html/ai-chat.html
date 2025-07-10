@@ -81,6 +81,12 @@
     #prompt-input {
         flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
         resize: none; font-size: 1rem; min-height: 24px; max-height: 200px; overflow-y: auto;
+        transition: border-color 0.3s, background-color 0.3s; /* ドラッグオーバー時のアニメーション用 */
+    }
+    /* ドラッグオーバー時のスタイル */
+    #prompt-input.drag-over {
+        border-color: var(--user-bg);
+        background-color: #f0f8ff;
     }
     #send-button {
         padding: 12px 20px; background-color: var(--user-bg); color: white;
@@ -272,15 +278,13 @@
       const systemInstruction = {
           role: "system",
           parts: [{
-              text: "あなたはWebデザインとコーディングを支援するAIです。以下のルールに従って回答してください。\n" +
-                  "1. 回答は必ずHTML形式で生成してください。必要に応じてJavaScriptやCSSもHTML内に含めてください。\n" +
-                  "2. 数式はLaTeX形式（例: `$ax^2$` や `$$...$$`）で記述してください。MathJaxライブラリがページに読み込まれています。\n" +
-                  "3. グラフや図形はSVG形式で出力してください。\n" +
-                  "4. テーブルは標準的なHTMLの`<table>`タグを使用してください。\n" +
-                  "5. 特に指示がない限り、マウスオーバー（:hover）などのインタラクティブな効果は使用しないでください。\n" +
-                  "6. すべての出力は単一のHTMLブロック内に収めてください。\n" +
-                  "7. 回答には` ```html `や` ``` `といったマークダウンのコードブロックを含めず、生のHTMLコードそのものだけを返してください。" +
-                  "8. ユーザーにソースコードそのものを表示する場合は、`<div class=\"code-container\">`で全体を囲み、その中に`<pre>`タグを使ってコードを配置すること。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。"
+              text: `あなたはWebデザインとコーディングを支援するAIです。以下のルールに従って回答してください。
+1. 回答は必ずHTML形式で生成し、\`\`\`html や \`\`\` といったマークダウンのコードブロックを含めず、単一のHTMLブロック内に収め、生のHTMLコードそのものだけを返してください。必要に応じてJavaScriptやCSSもHTML内に含めてください。
+2. ユーザにソースコードそのものを表示する場合は、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。特に、HTMLコードを表示するとき、エスケープ処理を忘れないでください。
+3. 数式はLaTeX形式（例: $ax^2$ や $$...$$）で記述してください。MathJaxライブラリがページに読み込まれています。
+4. グラフや図形はSVG形式で出力してください。
+5. テーブルは標準的なHTMLの <table> タグを使用してください。
+6. 特に指示がない限り、マウスオーバー（:hover）などのインタラクティブな効果は使用しないでください。`
           }],
       };
       
@@ -306,7 +310,7 @@
               window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err));
           }
           if (isHtml) {
-              addCopyButtons(messageDiv); // ★この行を追加
+              addCopyButtons(messageDiv);
           }
       }
 
@@ -323,7 +327,6 @@
                   
                   const codeToCopy = codeElement.textContent;
                   
-                  // 新しいAPI (navigator.clipboard) を試す
                   if (navigator.clipboard && window.isSecureContext) {
                       navigator.clipboard.writeText(codeToCopy).then(() => {
                           button.textContent = 'コピーしました！';
@@ -337,10 +340,9 @@
                           alert('コピーに失敗しました。');
                       });
                   } else {
-                      // 古い方法 (execCommand) にフォールバック
                       const textArea = document.createElement('textarea');
                       textArea.value = codeToCopy;
-                      textArea.style.position = 'fixed'; // 画面外に隠す
+                      textArea.style.position = 'fixed';
                       textArea.style.left = '-9999px';
                       document.body.appendChild(textArea);
                       textArea.focus();
@@ -373,7 +375,7 @@
       // --- タイピングアニメーション関連の関数 ---
       function displayTypingIndicator() {
           const container = document.createElement('div');
-          container.id = 'typing-indicator'; // 後で削除するためにIDを付与
+          container.id = 'typing-indicator';
           container.classList.add('message-container', 'model-message-container');
     
           container.innerHTML = `
@@ -414,11 +416,9 @@
             displayTypingIndicator();
 
             try {
-                // 初回送信時にチャットセッションを初期化
                 if (!chat) {
                     const genAI = new GoogleGenerativeAI(apiKey);
                     const model = genAI.getGenerativeModel({ 
-                        // model: "gemini-2.5-flash", 
                         model: "gemini-2.5-pro", 
                         systemInstruction: systemInstruction 
                     });
@@ -436,9 +436,8 @@
                 console.error(error);
                 removeTypingIndicator();
                 displayError(error.message || "不明なエラーが発生しました。APIキーが正しいか確認してください。");
-                chat = null; // エラー発生時はセッションをリセット
+                chat = null;
             } finally {
-                // UIを元に戻す
                 sendButton.disabled = false;
                 sendButton.textContent = '送信';
                 promptInput.focus();
@@ -447,8 +446,6 @@
         
       // --- モーダル関連の関数 ---
       function showApiKeyModal() {
-          // localStorageから現在のキーを取得して入力欄に設定する
-          // 保存されたキーがなければ空文字が設定される
           const savedKey = localStorage.getItem(CONFIG.API_KEY_STORAGE_KEY) || '';
           modalApiKeyInput.value = savedKey;
           
@@ -470,14 +467,13 @@
           localStorage.setItem(CONFIG.API_KEY_STORAGE_KEY, key);
           hideApiKeyModal();
         
-          // チャットUIを有効化
           promptInput.disabled = false;
           sendButton.disabled = false;
-          promptInput.placeholder = "メッセージを入力（送信ボタンを押すか、またはCtrl+Enterで送信）";
+          // placeholderを更新してドラッグ＆ドロップ機能を案内
+          promptInput.placeholder = "メッセージを入力、またはファイルをドロップ（Ctrl+Enterで送信）";
           promptInput.focus();
             
           if (chatHistoryElement.children.length === 0) {
-            // displayMessage('model', 'APIキーが設定されました。チャットを開始できます。');
             displayMessage('model', 'ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。');
           }
         }
@@ -494,10 +490,8 @@
           }
       });
       
-      // メインフォームの送信
       inputForm.addEventListener('submit', handleFormSubmit);
 
-        // Ctrl+Enterで送信
         promptInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
@@ -505,16 +499,13 @@
             }
         });
 
-        // テキストエリアの自動リサイズ
         promptInput.addEventListener('input', () => {
             promptInput.style.height = 'auto';
             promptInput.style.height = (promptInput.scrollHeight) + 'px';
         });
 
-        // モーダルの保存ボタン
         saveApiKeyButton.addEventListener('click', saveApiKey);
         
-        // モーダル内でEnterキーを押しても保存
         modalApiKeyInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -522,7 +513,50 @@
             }
         });
 
-        // ページの読み込み完了時にモーダルを表示
+        // --- ドラッグ＆ドロップ機能 ---
+        promptInput.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!promptInput.disabled) {
+                promptInput.classList.add('drag-over');
+            }
+        });
+
+        promptInput.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            promptInput.classList.remove('drag-over');
+        });
+
+        promptInput.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            promptInput.classList.remove('drag-over');
+            
+            if (promptInput.disabled) return;
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    promptInput.value = event.target.result;
+                    // テキストエリアの高さを自動調整
+                    promptInput.style.height = 'auto';
+                    promptInput.style.height = promptInput.scrollHeight + 'px';
+                    promptInput.focus();
+                };
+
+                reader.onerror = (error) => {
+                    console.error("File reading error:", error);
+                    displayError('ファイルの読み込みに失敗しました。');
+                };
+
+                reader.readAsText(file, 'UTF-8');
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', showApiKeyModal);
 
     </script>
