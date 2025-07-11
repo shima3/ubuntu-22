@@ -97,7 +97,6 @@
     .error-message { background-color: #ffebee; color: #c62828; text-align: center; }
     #input-form { display: flex; padding: 15px; gap: 10px; background-color: #f9f9f9; align-items: flex-end; }
     
-    /* --- 変更点: 入力エリアのラッパー --- */
     #input-area-wrapper {
         display: flex;
         flex-direction: column;
@@ -114,7 +113,7 @@
     
     #prompt-input {
         flex-grow: 1; padding: 12px;
-        border: none; /* ラッパーにボーダーを移したため不要に */
+        border: none;
         border-radius: 8px;
         resize: none; font-size: 1rem; min-height: 24px; max-height: 200px; overflow-y: auto;
         background-color: transparent;
@@ -127,11 +126,10 @@
         padding: 12px 20px;
         background-color: var(--user-bg); color: white;
         border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background-color 0.2s;
-        align-self: flex-end; /* ボタンがテキストエリアの高さに影響されないように */
+        align-self: flex-end;
     }
     #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
 
-    /* --- 追加: 添付ファイルプレビューのスタイル --- */
     #attachment-preview-container {
         display: flex;
         flex-wrap: wrap;
@@ -172,7 +170,6 @@
     .remove-attachment-btn:hover {
         background-color: #868e96;
     }
-    /* --- モーダルダイアログのスタイル (変更なし) --- */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center;
@@ -236,7 +233,6 @@
         line-height: 1;
         white-space: nowrap;
     }
-    /* --- タイピングアニメーションのスタイル (変更なし) --- */
     .typing-indicator { padding: 18px !important; }
     .typing-indicator span {
         height: 8px; width: 8px; background-color: #8e8e8e; border-radius: 50%;
@@ -245,21 +241,40 @@
     .typing-indicator span:nth-child(2) { animation-delay: -1.0s; }
     .typing-indicator span:nth-child(3) { animation-delay: -0.8s; }
     @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
-    /* --- ソースコード表示用のスタイル (変更なし) --- */
+
+    /* --- ソースコード表示用のスタイル (変更あり) --- */
     .code-container {
         background-color: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px;
         margin-bottom: 15px; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
         font-size: 14px; line-height: 1.6; position: relative;
+        max-height: 450px; /* 追加: 最大高さを設定 */
+        overflow-y: auto;  /* 追加: 縦スクロールを有効化 */
     }
     .code-container pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
-    .copy-button {
-        position: absolute; top: 10px; right: 10px; background-color: #4a5568;
-        color: #e2e8f0; border: 1px solid #718096; padding: 4px 8px;
-        border-radius: 4px; cursor: pointer; font-size: 12px; opacity: 0.7;
+    
+    /* 追加: ボタンをまとめるコンテナ */
+    .code-button-container {
+        position: absolute; 
+        top: 10px; 
+        right: 10px;
+        display: flex;
+        gap: 8px;
+        z-index: 1;
+    }
+    /* 変更: .copy-button から汎用的なクラス名に変更 */
+    .code-action-button {
+        background-color: #4a5568;
+        color: #e2e8f0; 
+        border: 1px solid #718096; 
+        padding: 4px 8px;
+        border-radius: 4px; 
+        cursor: pointer; 
+        font-size: 12px; 
+        opacity: 0.7;
         transition: opacity 0.2s, background-color 0.2s;
     }
-    .copy-button:hover { opacity: 1; background-color: #718096; }
-    .copy-button.copied { background-color: #38a169; border-color: #6ee7b7; color: white; }
+    .code-action-button:hover { opacity: 1; background-color: #718096; }
+    .code-action-button.copied { background-color: #38a169; border-color: #6ee7b7; color: white; }
     
     #scroll-buttons-container {
         position: absolute;
@@ -310,6 +325,7 @@
         </p>
 
         <label for="model-select" class="modal-label">使用するモデルを選択:</label>
+        <!-- ★モデル名は元のバージョンを維持 -->
         <select id="model-select">
           <option value="gemini-2.5-pro">Gemini 2.5 Pro（推奨）</option>
           <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
@@ -355,6 +371,7 @@
     <script type="module">
       import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
       
+      // ★デフォルトモデルは元のバージョンを維持
       const CONFIG = {
           MODEL_STORAGE_KEY: 'gemini_model_name_v2',
           DEFAULT_MODEL: 'gemini-2.5-pro',
@@ -381,7 +398,7 @@
         let chat;
         let apiKey = '';
         let selectedModel = CONFIG.DEFAULT_MODEL;
-        let attachedFiles = []; // 追加: 添付ファイルリスト
+        let attachedFiles = [];
 
       const systemInstruction = {
           role: "system",
@@ -435,35 +452,75 @@
 
           if (isHtml) {
               if (window.MathJax) { window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err)); }
-              addCopyButtons(messageDiv);
+              addCodeContainerActions(messageDiv);
           }
           setTimeout(updateScrollButtonsState, 100);
       }
 
-      function addCopyButtons(parentElement) {
+      function addCodeContainerActions(parentElement) {
           const codeContainers = parentElement.querySelectorAll('.code-container');
           codeContainers.forEach(container => {
-              if (container.querySelector('.copy-button')) return;
-              const button = document.createElement('button');
-              button.className = 'copy-button';
-              button.textContent = 'コピー';
-              button.addEventListener('click', () => {
-                  const codeElement = container.querySelector('pre');
-                  if (!codeElement) return;
-                  const codeToCopy = codeElement.textContent;
-                  navigator.clipboard.writeText(codeToCopy).then(() => {
-                      button.textContent = 'コピーしました！';
-                      button.classList.add('copied');
+              if (container.querySelector('.code-button-container')) return;
+
+              const buttonContainer = document.createElement('div');
+              buttonContainer.className = 'code-button-container';
+              
+              const preElement = container.querySelector('pre');
+              if (!preElement) return;
+              const codeToProcess = preElement.textContent;
+
+              // 1. ダウンロードボタンの作成
+              const downloadButton = document.createElement('button');
+              downloadButton.className = 'code-action-button';
+              downloadButton.textContent = 'ダウンロード';
+              downloadButton.addEventListener('click', () => {
+                  const blob = new Blob([codeToProcess], { type: 'text/plain;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+
+                  let extension = 'txt';
+                  const lowerCaseCode = codeToProcess.toLowerCase().trim();
+                  if (lowerCaseCode.startsWith('<!doctype html>') || lowerCaseCode.startsWith('<html')) {
+                      extension = 'html';
+                  } else if (lowerCaseCode.match(/\.[a-zA-Z0-9-]+\s*\{/)) {
+                      extension = 'css';
+                  } else if (lowerCaseCode.includes('function') || lowerCaseCode.includes('const ') || lowerCaseCode.includes('let ') || lowerCaseCode.includes('var ')) {
+                      extension = 'js';
+                  } else if (lowerCaseCode.includes('public class') || lowerCaseCode.includes('import java.')) {
+                      extension = 'java';
+                  } else if (lowerCaseCode.includes('def ') && lowerCaseCode.includes(':')) {
+                      extension = 'py';
+                  }
+                  a.download = `code-snippet.${extension}`;
+                  
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+              });
+
+              // 2. コピーボタンの作成
+              const copyButton = document.createElement('button');
+              copyButton.className = 'code-action-button';
+              copyButton.textContent = 'コピー';
+              copyButton.addEventListener('click', () => {
+                  navigator.clipboard.writeText(codeToProcess).then(() => {
+                      copyButton.textContent = 'コピーしました！';
+                      copyButton.classList.add('copied');
                       setTimeout(() => {
-                          button.textContent = 'コピー';
-                          button.classList.remove('copied');
+                          copyButton.textContent = 'コピー';
+                          copyButton.classList.remove('copied');
                       }, 2000);
                   }).catch(err => {
                       console.error('クリップボードへのコピーに失敗しました:', err);
                       alert('コピーに失敗しました。');
                   });
               });
-              container.appendChild(button);
+
+              buttonContainer.appendChild(downloadButton);
+              buttonContainer.appendChild(copyButton);
+              container.appendChild(buttonContainer);
           });
       }
 
@@ -596,7 +653,6 @@
           showApiKeyModal();
       }
       
-      // --- 追加: ファイルをAPI用の形式に変換するヘルパー関数 ---
       async function fileToGenerativePart(file) {
           const base64EncodedDataPromise = new Promise((resolve, reject) => {
               const reader = new FileReader();
@@ -609,7 +665,6 @@
           };
       }
 
-      // --- 追加: 添付ファイルUIを更新する関数 ---
       function updateAttachmentUI() {
           attachmentPreviewContainer.innerHTML = '';
           attachedFiles.forEach((file, index) => {
@@ -624,7 +679,7 @@
               const removeBtn = document.createElement('button');
               removeBtn.className = 'remove-attachment-btn';
               removeBtn.innerHTML = '&times;';
-              removeBtn.type = 'button'; // formのsubmitをトリガーしないように
+              removeBtn.type = 'button';
               removeBtn.onclick = () => {
                   attachedFiles.splice(index, 1);
                   updateAttachmentUI();
@@ -654,9 +709,8 @@
       saveSettingsButton.addEventListener('click', saveSettings);
       modalApiKeyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveSettings(); } });
 
-      // --- 変更点: ドラッグ&ドロップ処理の修正 ---
       ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-          inputAreaWrapper.addEventListener(eventName, (e) => { // イベントリスナーの対象をラッパーに変更
+          inputAreaWrapper.addEventListener(eventName, (e) => {
               e.preventDefault();
               e.stopPropagation();
               if (promptInput.disabled) return;
@@ -667,10 +721,9 @@
                   const files = e.dataTransfer.files;
                   if (files.length > 0) {
                       for (const file of files) {
-                          // ここでMIMEタイプによるフィルタリングも可能
                           attachedFiles.push(file);
                       }
-                      updateAttachmentUI(); // UIを更新
+                      updateAttachmentUI();
                       promptInput.focus();
                   }
               }
