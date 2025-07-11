@@ -32,6 +32,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        position: relative;
     }
     #header {
         padding: 15px 20px;
@@ -62,13 +63,12 @@
     .model-message-container { justify-content: flex-start; }
     .error-message-container { justify-content: center; }
 
-    /* 変更点: タイムスタンプを2行表示に対応させる */
     .timestamp {
         font-size: 0.75rem;
         color: #888;
-        white-space: pre-line; /* 改行を有効にする */
-        text-align: center;    /* 中央揃えにする */
-        line-height: 1.2;      /* 行間を詰める */
+        white-space: pre-line;
+        text-align: center;
+        line-height: 1.2;
         margin-bottom: 12px;
         flex-shrink: 0;
     }
@@ -95,7 +95,7 @@
     .model-message th { background-color: #e9e9e9; }
     .model-message svg { max-width: 100%; height: auto; }
     .error-message { background-color: #ffebee; color: #c62828; text-align: center; }
-    #input-form { display: flex; padding: 15px; gap: 10px; background-color: #f9f9f9; align-items: flex-start; }
+    #input-form { display: flex; padding: 15px; gap: 10px; background-color: #f9f9f9; align-items: flex-end; }
     #prompt-input {
         flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
         resize: none; font-size: 1rem; min-height: 24px; max-height: 200px; overflow-y: auto;
@@ -103,8 +103,8 @@
     }
     #prompt-input.drag-over { border-color: var(--user-bg); background-color: #f0f8ff; }
     #send-button {
-        transform: translateY(35%);
-        padding: 6px 20px; background-color: var(--user-bg); color: white;
+        padding: 12px 20px;
+        background-color: var(--user-bg); color: white;
         border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background-color 0.2s;
     }
     #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
@@ -197,6 +197,38 @@
     }
     .copy-button:hover { opacity: 1; background-color: #718096; }
     .copy-button.copied { background-color: #38a169; border-color: #6ee7b7; color: white; }
+    
+    #scroll-buttons-container {
+        position: absolute;
+        bottom: 85px;
+        right: 20px;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 10;
+    }
+    .scroll-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        background-color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s;
+    }
+    .scroll-button svg {
+        width: 20px;
+        height: 20px;
+        fill: #555;
+    }
+    .scroll-button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
   </style>
     <script>
       MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
@@ -217,7 +249,7 @@
         <label for="model-select" class="modal-label">使用するモデルを選択:</label>
         <select id="model-select">
           <option value="gemini-2.5-pro">Gemini 2.5 Pro（推奨）</option>
-          <option value="gemini-2.5-flash">Gemini 2.5 Flash（高速）</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
         </select>
         
         <label for="modal-api-key-input" class="modal-label">APIキーを入力:</label>
@@ -243,6 +275,15 @@
             <textarea id="prompt-input" placeholder="メッセージを入力（送信ボタンを押すか、またはCtrl+Enterで送信）" rows="2" disabled></textarea>
             <button id="send-button" type="submit" disabled>送信</button>
         </form>
+
+        <div id="scroll-buttons-container">
+            <button id="scroll-up-button" class="scroll-button" title="前のメッセージへ">
+                <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+            </button>
+            <button id="scroll-down-button" class="scroll-button" title="次のメッセージへ">
+                <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+            </button>
+        </div>
     </div>
 
     <script type="module">
@@ -265,6 +306,9 @@
         const sendButton = document.getElementById('send-button');
         const toggleVisibilityButton = document.getElementById('toggle-visibility-button');
         const headerTitle = document.getElementById('header-title');
+        const scrollButtonsContainer = document.getElementById('scroll-buttons-container');
+        const scrollUpButton = document.getElementById('scroll-up-button');
+        const scrollDownButton = document.getElementById('scroll-down-button');
 
         let chat;
         let apiKey = '';
@@ -274,8 +318,8 @@
           role: "system",
           parts: [{
               text: `あなたはWebデザインとコーディングを支援するAIです。以下のルールに従って回答してください。
-1. 回答は必ずHTML形式で生成し、必要に応じてJavaScriptやCSSもHTML内に含めてください。ブラウザが回答のHTMLを解釈し、ページに表示します。
-2. コードそのものを表示する場合は、マークダウンのコードブロックは使わず、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。
+1. Markdownを一切使用せず、必ずHTML形式で回答を生成し、必要に応じてJavaScriptやCSSもHTML内に含めてください。ブラウザが回答のHTMLを解釈し、ページに表示します。
+2. コードそのものを表示する場合は、Markdownのコードスパンやコードブロックは使わず、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。コードが長い場合、スクロールできるようにしてください。
 3. ユーザがHTMLコードの表示を要求している場合、必ずHTMLエスケープ処理を行って回答してください。特に指示がない限り、直接ブラウザでの実行や確認ができる形式で提供する必要はありません。
 4. 数式はLaTeX形式（例: $ax^2$ や $$...$$）で記述してください。MathJaxライブラリがページに読み込まれています。
 5. グラフや図形はSVG形式で出力してください。
@@ -284,9 +328,6 @@
           }],
       };
       
-      /**
-       * 変更点: タイムスタンプのフォーマットを「月/日（改行）時:分」に変更
-       */
       function displayMessage(role, content, isHtml = false) {
           const container = document.createElement('div');
           container.classList.add('message-container', `${role}-message-container`);
@@ -304,7 +345,6 @@
               const hours = String(now.getHours()).padStart(2, '0');
               const minutes = String(now.getMinutes()).padStart(2, '0');
               
-              // フォーマットを「月/日\n時:分」に変更
               timestampSpan.textContent = `${month}/${day}\n${hours}:${minutes}`;
 
               if (role === 'user') {
@@ -319,12 +359,16 @@
           }
 
           chatHistoryElement.appendChild(container);
-          chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
           
+          if (role !== 'typing') {
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+          }
+
           if (isHtml) {
               if (window.MathJax) { window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err)); }
               addCopyButtons(messageDiv);
           }
+          setTimeout(updateScrollButtonsState, 100);
       }
 
       function addCopyButtons(parentElement) {
@@ -369,6 +413,7 @@
       function removeTypingIndicator() {
           const indicator = document.getElementById('typing-indicator');
           if (indicator) { indicator.remove(); }
+          updateScrollButtonsState();
       }
 
       async function handleFormSubmit(e) {
@@ -513,6 +558,68 @@
 
       window.addEventListener('DOMContentLoaded', initializeApp);
 
+      // --- 変更点：ここから下の scrollToMessage 関数を修正 ---
+
+      /**
+       * 指定された方向（上または下）の次のメッセージへスクロールする
+       * @param {'up' | 'down'} direction - スクロール方向
+       */
+      function scrollToMessage(direction) {
+        const allMessages = Array.from(chatHistoryElement.querySelectorAll('.message-container')).filter(c => c.querySelector('.timestamp'));
+        if (allMessages.length === 0) return;
+
+        const scrollTop = chatHistoryElement.scrollTop;
+        const clientHeight = chatHistoryElement.clientHeight;
+
+        if (direction === 'up') {
+            const candidates = allMessages.filter(m => m.offsetTop < scrollTop - 1);
+            if (candidates.length > 0) {
+                candidates[candidates.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } else { // 'down'
+            // 表示領域の中心を基準点とする
+            const scrollCenter = scrollTop + (clientHeight / 2);
+            // 基準点より下にある最初のメッセージを探す
+            const target = allMessages.find(m => m.offsetTop > scrollCenter);
+
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // 候補がない場合（既に一番下のメッセージが表示されているなど）は、一番下までスクロールする
+                chatHistoryElement.scrollTo({
+                    top: chatHistoryElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }
+
+    /**
+     * スクロールボタンの表示・非表示と有効・無効状態を更新する
+     */
+    function updateScrollButtonsState() {
+        const scrollTop = chatHistoryElement.scrollTop;
+        const scrollHeight = chatHistoryElement.scrollHeight;
+        const clientHeight = chatHistoryElement.clientHeight;
+
+        const hasScrollbar = scrollHeight > clientHeight;
+        scrollButtonsContainer.style.display = hasScrollbar ? 'flex' : 'none';
+
+        if (!hasScrollbar) return;
+
+        scrollUpButton.disabled = scrollTop < 5;
+        scrollDownButton.disabled = (scrollHeight - scrollTop - clientHeight) < 5;
+    }
+
+    // スクロールボタンのクリックイベント
+    scrollUpButton.addEventListener('click', () => scrollToMessage('up'));
+    scrollDownButton.addEventListener('click', () => scrollToMessage('down'));
+
+    // チャット履歴のスクロールイベントでボタンの状態を更新
+    chatHistoryElement.addEventListener('scroll', updateScrollButtonsState);
+
+    // ウィンドウリサイズ時にもボタンの状態を更新
+    new ResizeObserver(updateScrollButtonsState).observe(chatHistoryElement);
     </script>
 </body>
 </html>
