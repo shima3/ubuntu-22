@@ -1,809 +1,769 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chat</title>
-  <style>
-    :root {
-        --user-bg: #007bff;
-        --model-bg: #f0f0f0;
-        --border-color: #e0e0e0;
-    }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: #f4f4f9;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-size: 16px;
-    }
-    #app-container {
-        width: 100%;
-        max-width: 800px;
-        height: 95vh;
-        // max-height: 900px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-    }
-    #header {
-        padding: 15px 20px;
-        border-bottom: 1px solid var(--border-color);
-        background-color: #fafafa;
-    }
-    #header h1 {
-        margin: 0;
-        font-size: 1.2rem;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    #chat-history {
-        flex-grow: 1;
-        padding: 20px;
-        overflow-y: auto;
-        border-bottom: 1px solid var(--border-color);
-    }
-    .message-container {
-        display: flex;
-        margin-bottom: 15px;
-        align-items: flex-end;
-        gap: 8px;
-    }
-    .user-message-container { justify-content: flex-end; }
-    .model-message-container { justify-content: flex-start; }
-    .error-message-container { justify-content: center; }
-
-    .timestamp {
-        font-size: 0.75rem;
-        color: #888;
-        white-space: pre-line;
-        text-align: center;
-        line-height: 1.2;
-        margin-bottom: 12px;
-        flex-shrink: 0;
-    }
-    .message {
-        padding: 12px 18px;
-        border-radius: 18px;
-        max-width: 90%;
-        line-height: 1.5;
-        word-wrap: break-word;
-    }
-    .user-message {
-        background-color: var(--user-bg);
-        color: white;
-        border-bottom-right-radius: 4px;
-        white-space: pre-wrap;
-        font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
-        max-height: 450px;
-        overflow-y: auto;
-    }
-    .model-message {
-        background-color: var(--model-bg);
-        color: #333;
-        border-bottom-left-radius: 4px;
-    }
-    .model-message table { border-collapse: collapse; width: 100%; margin: 1em 0; border: 1px solid #ccc; }
-    .model-message th, .model-message td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    .model-message th { background-color: #e9e9e9; }
-    .model-message svg { max-width: 100%; height: auto; }
-    .error-message { background-color: #ffebee; color: #c62828; text-align: center; }
-    #input-form { display: flex; padding: 15px; gap: 10px; background-color: #f9f9f9; align-items: flex-end; }
-    
-    #input-area-wrapper {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #fff;
-        transition: border-color 0.3s, background-color 0.3s;
-    }
-    #input-area-wrapper.drag-over {
-        border-color: var(--user-bg);
-        background-color: #f0f8ff;
-    }
-    
-    #prompt-input {
-        flex-grow: 1; padding: 12px;
-        border: none;
-        border-radius: 8px;
-        resize: none; font-size: 1rem; min-height: 24px; max-height: 200px; overflow-y: auto;
-        background-color: transparent;
-    }
-    #prompt-input:focus {
-        outline: none;
-    }
-
-    #send-button {
-        padding: 12px 20px;
-        background-color: var(--user-bg); color: white;
-        border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background-color 0.2s;
-        align-self: flex-end;
-    }
-    #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
-
-    #attachment-preview-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 8px 8px 0 8px;
-    }
-    .attachment-item {
-        display: flex;
-        align-items: center;
-        background-color: #e9ecef;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        color: #495057;
-        max-width: 200px;
-    }
-    .attachment-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .remove-attachment-btn {
-        margin-left: 6px;
-        padding: 0;
-        width: 16px;
-        height: 16px;
-        line-height: 16px;
-        text-align: center;
-        cursor: pointer;
-        border: none;
-        background-color: #adb5bd;
-        color: white;
-        border-radius: 50%;
-        font-size: 12px;
-        font-weight: bold;
-        flex-shrink: 0;
-    }
-    .remove-attachment-btn:hover {
-        background-color: #868e96;
-    }
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center;
-        align-items: center; z-index: 1000; opacity: 0; visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    .modal-overlay.visible { opacity: 1; visibility: visible; }
-    .modal-content {
-        background-color: #fff; padding: 20px 30px; border-radius: 8px;
-        width: 90%; max-width: 500px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    .modal-content h2 { margin-top: 0; margin-bottom: 10px; }
-    .modal-content p { color: #555; line-height: 1.5; margin-bottom: 15px; }
-    .modal-form-row {
-        display: flex;
-        align-items: center; /* ラベルとセレクトボックスを垂直方向中央に揃える */
-        gap: 10px; /* 要素間の隙間を設定 */
-        margin-bottom: 5px; /* 下の要素との間隔を調整 */
-    }
-    .modal-label {
-        display: block;
-        text-align: left;
-        margin: 10px 0 5px 0;
-        color: #333;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    .modal-form-row .modal-label {
-        margin: 0;
-        white-space: nowrap; /* ラベルが折り返さないようにする */
-    }
-    .modal-content input {
-        width: 100%; box-sizing: border-box; padding: 12px;
-        border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;
-    }
-    .modal-content select {
-        flex: 1;
-        width: auto; /* width指定を自動に任せる */
-        box-sizing: border-box; 
-        padding: 12px;
-        border: 1px solid #ccc; 
-        border-radius: 4px; 
-        font-size: 1rem;
-        background-color: white; 
-        -webkit-appearance: none; 
-        appearance: none;
-    }
-    .modal-content button {
-        width: 100%; padding: 12px; background-color: var(--user-bg); color: #fff;
-        border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 15px;
-    }
-    .modal-note {
-        padding-left: 15pt;
-        text-align: left;
-        font-size: 0.8rem;
-        color: #666;
-        margin-top: 15px;
-        margin-bottom: 0;
-    }
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    #modal-api-key-input {
-        width: 100%;
-        margin: 0;
-        padding-right: 60px;
-    }
-    #toggle-visibility-button {
-        position: absolute;
-        right: 5px;
-        top: 50%;
-        transform: translateY(-100%);
-        padding: 6px 10px;
-        font-size: 1rem;
-        background-color: #f0f0f0;
-        color: #333; border: 1px solid #ccc;
-        border-radius: 4px;
-        width: auto;
-        line-height: 1;
-        white-space: nowrap;
-    }
-    .typing-indicator { padding: 18px !important; }
-    .typing-indicator span {
-        height: 8px; width: 8px; background-color: #8e8e8e; border-radius: 50%;
-        display: inline-block; margin: 0 2px; animation: bounce 1.2s infinite ease-in-out;
-    }
-    .typing-indicator span:nth-child(2) { animation-delay: -1.0s; }
-    .typing-indicator span:nth-child(3) { animation-delay: -0.8s; }
-    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
-
-    /* --- ソースコード表示用のスタイル (変更あり) --- */
-    .code-container {
-        background-color: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px;
-        margin-bottom: 15px; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-        font-size: 14px; line-height: 1.6; position: relative;
-        max-height: 450px; /* 追加: 最大高さを設定 */
-        overflow-y: auto;  /* 追加: 縦スクロールを有効化 */
-    }
-    .code-container pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
-    
-    /* 追加: ボタンをまとめるコンテナ */
-    .code-button-container {
-        position: absolute; 
-        top: 10px; 
-        right: 10px;
-        display: flex;
-        gap: 8px;
-        z-index: 1;
-    }
-    /* 変更: .copy-button から汎用的なクラス名に変更 */
-    .code-action-button {
-        background-color: #4a5568;
-        color: #e2e8f0; 
-        border: 1px solid #718096; 
-        padding: 4px 8px;
-        border-radius: 4px; 
-        cursor: pointer; 
-        font-size: 12px; 
-        opacity: 0.7;
-        transition: opacity 0.2s, background-color 0.2s;
-    }
-    .code-action-button:hover { opacity: 1; background-color: #718096; }
-    .code-action-button.copied { background-color: #38a169; border-color: #6ee7b7; color: white; }
-    
-    #scroll-buttons-container {
-        position: absolute;
-        bottom: 85px;
-        right: 20px;
-        display: none;
-        flex-direction: column;
-        gap: 8px;
-        z-index: 10;
-    }
-    .scroll-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid var(--border-color);
-        background-color: #ffffff;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.2s;
-    }
-    .scroll-button svg {
-        width: 20px;
-        height: 20px;
-        fill: #555;
-    }
-    .scroll-button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>AI Chat by Gemini API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- MathJax for LaTeX rendering -->
     <script>
-      MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --background-color: #f4f7f9;
+            --container-bg-color: #ffffff;
+            --user-message-bg: #dcf8c6;
+            --ai-message-bg: #e9e9eb;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --error-color: #d9534f;
+            --code-bg-color: #282c34;
+            --code-header-bg: #3a404a;
+            --font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100dvh;
+            color: var(--text-color);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--container-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100dvh - 40px);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.2em; }
+        #settings-toggle { background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em; }
+        #settings-container { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        #settings-container.hidden { display: none; }
+        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .settings-grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
+        .form-group input { padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; }
+        
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+        }
+        
+        #chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message-row.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+            max-width: 90%;
+        }
+
+        .message-row.ai {
+            align-self: flex-start;
+            max-width: 100%;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-timestamp {
+            font-size: 0.75em;
+            color: #888;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .message-content { white-space: normal; word-break: break-word; }
+        .message-content img { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+
+        .user-message {
+            background-color: var(--user-message-bg);
+            border-bottom-right-radius: 4px;
+        }
+        .ai-message {
+            background-color: var(--ai-message-bg);
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Markdown用スタイル */
+        .ai-message .message-content p { margin-top: 0; margin-bottom: 0.5em; }
+        .ai-message .message-content p:last-child { margin-bottom: 0; }
+        .ai-message .message-content ul, .ai-message .message-content ol { padding-left: 20px; margin-top: 0.5em; margin-bottom: 0.5em; }
+        .ai-message .message-content li { margin-bottom: 0.25em; }
+        .ai-message .message-content blockquote { border-left: 4px solid #ccc; padding-left: 10px; margin-left: 0; color: #666; font-style: italic; }
+        .ai-message .message-content a { color: var(--primary-color); }
+        .ai-message .message-content table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+        .ai-message .message-content th, .ai-message .message-content td { border: 1px solid #ccc; padding: 8px; }
+        .ai-message .message-content th { background-color: #f0f0f0; }
+
+        mjx-container { text-align: left !important; }
+
+        .code-block-wrapper { margin: 1em 0; border-radius: 8px; overflow: hidden; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; background-color: var(--code-header-bg); padding: 5px 10px; color: #ccc; font-size: 0.8em; }
+        .code-header .language-name { font-weight: bold; }
+        .code-header .code-actions button { background: none; border: 1px solid #777; color: #ccc; padding: 3px 8px; border-radius: 4px; cursor: pointer; margin-left: 8px; font-size: 0.9em; }
+        .code-header .code-actions button:hover { background-color: #555; }
+        pre, code { margin: 0; font-family: 'Courier New', Courier, monospace; }
+        
+        .code-block-wrapper pre {
+            background-color: var(--code-bg-color);
+            padding: 15px;
+            max-height: 400px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-y: auto;
+        }
+        .ai-message .message-content > p > code, .ai-message .message-content > ul li code, .ai-message .message-content > ol li code {
+            background-color: rgba(0,0,0,0.08);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .svg-container { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin: 1em 0; }
+        .svg-container svg { max-width: 100%; height: auto; display: block; }
+
+        .message-files-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .user-message .message-files-container img { max-width: 150px; max-height: 150px; border-radius: 8px; margin-top: 0; }
+        .file-display-item { display: inline-flex; align-items: center; gap: 8px; background-color: rgba(0, 0, 0, 0.05); padding: 6px 12px; border-radius: 16px; font-size: 0.9em; }
+        .file-display-item svg { width: 16px; height: 16px; fill: #555; flex-shrink: 0; }
+
+        /* Loading Indicator Styles */
+        .typing-indicator-bubble {
+            background-color: var(--ai-message-bg);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            padding: 12px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #8e8e93;
+            border-radius: 50%;
+            animation: typing-blink 1.4s infinite both;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
+
+        #chat-form { flex-shrink: 0; }
+        #chat-form-container { padding: 10px 20px 20px 20px; border-top: 1px solid var(--border-color); }
+        #input-wrapper { display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: 20px; padding: 5px; }
+        #input-wrapper.drag-over { border-color: var(--primary-color); border-style: dashed; }
+        #file-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 10px 8px 10px; }
+        .file-item { background-color: #f0f0f0; padding: 5px 8px; border-radius: 12px; font-size: 0.8em; display: flex; align-items: center; gap: 5px; }
+        .file-item .remove-file { cursor: pointer; font-weight: bold; color: #999; }
+        #form-bottom-row { display: flex; gap: 10px; align-items: flex-end; }
+        #file-input-label { padding: 8px; cursor: pointer; transition: opacity 0.2s; }
+        #file-input-label svg { width: 24px; height: 24px; fill: #555; }
+        #message-input { flex-grow: 1; padding: 10px; border: none; resize: none; font-size: 1em; height: 24px; max-height: 100px; overflow-y: auto; background: transparent; }
+        #message-input:focus { outline: none; }
+        #send-button { padding: 0 20px; border: none; background-color: var(--primary-color); color: white; border-radius: 20px; cursor: pointer; font-size: 1em; align-self: flex-end; margin: 5px; height: 40px; }
+        #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        #error-message { color: var(--error-color); padding: 10px 20px; text-align: center; font-weight: bold; display: none; }
+        #toast-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000; opacity: 0; transition: opacity 0.5s; font-size: 0.9em; }
+        #toast-notification.show { opacity: 1; }
+
+        .api-key-guide { margin-top: 20px; font-size: 0.9em; color: #555; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .api-key-guide h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+        .api-key-guide ol { margin: 0; padding-left: 20px; line-height: 1.6; }
+        .api-key-guide li { margin-bottom: 5px; }
+        .api-key-guide a { color: var(--primary-color); font-weight: 500; text-decoration: none; }
+        .api-key-guide a:hover { text-decoration: underline; }
+
+        .history-management { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .history-management h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+        .history-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .history-buttons button, .history-buttons .button-label { padding: 8px 15px; border: 1px solid var(--primary-color); background-color: white; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s, color 0.2s; text-align: center; display: inline-block; }
+        .history-buttons button:hover, .history-buttons .button-label:hover { background-color: var(--primary-color); color: white; }
+    </style>
 </head>
 <body>
 
-    <div id="api-key-modal-overlay" class="modal-overlay">
-      <div class="modal-content">
-        <h2>AI Chatへようこそ</h2>
-        <p>
-          Googleの生成AI「Gemini」とチャットするアプリです。<br>
-          チャットを開始するにはモデルを選択し、APIキーを入力してください。
-          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>で無料プランのAPIキーを１つ取得できます。
-        </p>
+    <div class="app-container">
+        <header>
+            <h1 id="app-title">Gemini Chat</h1>
+            <button id="settings-toggle">設定</button>
+        </header>
 
-        <div class="modal-form-row">
-          <label for="model-select" class="modal-label">使用するモデルを選択:</label>
-          <select id="model-select">
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro（推奨）</option>
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-          </select>
-        </div>
-        
-        <label for="modal-api-key-input" class="modal-label">APIキーを入力:</label>
-        <div class="input-wrapper">
-          <input type="password" id="modal-api-key-input" placeholder="ここにAPIキーを貼り付け">
-          <button type="button" id="toggle-visibility-button">表示</button>
-        </div>
-        
-        <button id="save-settings-button">保存して開始</button>
-        <ul class="modal-note">
-          <li>ここで入力したAPIキーはブラウザ内にのみ保存され、外部には送信されません。
-          <li>無料プランのAPIキーでは、1日あたり1500回、1分あたり100万トークン<br>（日本語約150万文字、英語約400万文字）まで利用可能です。
-        </ul>
-      </div>
-    </div>
-
-    <div id="app-container">
-        <div id="header">
-            <h1 id="header-title">AI Chat</h1>
-        </div>
-        <div id="chat-history"></div>
-        <form id="input-form">
-            <div id="input-area-wrapper">
-                <div id="attachment-preview-container"></div>
-                <textarea id="prompt-input" placeholder="メッセージを入力（送信ボタンを押すか、またはCtrl+Enterで送信）" rows="1" disabled></textarea>
+        <div id="settings-container" class="hidden">
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label for="api-key">APIキー</label>
+                    <input type="password" id="api-key" placeholder="Google AI Studioで取得したキー">
+                </div>
+                <div class="form-group">
+                    <label for="model-input">モデル</label>
+                    <input type="text" id="model-input" placeholder="例: gemini-1.5-pro-latest">
+                </div>
             </div>
-            <button id="send-button" type="submit" disabled>送信</button>
-        </form>
+            <div class="api-key-guide">
+                <h4>APIキーの取得方法</h4>
+                <ol>
+                    <li><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> にアクセスします。</li>
+                    <li>「Create API key」ボタンをクリックして新しいキーを作成します。</li>
+                    <li>生成されたキーをコピーし、上のAPIキー入力欄に貼り付けてください。</li>
+                </ol>
+                <p style="font-size: 0.85em; color: #666; margin-top: 10px; margin-bottom: 0;">※APIキーはブラウザのローカルストレージに保存され、このページ以外からアクセスされることはありません。</p>
+            </div>
+            <div class="history-management">
+                <h4>対話履歴の管理</h4>
+                <div class="history-buttons">
+                    <button id="download-history-btn">履歴をダウンロード</button>
+                    <label for="upload-history-input" class="button-label">履歴をアップロード</label>
+                    <input type="file" id="upload-history-input" accept=".json,application/json" style="display: none;">
+                </div>
+                <p style="font-size: 0.85em; color: #666; margin-top: 10px; margin-bottom: 0;">※現在の対話履歴をJSONファイルとして保存・読み込みできます。アップロードすると現在の履歴は上書きされます。</p>
+            </div>
+        </div>
 
-        <div id="scroll-buttons-container">
-            <button id="scroll-up-button" class="scroll-button" title="前のメッセージへ">
-                <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-            </button>
-            <button id="scroll-down-button" class="scroll-button" title="次のメッセージへ">
-                <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-            </button>
+        <div id="error-message"></div>
+
+        <div id="chat-container">
+            <div id="chat-history"></div>
+            <!-- Loading indicator will be added here by JS -->
+            <form id="chat-form">
+                <div id="chat-form-container">
+                    <div id="input-wrapper">
+                        <div id="file-preview"></div>
+                        <div id="form-bottom-row">
+                           <label id="file-input-label" for="file-input">
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z" /></svg>
+                           </label>
+                           <input type="file" id="file-input" multiple style="display: none;">
+                           <textarea id="message-input" placeholder="メッセージを入力、またはファイルをドロップ (Ctrl+Enterで送信)" rows="1"></textarea>
+                           <button type="submit" id="send-button">送信</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
+    <div id="toast-notification">コピーしました！</div>
 
     <script type="module">
-      import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-      
-      // ★デフォルトモデルは元のバージョンを維持
-      const CONFIG = {
-          MODEL_STORAGE_KEY: 'gemini_model_name_v2',
-          DEFAULT_MODEL: 'gemini-2.5-pro',
-          API_KEY_STORAGE_KEY: 'gemini_api_key_v2',
-          PROMPT: 'メッセージを入力、またはファイルをドロップして添付\n（送信ボタンを押す、またはCtrl+Enterで送信）'
-      };
-      
-        const modalOverlay = document.getElementById('api-key-modal-overlay');
-        const modalApiKeyInput = document.getElementById('modal-api-key-input');
-        const modelSelect = document.getElementById('model-select');
-        const saveSettingsButton = document.getElementById('save-settings-button');
-        const chatHistoryElement = document.getElementById('chat-history');
-        const inputForm = document.getElementById('input-form');
-        const promptInput = document.getElementById('prompt-input');
+        const { GoogleGenerativeAI } = await import("https://unpkg.com/@google/generative-ai/dist/index.mjs");
+
+        // Code block data store
+        const codeBlocks = new Map();
+        let codeBlockIdCounter = 0;
+
+        // DOM Elements
+        const settingsContainer = document.getElementById('settings-container');
+        const settingsToggleBtn = document.getElementById('settings-toggle');
+        const apiKeyInput = document.getElementById('api-key');
+        const modelInput = document.getElementById('model-input');
+        const chatContainer = document.getElementById('chat-container');
+        const chatHistory = document.getElementById('chat-history');
+        const chatForm = document.getElementById('chat-form');
+        const inputWrapper = document.getElementById('input-wrapper');
+        const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
-        const toggleVisibilityButton = document.getElementById('toggle-visibility-button');
-        const headerTitle = document.getElementById('header-title');
-        const scrollButtonsContainer = document.getElementById('scroll-buttons-container');
-        const scrollUpButton = document.getElementById('scroll-up-button');
-        const scrollDownButton = document.getElementById('scroll-down-button');
-        const inputAreaWrapper = document.getElementById('input-area-wrapper');
-        const attachmentPreviewContainer = document.getElementById('attachment-preview-container');
+        const errorMessageDiv = document.getElementById('error-message');
+        const fileInput = document.getElementById('file-input');
+        const fileInputLabel = document.getElementById('file-input-label');
+        const filePreview = document.getElementById('file-preview');
+        const toastNotification = document.getElementById('toast-notification');
+        const downloadHistoryBtn = document.getElementById('download-history-btn');
+        const uploadHistoryInput = document.getElementById('upload-history-input');
+        const appTitle = document.getElementById('app-title');
 
+        // State
+        let genAI;
         let chat;
-        let apiKey = '';
-        let selectedModel = CONFIG.DEFAULT_MODEL;
+        let conversationHistory = [];
+        let messageTimestamps = [];
         let attachedFiles = [];
+        let loadingIndicator;
 
-      const systemInstruction = {
-          role: "system",
-          parts: [{
-              text: `あなたはWebデザインとコーディングを支援するAIです。以下のルールに従って回答してください。
-1. Markdownを一切使用せず、必ずHTML形式で回答を生成し、必要に応じてJavaScriptやCSSもHTML内に含めてください。ブラウザが回答のHTMLを解釈し、ページに表示します。
-2. コードそのものを表示する場合は、Markdownのコードスパンやコードブロックは使わず、<div class="code-container"> で全体を囲み、その中に <pre> タグを使ってコードを配置してください。コードは適切にHTMLエスケープ処理を行い、インデントを正確に維持し、コードの可読性を最大限に高めてください。コードが長い場合、スクロールできるようにしてください。
-3. ユーザがHTMLコードの表示を要求している場合、必ずHTMLエスケープ処理を行って回答してください。特に指示がない限り、直接ブラウザでの実行や確認ができる形式で提供する必要はありません。
-4. 数式はLaTeX形式（例: $ax^2$ や $$...$$）で記述してください。MathJaxライブラリがページに読み込まれています。
-5. グラフや図形はSVG形式で出力してください。
-6. テーブルは標準的なHTMLの <table> タグを使用してください。
-7. 特に指示がない限り、マウスオーバー（:hover）などのインタラクティブな効果は使用しないでください。`
-          }],
-      };
-      
-      function displayMessage(role, content, isHtml = false) {
-          const container = document.createElement('div');
-          container.classList.add('message-container', `${role}-message-container`);
+        const TEXT_MIME_TYPES = ['application/json', 'application/xml', 'application/javascript', 'application/csv', 'application/x-sh'];
+        const TEXT_EXTENSIONS = [ 'txt', 'md', 'html', 'css', 'js', 'ts', 'jsx', 'tsx', 'json', 'xml', 'csv', 'py', 'rb', 'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'sh', 'bat', 'ps1', 'sql', 'log', 'ini', 'toml', 'yaml', 'yml', 'svg', 'go', 'php', 'swift' ];
+        
+        function updateAppTitle() {
+            const modelName = modelInput.value.trim();
+            appTitle.textContent = modelName ? `AI Chat by Google ${modelName}` : 'Gemini Chat';
+        }
 
-          const messageDiv = document.createElement('div');
-          messageDiv.classList.add('message', `${role}-message`);
-          if (isHtml) { messageDiv.innerHTML = content; } else { messageDiv.textContent = content; }
-
-          if (role === 'user' || role === 'model') {
-              const timestampSpan = document.createElement('span');
-              timestampSpan.classList.add('timestamp');
-              const now = new Date();
-              const month = String(now.getMonth() + 1).padStart(2, '0');
-              const day = String(now.getDate()).padStart(2, '0');
-              const hours = String(now.getHours()).padStart(2, '0');
-              const minutes = String(now.getMinutes()).padStart(2, '0');
-              
-              timestampSpan.textContent = `${month}/${day}\n${hours}:${minutes}`;
-
-              if (role === 'user') {
-                  container.appendChild(timestampSpan);
-                  container.appendChild(messageDiv);
-              } else {
-                  container.appendChild(messageDiv);
-                  container.appendChild(timestampSpan);
-              }
-          } else {
-              container.appendChild(messageDiv);
-          }
-
-          chatHistoryElement.appendChild(container);
-          
-          if (role !== 'typing') {
-            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
-          }
-
-          if (isHtml) {
-              if (window.MathJax) { window.MathJax.typesetPromise([messageDiv]).catch(err => console.error('MathJax Error:', err)); }
-              addCodeContainerActions(messageDiv);
-          }
-          setTimeout(updateScrollButtonsState, 100);
-      }
-
-      function addCodeContainerActions(parentElement) {
-          const codeContainers = parentElement.querySelectorAll('.code-container');
-          codeContainers.forEach(container => {
-              if (container.querySelector('.code-button-container')) return;
-
-              const buttonContainer = document.createElement('div');
-              buttonContainer.className = 'code-button-container';
-              
-              const preElement = container.querySelector('pre');
-              if (!preElement) return;
-              const codeToProcess = preElement.textContent;
-
-              // 1. ダウンロードボタンの作成
-              const downloadButton = document.createElement('button');
-              downloadButton.className = 'code-action-button';
-              downloadButton.textContent = 'ダウンロード';
-              downloadButton.addEventListener('click', () => {
-                  const blob = new Blob([codeToProcess], { type: 'text/plain;charset=utf-8' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-
-                  let extension = 'txt';
-                  const lowerCaseCode = codeToProcess.toLowerCase().trim();
-                  if (lowerCaseCode.startsWith('<!doctype html>') || lowerCaseCode.startsWith('<html')) {
-                      extension = 'html';
-                  } else if (lowerCaseCode.match(/\.[a-zA-Z0-9-]+\s*\{/)) {
-                      extension = 'css';
-                  } else if (lowerCaseCode.includes('function') || lowerCaseCode.includes('const ') || lowerCaseCode.includes('let ') || lowerCaseCode.includes('var ')) {
-                      extension = 'js';
-                  } else if (lowerCaseCode.includes('public class') || lowerCaseCode.includes('import java.')) {
-                      extension = 'java';
-                  } else if (lowerCaseCode.includes('def ') && lowerCaseCode.includes(':')) {
-                      extension = 'py';
-                  }
-                  a.download = `code-snippet.${extension}`;
-                  
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-              });
-
-              // 2. コピーボタンの作成
-              const copyButton = document.createElement('button');
-              copyButton.className = 'code-action-button';
-              copyButton.textContent = 'コピー';
-              copyButton.addEventListener('click', () => {
-                  navigator.clipboard.writeText(codeToProcess).then(() => {
-                      copyButton.textContent = 'コピーしました！';
-                      copyButton.classList.add('copied');
-                      setTimeout(() => {
-                          copyButton.textContent = 'コピー';
-                          copyButton.classList.remove('copied');
-                      }, 2000);
-                  }).catch(err => {
-                      console.error('クリップボードへのコピーに失敗しました:', err);
-                      alert('コピーに失敗しました。');
-                  });
-              });
-
-              buttonContainer.appendChild(downloadButton);
-              buttonContainer.appendChild(copyButton);
-              container.appendChild(buttonContainer);
-          });
-      }
-
-      function displayError(message) { displayMessage('error', `エラー: ${message}`); }
-
-      function displayTypingIndicator() {
-          const container = document.createElement('div');
-          container.id = 'typing-indicator';
-          container.classList.add('message-container', 'model-message-container');
-          container.style.gap = '0';
-          container.innerHTML = `<div class="message model-message typing-indicator"><span></span><span></span><span></span></div>`;
-          chatHistoryElement.appendChild(container);
-          chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
-      }
-      
-      function removeTypingIndicator() {
-          const indicator = document.getElementById('typing-indicator');
-          if (indicator) { indicator.remove(); }
-          updateScrollButtonsState();
-      }
-
-      async function handleFormSubmit(e) {
-            e.preventDefault();
-            const prompt = promptInput.value.trim();
-            if (!apiKey) {
-                displayError("APIキーが設定されていません。");
-                showApiKeyModal();
-                return;
+        function displayInitialWelcomeMessage() {
+            const welcomeText = "ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。";
+            const timestamp = new Date().toISOString();
+            if (messageTimestamps.length === 0) {
+                messageTimestamps.push(timestamp);
             }
-            if (!prompt && attachedFiles.length === 0) return;
+            addMessageToDisplay('model', welcomeText, [], timestamp);
+        }
+        
+        // ★★★ この関数が新しい安定版のレンダリング処理です ★★★
+        function renderFormattedContent(container, text) {
+            const placeholders = new Map();
+            let placeholderId = 0;
 
-            sendButton.disabled = true;
-            sendButton.textContent = '...';
-            
-            let userMessageContent = prompt;
-            if (attachedFiles.length > 0) {
-                const fileNames = attachedFiles.map(f => f.name).join(', ');
-                userMessageContent += `\n\n[添付ファイル: ${fileNames}]`;
-            }
+            const fileBlockRegex = /\[添付ファイル: (.*?)\]\n```([\s\S]*?)```/g;
+            let processedText = text.replace(fileBlockRegex, (match, fileName) => {
+                return `\n> AIはファイル "${fileName}" の内容を参照しました\n`;
+            });
 
-            promptInput.value = '';
-            promptInput.style.height = 'auto';
-            
-            displayMessage('user', userMessageContent);
-            displayTypingIndicator();
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
+            processedText = processedText.replace(codeBlockRegex, (match, lang, code) => {
+                const id = `%%CODE_BLOCK_PLACEHOLDER_${placeholderId++}%%`;
+                const language = (lang || 'plaintext').toLowerCase();
+                
+                const isSvg = (language === 'svg' || language === 'xml') && code.trim().startsWith('<svg');
+                let blockHtml;
+                if (isSvg) {
+                    blockHtml = `<div class="svg-container">${code}</div>`;
+                } else {
+                    const blockId = `code-block-${codeBlockIdCounter++}`;
+                    const highlightedCode = hljs.getLanguage(language)
+                        ? hljs.highlight(code, { language, ignoreIllegals: true }).value
+                        : hljs.highlightAuto(code).value;
+                    
+                    codeBlocks.set(blockId, { code, language });
 
-            try {
-                if (!chat) {
-                    const genAI = new GoogleGenerativeAI(apiKey);
-                    const model = genAI.getGenerativeModel({ model: selectedModel, systemInstruction });
-                    chat = model.startChat({ history: [] });
+                    blockHtml = `
+                        <div class="code-block-wrapper" data-block-id="${blockId}">
+                            <div class="code-header">
+                                <span class="language-name">${language === 'plaintext' ? 'text' : language}</span>
+                                <div class="code-actions">
+                                    <button class="code-copy-btn">Copy</button>
+                                    <button class="code-download-btn">Download</button>
+                                </div>
+                            </div>
+                            <pre><code class="hljs language-${language}">${highlightedCode}</code></pre>
+                        </div>
+                    `;
                 }
                 
-                const fileParts = await Promise.all(attachedFiles.map(fileToGenerativePart));
-                const messageParts = [prompt, ...fileParts];
-                
-                const result = await chat.sendMessage(messageParts);
-                const response = result.response;
-                const text = response.text();
-                
-                removeTypingIndicator();
-                displayMessage('model', text, true);
+                placeholders.set(id, blockHtml);
+                return id;
+            });
 
-            } catch (error) {
-                console.error(error);
-                removeTypingIndicator();
-                displayError(error.message || "不明なエラーが発生しました。APIキーまたはモデル名が正しいか確認してください。");
-                chat = null;
-            } finally {
-                sendButton.disabled = false;
-                sendButton.textContent = '送信';
-                attachedFiles = [];
-                updateAttachmentUI();
-                promptInput.focus();
+            let html = '';
+            if (typeof marked !== 'undefined') {
+                html = marked.parse(processedText);
+            } else {
+                html = processedText.replace(/\n/g, '<br>');
+            }
+            
+            html = html.replace(/<p>(%%CODE_BLOCK_PLACEHOLDER_\d+%%)<\/p>/g, (match, placeholder) => {
+                return placeholders.get(placeholder) || '';
+            });
+            html = html.replace(/(%%CODE_BLOCK_PLACEHOLDER_\d+%%)/g, (match, placeholder) => {
+                return placeholders.get(placeholder) || '';
+            });
+            
+            container.innerHTML = html;
+            
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                Promise.resolve().then(() => MathJax.typesetPromise([container]))
+                    .catch((err) => console.error('MathJax typesetting error:', err))
+                    .finally(() => chatHistory.scrollTop = chatHistory.scrollHeight);
             }
         }
         
-      function showApiKeyModal() { modalOverlay.classList.add('visible'); modalApiKeyInput.focus(); }
-      function hideApiKeyModal() { modalOverlay.classList.remove('visible'); }
+        function addMessageToDisplay(sender, text, files = [], timestamp = null) {
+            const messageDate = timestamp ? new Date(timestamp) : new Date();
+            const messageRow = document.createElement('div');
+            messageRow.classList.add('message-row', sender === 'user' ? 'user' : 'ai');
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+            const contentEl = document.createElement('div');
+            contentEl.classList.add('message-content');
 
-      function saveSettings() {
-          const key = modalApiKeyInput.value.trim();
-          const model = modelSelect.value;
-          if (!key) { alert("APIキーを入力してください。"); return; }
-          
-          const modelChanged = selectedModel !== model;
-
-          apiKey = key;
-          selectedModel = model;
-          localStorage.setItem(CONFIG.API_KEY_STORAGE_KEY, key);
-          localStorage.setItem(CONFIG.MODEL_STORAGE_KEY, model);
-          
-          hideApiKeyModal();
-          updateHeaderTitle();
-          promptInput.disabled = false;
-          sendButton.disabled = false;
-          promptInput.placeholder = CONFIG.PROMPT;
-          promptInput.focus();
-
-          if (modelChanged && chat) {
-              chat = null;
-              chatHistoryElement.innerHTML = '';
-              displayMessage('model', `モデルが「${getDisplayName(selectedModel)}」に変更されました。新しいチャットを開始します。`);
-          } else if (chatHistoryElement.children.length === 0) {
-              displayMessage('model', 'ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。');
-          }
-      }
-
-      function getDisplayName(modelName) {
-          return modelName.replace(/-latest$/, '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      }
-      
-      function updateHeaderTitle() {
-          headerTitle.textContent = `AI Chat (Powered by Google ${getDisplayName(selectedModel)})`;
-      }
-
-      function initializeApp() {
-          const savedKey = localStorage.getItem(CONFIG.API_KEY_STORAGE_KEY);
-          const savedModel = localStorage.getItem(CONFIG.MODEL_STORAGE_KEY);
-
-          modalApiKeyInput.value = savedKey || '';
-          modelSelect.value = savedModel || CONFIG.DEFAULT_MODEL;
-
-          if (savedKey) {
-              apiKey = savedKey;
-              selectedModel = savedModel || CONFIG.DEFAULT_MODEL;
-              updateHeaderTitle();
-          }
-          promptInput.placeholder = CONFIG.PROMPT;
-          showApiKeyModal();
-      }
-      
-      async function fileToGenerativePart(file) {
-          const base64EncodedDataPromise = new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result.split(',')[1]);
-              reader.onerror = err => reject(new Error("ファイルの読み込みに失敗しました。"));
-              reader.readAsDataURL(file);
-          });
-          return {
-              inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-          };
-      }
-
-      function updateAttachmentUI() {
-          attachmentPreviewContainer.innerHTML = '';
-          attachedFiles.forEach((file, index) => {
-              const item = document.createElement('div');
-              item.className = 'attachment-item';
-              
-              const nameSpan = document.createElement('span');
-              nameSpan.className = 'attachment-name';
-              nameSpan.textContent = file.name;
-              item.appendChild(nameSpan);
-
-              const removeBtn = document.createElement('button');
-              removeBtn.className = 'remove-attachment-btn';
-              removeBtn.innerHTML = '&times;';
-              removeBtn.type = 'button';
-              removeBtn.onclick = () => {
-                  attachedFiles.splice(index, 1);
-                  updateAttachmentUI();
-              };
-              
-              item.appendChild(removeBtn);
-              attachmentPreviewContainer.appendChild(item);
-          });
-      }
-
-      toggleVisibilityButton.addEventListener('click', () => {
-          if (modalApiKeyInput.type === 'password') {
-              modalApiKeyInput.type = 'text';
-              toggleVisibilityButton.textContent = '隠す';
-          } else {
-              modalApiKeyInput.type = 'password';
-              toggleVisibilityButton.textContent = '表示';
-          }
-      });
-      
-      inputForm.addEventListener('submit', handleFormSubmit);
-      promptInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); inputForm.requestSubmit(); } });
-      promptInput.addEventListener('input', () => { 
-        promptInput.style.height = 'auto'; 
-        promptInput.style.height = (promptInput.scrollHeight) + 'px'; 
-      });
-      saveSettingsButton.addEventListener('click', saveSettings);
-      modalApiKeyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveSettings(); } });
-
-      ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-          inputAreaWrapper.addEventListener(eventName, (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (promptInput.disabled) return;
-              if (eventName === 'dragover') inputAreaWrapper.classList.add('drag-over');
-              else inputAreaWrapper.classList.remove('drag-over');
-
-              if (eventName === 'drop') {
-                  const files = e.dataTransfer.files;
-                  if (files.length > 0) {
-                      for (const file of files) {
-                          attachedFiles.push(file);
-                      }
-                      updateAttachmentUI();
-                      promptInput.focus();
-                  }
-              }
-          });
-      });
-
-      window.addEventListener('DOMContentLoaded', initializeApp);
-
-      function scrollToMessage(direction) {
-        const allMessages = Array.from(chatHistoryElement.querySelectorAll('.message-container')).filter(c => c.querySelector('.timestamp'));
-        if (allMessages.length === 0) return;
-
-        const scrollTop = chatHistoryElement.scrollTop;
-        const clientHeight = chatHistoryElement.clientHeight;
-
-        if (direction === 'up') {
-            const candidates = allMessages.filter(m => m.offsetTop < scrollTop - 1);
-            if (candidates.length > 0) {
-                candidates[candidates.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        } else { // 'down'
-            const scrollCenter = scrollTop + (clientHeight / 2);
-            const target = allMessages.find(m => m.offsetTop > scrollCenter);
-
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (sender === 'model') {
+                renderFormattedContent(contentEl, text);
             } else {
-                chatHistoryElement.scrollTo({
-                    top: chatHistoryElement.scrollHeight,
-                    behavior: 'smooth'
-                });
+                if (text) {
+                    contentEl.textContent = text;
+                    contentEl.style.whiteSpace = 'pre-wrap';
+                }
+                if (files.length > 0) {
+                    const filesContainer = document.createElement('div');
+                    filesContainer.className = 'message-files-container';
+                    if (text) filesContainer.style.marginTop = '8px';
+                    files.forEach(file => {
+                        const isFileObject = file instanceof File;
+                        const isReconstructed = !!file.isReconstructed;
+                        const mimeType = isFileObject ? file.type : (file.inlineData ? file.inlineData.mimeType : (isReconstructed ? 'text/plain' : ''));
+                        const fileName = isFileObject ? file.name : (isReconstructed ? file.name : `添付ファイル (${mimeType})`);
+                        const isImage = mimeType && mimeType.startsWith('image/');
+                        if (isImage) {
+                            const img = document.createElement('img');
+                            if (isFileObject) {
+                                img.src = URL.createObjectURL(file);
+                                img.onload = () => URL.revokeObjectURL(img.src);
+                            } else {
+                                img.src = `data:${mimeType};base64,${file.inlineData.data}`;
+                            }
+                            filesContainer.appendChild(img);
+                        } else {
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'file-display-item';
+                            fileItem.innerHTML = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z" /></svg><span>${fileName}</span>`;
+                            filesContainer.appendChild(fileItem);
+                        }
+                    });
+                    contentEl.appendChild(filesContainer);
+                }
+            }
+            const timestampEl = document.createElement('div');
+            timestampEl.classList.add('message-timestamp');
+            timestampEl.textContent = messageDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+            messageEl.appendChild(contentEl);
+            messageRow.appendChild(messageEl);
+            messageRow.appendChild(timestampEl);
+            chatHistory.appendChild(messageRow);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function saveAndReinitializeChat() {
+            const apiKey = apiKeyInput.value.trim();
+            const modelName = modelInput.value.trim();
+            if (!apiKey) { displayError("APIキーを入力してください。"); return; }
+            if (!modelName) { displayError("モデル名を入力してください。"); return; }
+            localStorage.setItem('geminiApiKey', apiKey);
+            localStorage.setItem('geminiModel', modelName);
+            clearError();
+            conversationHistory = [];
+            messageTimestamps = [];
+            chatHistory.innerHTML = '';
+            displayInitialWelcomeMessage(); 
+            updateAppTitle();
+            setupChat();
+            settingsContainer.classList.add('hidden');
+        }
+        
+        function setupChat() {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) { displayError("APIキーが設定されていません。"); chatContainer.style.display = 'none'; return; }
+            try {
+                genAI = new GoogleGenerativeAI(apiKey);
+                const modelName = modelInput.value.trim();
+                if (!modelName) { displayError("モデル名を入力してください。"); chatContainer.style.display = 'none'; return; }
+                const model = genAI.getGenerativeModel({ model: modelName, systemInstruction: "ユーザーから図形やグラフの描画を指示された場合は、必ずSVGコードを生成し、そのコードブロックの言語指定を ```svg として応答してください。他の形式（xmlなど）は使用しないでください。また、数式を記述する際は、必ずLaTeX形式（インラインは`$...$`、ブロックは`$$...$$`）を使用してください。" });
+                chat = model.startChat({ history: conversationHistory });
+                chatContainer.style.display = 'flex';
+                clearError();
+            } catch (error) { displayError(`チャットの初期化に失敗: ${error.message}`); chatContainer.style.display = 'none'; }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const userInput = messageInput.value.trim();
+            if (!userInput && attachedFiles.length === 0) return;
+            inputWrapper.classList.add('submitting');
+            sendButton.disabled = true; messageInput.disabled = true; fileInput.disabled = true;
+            fileInputLabel.style.cssText = 'cursor: not-allowed; opacity: 0.5;';
+            document.querySelectorAll('.remove-file').forEach(btn => btn.style.display = 'none');
+            const filesToSend = [...attachedFiles];
+            const userTimestamp = new Date().toISOString();
+            messageTimestamps.push(userTimestamp);
+            addMessageToDisplay('user', userInput, filesToSend, userTimestamp);
+            chatHistory.appendChild(loadingIndicator);
+            loadingIndicator.style.display = 'block';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            try {
+                const filePromises = filesToSend.map(file => isTextFile(file) ? readTextFileAsPart(file) : fileToGenerativePart(file));
+                const allParts = await Promise.all(filePromises);
+                const textPartsContent = allParts.filter(p => p.text).map(p => p.text);
+                const dataParts = allParts.filter(p => p.inlineData);
+                const combinedText = [ ...textPartsContent, userInput ].filter(Boolean).join('\n\n');
+                const parts = [ ...dataParts, ...(combinedText ? [{ text: combinedText }] : []) ];
+                const result = await chat.sendMessage(parts);
+                const response = await result.response;
+                const text = response.text();
+                const aiTimestamp = new Date().toISOString();
+                messageTimestamps.push(aiTimestamp);
+                addMessageToDisplay('model', text, [], aiTimestamp);
+                clearError();
+            } catch (error) {
+                console.error('API Error:', error); messageTimestamps.pop();
+                const msg = error.message.includes("API key not valid") ? "APIキーが無効です。" : `APIエラー: ${error.message}`;
+                displayError(msg);
+                if (chatHistory.lastChild && chatHistory.lastChild.classList.contains('user')) chatHistory.removeChild(chatHistory.lastChild);
+            } finally {
+                inputWrapper.classList.remove('submitting');
+                sendButton.disabled = false; messageInput.disabled = false; fileInput.disabled = false;
+                fileInputLabel.style.cssText = 'cursor: pointer; opacity: 1;';
+                if (loadingIndicator.parentNode) loadingIndicator.parentNode.removeChild(loadingIndicator);
+                attachedFiles = []; renderFilePreview(); messageInput.value = ''; autoResizeTextarea();
             }
         }
-    }
+
+        function isTextFile(file) {
+            const fileType = file.type; const fileName = file.name || '';
+            const fileExtension = fileName.split('.').pop()?.toLowerCase();
+            if (fileType && fileType.startsWith('text/')) return true;
+            if (fileType && TEXT_MIME_TYPES.includes(fileType)) return true;
+            if (fileExtension && TEXT_EXTENSIONS.includes(fileExtension)) return true;
+            return false;
+        }
+
+        function readTextFileAsPart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => { const formattedText = `[添付ファイル: ${file.name}]\n\`\`\`\n${e.target.result}\n\`\`\``; resolve({ text: formattedText }); };
+                reader.onerror = reject; reader.readAsText(file);
+            });
+        }
+        
+        function fileToGenerativePart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({ inlineData: { data: reader.result.split(',')[1], mimeType: file.type } });
+                reader.onerror = reject; reader.readAsDataURL(file);
+            });
+        }
+        
+        async function handleDownloadHistory() {
+            if (!chat) { showToast("チャットが開始されていません。"); return; }
+            try {
+                const currentHistory = await chat.getHistory();
+                const historyTimestamps = messageTimestamps.slice(1);
+                if (currentHistory.length === 0) { showToast("対話履歴がありません。"); return; }
+                if (currentHistory.length !== historyTimestamps.length) { displayError("履歴とタイムスタンプの数が一致しません。"); return; }
+                const historyWithTimestamps = currentHistory.map((entry, index) => ({ ...entry, timestamp: historyTimestamps[index] }));
+                const dataToSave = { version: "1.0", model: modelInput.value.trim(), history: historyWithTimestamps };
+                const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                const now = new Date();
+                a.download = `gemini-chat-history-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+                showToast("履歴をダウンロードしました。");
+            } catch (error) { displayError("履歴のダウンロードに失敗しました。"); }
+        }
+
+        function handleUploadHistory(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    let newHistory, newTimestamps;
+                    if (loadedData.version === "1.0" && Array.isArray(loadedData.history)) {
+                        newHistory = loadedData.history.map(entry => { const { timestamp, ...rest } = entry; return rest; });
+                        newTimestamps = loadedData.history.map(entry => entry.timestamp);
+                        if (loadedData.model) { modelInput.value = loadedData.model; localStorage.setItem('geminiModel', loadedData.model); updateAppTitle(); }
+                    } else if (Array.isArray(loadedData)) {
+                        newHistory = loadedData; newTimestamps = newHistory.map(() => new Date().toISOString());
+                    } else { throw new Error("無効な履歴ファイル形式です。"); }
+                    conversationHistory = newHistory;
+                    messageTimestamps = [new Date().toISOString(), ...newTimestamps];
+                    rebuildChatDisplay(conversationHistory, messageTimestamps);
+                    setupChat(); settingsContainer.classList.add('hidden');
+                    showToast("履歴をアップロードしました。");
+                } catch (error) { displayError(`履歴の読み込みに失敗しました: ${error.message}`); } finally { event.target.value = ''; }
+            };
+            reader.onerror = () => displayError("ファイルの読み込み中にエラーが発生しました。"); reader.readAsText(file);
+        }
     
-    function updateScrollButtonsState() {
-        const scrollTop = chatHistoryElement.scrollTop;
-        const scrollHeight = chatHistoryElement.scrollHeight;
-        const clientHeight = chatHistoryElement.clientHeight;
+        function rebuildChatDisplay(history, timestamps) {
+            chatHistory.innerHTML = '';
+            const welcomeText = "ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。";
+            addMessageToDisplay('model', welcomeText, [], timestamps[0]);
+            const fileBlockRegex = /\[添付ファイル: (.*?)\]\n```\n(?:[\s\S]*?)\n```\n?\s*/g;
+            history.forEach((message, index) => {
+                const timestamp = timestamps[index + 1];
+                const fileParts = message.parts.filter(p => p.inlineData);
+                const textParts = message.parts.filter(p => p.text);
+                let combinedText = textParts.map(p => p.text).join('\n\n');
+                const reconstructedFiles = [...fileParts];
+                if (message.role === 'user') {
+                    const cleanedText = combinedText.replace(fileBlockRegex, (match, fileName) => {
+                        reconstructedFiles.push({ name: fileName, isReconstructed: true }); return '';
+                    }).trim();
+                    addMessageToDisplay(message.role, cleanedText, reconstructedFiles, timestamp);
+                } else {
+                    addMessageToDisplay(message.role, combinedText, fileParts, timestamp);
+                }
+            });
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                Promise.resolve().then(() => MathJax.typesetPromise([chatHistory])).catch((err) => console.error('MathJax error:', err));
+            }
+        }
 
-        const hasScrollbar = scrollHeight > clientHeight;
-        scrollButtonsContainer.style.display = hasScrollbar ? 'flex' : 'none';
+        function handleDownloadClick(code, language, messageDate) {
+            const langMap = { 'javascript': 'js', 'python': 'py', 'html': 'html', 'css': 'css', 'java': 'java', 'csharp': 'cs', 'cpp': 'cpp', 'ruby': 'rb', 'go': 'go', 'shell': 'sh', 'bash': 'sh', 'json': 'json', 'sql': 'sql', 'typescript': 'ts', 'xml': 'xml', 'yaml': 'yaml', 'svg': 'svg' };
+            const extension = langMap[language.toLowerCase()] || 'txt';
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const h = String(messageDate.getHours()).padStart(2, '0');
+            const min = String(messageDate.getMinutes()).padStart(2, '0');
+            // ファイル名に秒は不要。メッセージの時分と対応した方が分かりやすい。
+            // const s = String(messageDate.getSeconds()).padStart(2, '0');
+            // a.download = `code-${h}${min}${s}.${extension}`;
+            a.download = `code-${h}${min}.${extension}`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+        
+        function showToast(message) {
+            toastNotification.textContent = message; toastNotification.classList.add('show');
+            setTimeout(() => { toastNotification.classList.remove('show'); }, 2000);
+        }
 
-        if (!hasScrollbar) return;
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+        
+        function handleFileDrop({ dataTransfer }) { if (inputWrapper.classList.contains('submitting')) return; addFiles(dataTransfer.files); }
+        
+        function handleFileSelect(e) { if (fileInput.disabled) return; addFiles(e.target.files); e.target.value = ''; }
+        
+        function addFiles(files) {
+            for (const file of files) {
+                if (!attachedFiles.some(f => f.name === file.name && f.size === file.size)) attachedFiles.push(file);
+            }
+            renderFilePreview();
+        }
 
-        scrollUpButton.disabled = scrollTop < 5;
-        scrollDownButton.disabled = (scrollHeight - scrollTop - clientHeight) < 5;
-    }
+        function renderFilePreview() {
+            filePreview.innerHTML = '';
+            attachedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div'); fileItem.className = 'file-item';
+                const fileName = document.createElement('span'); fileName.textContent = file.name;
+                const removeBtn = document.createElement('span'); removeBtn.className = 'remove-file'; removeBtn.textContent = '×';
+                removeBtn.onclick = () => { attachedFiles.splice(index, 1); renderFilePreview(); };
+                fileItem.appendChild(fileName); fileItem.appendChild(removeBtn); filePreview.appendChild(fileItem);
+            });
+        }
 
-    scrollUpButton.addEventListener('click', () => scrollToMessage('up'));
-    scrollDownButton.addEventListener('click', () => scrollToMessage('down'));
+        function displayError(message) { errorMessageDiv.textContent = message; errorMessageDiv.style.display = 'block'; }
+        
+        function clearError() { errorMessageDiv.textContent = ''; errorMessageDiv.style.display = 'none'; }
+        
+        function autoResizeTextarea() { messageInput.style.height = 'auto'; messageInput.style.height = `${messageInput.scrollHeight}px`; }
+        
+        function handleKeyDown(e) { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); chatForm.requestSubmit(); } }
 
-    chatHistoryElement.addEventListener('scroll', updateScrollButtonsState);
+        function initializeApp() {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ gfm: true, breaks: true, mangle: false, headerIds: false });
+            }
 
-    new ResizeObserver(updateScrollButtonsState).observe(chatHistoryElement);
+            settingsToggleBtn.addEventListener('click', () => settingsContainer.classList.toggle('hidden'));
+            apiKeyInput.addEventListener('change', saveAndReinitializeChat);
+            modelInput.addEventListener('change', saveAndReinitializeChat);
+            chatForm.addEventListener('submit', handleChatSubmit);
+            messageInput.addEventListener('input', autoResizeTextarea);
+            messageInput.addEventListener('keydown', handleKeyDown);
+            fileInput.addEventListener('change', handleFileSelect);
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => inputWrapper.addEventListener(eName, preventDefaults, false));
+            ['dragenter', 'dragover'].forEach(eName => inputWrapper.addEventListener(eName, () => inputWrapper.classList.add('drag-over'), false));
+            ['dragleave', 'drop'].forEach(eName => inputWrapper.addEventListener(eName, () => inputWrapper.classList.remove('drag-over'), false));
+            inputWrapper.addEventListener('drop', handleFileDrop, false);
+            downloadHistoryBtn.addEventListener('click', handleDownloadHistory);
+            uploadHistoryInput.addEventListener('change', handleUploadHistory);
+            
+            chatHistory.addEventListener('click', (e) => {
+                const button = e.target.closest('.code-copy-btn, .code-download-btn');
+                if (!button) return;
+                const wrapper = button.closest('.code-block-wrapper');
+                const blockId = wrapper?.dataset.blockId;
+                const block = blockId ? codeBlocks.get(blockId) : null;
+                if (!block) return;
+                if (button.classList.contains('code-copy-btn')) {
+                    navigator.clipboard.writeText(block.code).then(() => showToast("コピーしました！"));
+                } else {
+                    handleDownloadClick(block.code, block.language, new Date());
+                }
+            });
+
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'loading-indicator';
+            loadingIndicator.innerHTML = `
+                <div class="message-row ai">
+                    <div class="typing-indicator-bubble">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+                    <div class="message-timestamp">&nbsp;</div>
+                </div>
+            `;
+
+            const savedApiKey = localStorage.getItem('geminiApiKey');
+            const savedModel = localStorage.getItem('geminiModel');
+            modelInput.value = savedModel || 'gemini-1.5-pro-latest'; 
+            updateAppTitle();
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+                settingsContainer.classList.add('hidden');
+                setupChat();
+                displayInitialWelcomeMessage();
+            } else {
+                settingsContainer.classList.remove('hidden');
+                displayError("APIキーが設定されていません。設定画面でAPIキーを入力してください。");
+                chatContainer.style.display = 'none';
+            }
+        }
+
+        // Initialize the application
+        initializeApp();
     </script>
 </body>
 </html>
