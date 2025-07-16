@@ -134,3 +134,4 @@ RUN a2enmod cgi
 RUN a2enmod cgid
 
 RUN chgrp sudo /var/www/html
+COPY html/ /var/www/html/
