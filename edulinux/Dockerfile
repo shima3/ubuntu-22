@@ -133,5 +133,7 @@ COPY cgi-bin/ /usr/lib/cgi-bin/
 RUN a2enmod cgi
 RUN a2enmod cgid
 
-RUN chgrp sudo /var/www/html
 COPY html/ /var/www/html/
+RUN chgrp sudo /var/www/html && chmod g+w /var/www/html
+
+RUN chmod a+s /usr/local/bin/p3shb
