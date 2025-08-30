@@ -12,6 +12,7 @@ RUN sudo -u opam opam --yes install --download-only frama-c
 RUN tar Jcf /pkg.tar.xz /opt/opam/.opam/download-cache
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
+RUN echo 'sudo -u opam opam init --disable-sandboxing --auto-setup --yes' >> /install
 RUN echo 'sudo -u opam opam --yes install frama-c' >> /install
 RUN chmod +x /install
 
