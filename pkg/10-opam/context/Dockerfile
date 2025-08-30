@@ -30,5 +30,3 @@ FROM base AS test-stage
 
 COPY --from=package-stage / /
 RUN /install
-
-ENV PATH /hoge:$PATH
