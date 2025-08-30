@@ -8,7 +8,8 @@ case $- in
       *) return;;
 esac
 
-export PATH="/usr/local/bin:/usr/bin:/bin"
+# export PATH="/usr/local/bin:/usr/bin:/bin"
+# . /etc/profile
 export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S "
 # shopt -s histappend
 export PROMPT_COMMAND='history -a; history -c; history -r'
