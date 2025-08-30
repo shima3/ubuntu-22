@@ -5,7 +5,7 @@ bin="${script%/*}"
 cd "$bin/.."
 base=$(basename $PWD)
 if [[ "$*" == "" ]]
-then cmd="bash"
+then cmd="bash -l"
 else cmd="$*"
 fi
 list="$(docker ps --all --filter ancestor=$base --quiet)"

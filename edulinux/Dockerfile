@@ -14,6 +14,15 @@ RUN /install && rm /install
 COPY --from=pkg:japanese / /
 RUN /install && rm /install
 
+COPY --from=pkg:gcc / /
+RUN /install && rm /install
+
+COPY --from=pkg:opam / /
+RUN /install && rm /install
+
+COPY --from=pkg:frama-c / /
+RUN /install && rm /install
+
 COPY --from=pkg:chromium / /
 RUN /install && rm /install
 
@@ -24,9 +33,6 @@ COPY --from=pkg:vscode / /
 RUN /install && rm /install
 
 COPY --from=pkg:pdf / /
-RUN /install && rm /install
-
-COPY --from=pkg:gcc / /
 RUN /install && rm /install
 
 # utilsにインストール済み
@@ -57,6 +63,9 @@ COPY --from=pkg:meld / /
 RUN /install
 
 COPY --from=pkg:utils / /
+RUN /install
+
+COPY --from=pkg:ttyd / /
 RUN /install
 
 # RUN rm /install
@@ -137,3 +146,8 @@ COPY html/ /var/www/html/
 RUN chgrp sudo /var/www/html && chmod g+w /var/www/html
 
 RUN chmod a+s /usr/local/bin/p3shb
+
+# ENV PATH="/usr/local/bin:/usr/bin:/bin"
+COPY root.profile /root/.profile
+RUN chmod +x /root/.profile
+COPY etc.profile /etc/profile
