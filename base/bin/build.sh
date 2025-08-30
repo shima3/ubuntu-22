@@ -1,16 +1,4 @@
 #!/bin/bash
-package="\
-  dconf-editor dnsutils dpkg-dev \
-  file findutils \
-  iputils-ping iproute2 \
-  less lsb-release
-  man-db \
-  nano net-tools netcat-openbsd
-  pwgen \
-  rsnapshot \
-  shc \
-  traceroute \
-  "
 PACKAGE="\
   apt-file apt-transport-https apt-utils autoconf \
   bash build-essential \

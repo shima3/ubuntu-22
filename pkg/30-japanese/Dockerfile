@@ -9,7 +9,7 @@ RUN /install
 COPY --from=pkg:mate / /
 RUN /install
 
-RUN apt-get clean
+RUN apt-get clean && apt-get update
 
 # ------------------------------------------------------------------
 FROM update-stage AS download-stage
