@@ -1,8 +1,9 @@
 FROM base AS download-stage
 ARG PACKAGE
 
-RUN apt-get update
-RUN apt-get install --yes --download-only --fix-missing $PACKAGE
+# RUN apt-get update
+# RUN apt-get install --yes --download-only --fix-missing $PACKAGE
+RUN apt-get update && apt-get install --yes --download-only --fix-missing $PACKAGE
 
 COPY opam.sh /etc/profile.d/
 RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/profile.d/opam.sh
@@ -29,4 +30,4 @@ COPY --from=download-stage /install /
 FROM base AS test-stage
 
 COPY --from=package-stage / /
-# RUN /install
+RUN /install
