@@ -26,3 +26,5 @@ RUN apt-get install --yes --fix-missing $PACKAGE
 RUN apt-get clean
 
 CMD ["/usr/bin/supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
+
+COPY resolv.conf /etc/
