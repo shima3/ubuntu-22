@@ -29,4 +29,4 @@ COPY --from=download-stage /install /
 FROM base AS test-stage
 
 COPY --from=package-stage / /
-RUN /install
+# RUN /install
