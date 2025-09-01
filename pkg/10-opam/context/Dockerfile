@@ -13,6 +13,7 @@ RUN echo "apt-get install --yes --no-download --no-install-recommends $PACKAGE" 
 RUN echo 'apt-get autoclean' >> /install
 RUN echo 'useradd -d /opt/opam -m -s /bin/bash opam' >> /install
 RUN echo 'sudo -u opam opam init --disable-sandboxing --auto-setup --yes' >> /install
+# RUN echo 'sudo -u opam opam init --disable-sandboxing --auto-setup --yes --compiler=ocaml-base-compiler.4.14.1' >> /install
 # RUN echo 'echo export PATH="$PATH:/opt/opam/.opam/default/bin" > /etc/profile.d/opam.sh' >> /install
 # RUN echo 'chmod +x /etc/profile.d/opam.sh' >> /install
 # RUN echo '. /etc/profile.d/opam.sh' >> /install

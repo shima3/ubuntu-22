@@ -20,9 +20,6 @@ RUN /install && rm /install
 COPY --from=pkg:opam / /
 RUN /install && rm /install
 
-COPY --from=pkg:frama-c / /
-RUN /install && rm /install
-
 COPY --from=pkg:chromium / /
 RUN /install && rm /install
 
@@ -67,6 +64,9 @@ RUN /install
 
 COPY --from=pkg:ttyd / /
 RUN /install
+
+COPY --from=pkg:frama-c / /
+# RUN /install && rm /install
 
 # RUN rm /install
  

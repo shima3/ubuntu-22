@@ -27,4 +27,3 @@ RUN apt-get clean
 
 CMD ["/usr/bin/supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
 
-COPY resolv.conf /etc/

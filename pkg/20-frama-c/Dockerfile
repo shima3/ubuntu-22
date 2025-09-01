@@ -7,12 +7,14 @@ RUN /install && rm /install
 # -----------------------------------------------------------------------------
 FROM update-stage AS download-stage
 
-RUN sudo -u opam opam --yes install --download-only frama-c
+# RUN sudo -u opam opam --yes install --download-only frama-c
+RUN sudo -u opam opam --yes install frama-c.29.0
 
-RUN tar Jcf /pkg.tar.xz /opt/opam/.opam/download-cache
+# RUN tar Jcf /pkg.tar.xz /opt/opam/.opam/download-cache
+RUN tar Jcf /pkg.tar.xz /opt/opam/.opam
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
-RUN echo 'sudo -u opam opam --yes install frama-c' >> /install
+# RUN echo 'sudo -u opam opam --yes install frama-c' >> /install
 RUN chmod +x /install
 
 # -----------------------------------------------------------------------------
