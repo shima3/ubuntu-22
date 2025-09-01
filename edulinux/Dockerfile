@@ -66,9 +66,9 @@ COPY --from=pkg:ttyd / /
 RUN /install
 
 COPY --from=pkg:frama-c / /
-# RUN /install && rm /install
+RUN /install
 
-# RUN rm /install
+RUN rm /install
  
 # Ctrl+Shift+SpaceでIME切り替え
 # COPY dconf /etc/skel/.config/dconf
