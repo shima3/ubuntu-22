@@ -1,3 +1,11 @@
+2025/9/11 Thu
+ホームディレクトリのバックアップ
+chrome remote desktop
+mac2021i7
+# 自宅からSSH接続するとバックアップの途中でVPNが切断されることがある。
+ssh-gws2025.sh
+shima@gws2025:~$ edulinux-bin/home-backup.sh 
+
 2025/7/7 Mon
 パスワードを初期化してもログインできない現象が生じたので、16時ごろサーバを再起動した。
 iptablesでSSHポートへのアクセスを禁止していたが、再起動時に解除された。
