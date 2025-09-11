@@ -154,3 +154,6 @@ RUN chmod a+s /usr/local/bin/p3shb
 COPY root.profile /root/.profile
 RUN chmod +x /root/.profile
 COPY etc.profile /etc/profile
+
+# RUN cd /etc/skel && npm init -y
+
