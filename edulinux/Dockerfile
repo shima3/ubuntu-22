@@ -155,4 +155,9 @@ COPY root.profile /root/.profile
 RUN chmod +x /root/.profile
 COPY etc.profile /etc/profile
 
-RUN bash -c '. /opt/nvm/nvm.sh && cd /etc/skel && npm init -y && npm install express cors'
+# RUN bash -c '. /opt/nvm/nvm.sh && cd /etc/skel && npm init -y && npm install express cors'
+COPY nodejs /etc/skel/nodejs
+WORKDIR /etc/skel/nodejs
+RUN bash -c '. /opt/nvm/nvm.sh && npm init -y && npm install cors express'
+RUN git config --global user.email "shima@hiroshima-cu.ac.jp" && git config --global user.name 'Kazuyuki Shima' && git init && git add . && git commit -m 'Initial commit'
+WORKDIR /

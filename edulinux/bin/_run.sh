@@ -47,5 +47,3 @@ docker run \
 #       -e "TZ=$TZ" \
 #       -p 3333:3389 \
 #       -p 2222:22 \
-
-docker exec -i "$base" config-apache2.sh "$(hostname)"

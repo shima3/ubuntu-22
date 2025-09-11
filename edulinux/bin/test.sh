@@ -4,11 +4,12 @@ script="$(readlink -f $0)"
 bin="${script%/*}"
 cd "$bin/.."
 base="${PWD##*/}"
+container="test"
 
 bin/_run.sh \
     -dit \
     -v $PWD/context/local/bin:/usr/local/bin \
-    --name test \
+    --name "$container" \
     "$base"
 
 #       --name "$base" --hostname "$base" \
@@ -22,22 +23,22 @@ bin/_run.sh \
 
 bin/exec.sh useradd -g sudo -m --key HOME_MODE=0751 -s /bin/bash shima
 bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
-echo 'Kazuyuki Shima' | docker exec --interactive --user shima "$base" config-git.sh shima@hiroshima-cu.ac.jp
+echo 'Kazuyuki Shima' | docker exec --interactive --user shima "$container" config-git.sh shima@hiroshima-cu.ac.jp
 
 # user=a20999
 user=j90001
 # bin/exec.sh useradd -g users -m -s /bin/bash "$user"
 bin/exec.sh useradd -g users -m --key HOME_MODE=0751 -s /bin/bash "$user"
 bin/exec.sh usermod --password '$y$j9T$4nNEnBJJRMYu9XGqCCTl/0$a9hGDNeBuh4OL4wB5AaHv2.AN2peG8A5uYoK7nwP0U7' "$user"
-echo 'Dummy User a' | docker exec --interactive --user "$user" "$base" config-git.sh "$user@e.hiroshima-cu.ac.jp"
+echo 'Dummy User a' | docker exec --interactive --user "$user" "$container" config-git.sh "$user@e.hiroshima-cu.ac.jp"
 
 # user=b20999
 user=j90002
 bin/exec.sh useradd -g users -m --key HOME_MODE=0751 -s /bin/bash "$user"
 bin/exec.sh usermod --password '$y$j9T$4nNEnBJJRMYu9XGqCCTl/0$a9hGDNeBuh4OL4wB5AaHv2.AN2peG8A5uYoK7nwP0U7' "$user"
-echo 'Dummy User b' | docker exec --interactive --user "$user" "$base" config-git.sh "$user@e.hiroshima-cu.ac.jp"
+echo 'Dummy User b' | docker exec --interactive --user "$user" "$container" config-git.sh "$user@e.hiroshima-cu.ac.jp"
 
 # bin/exec.sh sudo -u shima mkdir -p /home/shima/public_html/pcr7
 
-docker exec "$base" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
+docker exec "$container" bash -c 'while ! ss -tln | grep -q :3389; do echo wait; sleep 1; done'
 echo OK
