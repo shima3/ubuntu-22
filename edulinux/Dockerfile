@@ -68,6 +68,9 @@ RUN /install
 COPY --from=pkg:frama-c / /
 RUN /install
 
+COPY --from=pkg:nodejs / /
+RUN /install
+
 RUN rm /install
  
 # Ctrl+Shift+SpaceでIME切り替え
