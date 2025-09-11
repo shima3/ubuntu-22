@@ -11,7 +11,7 @@ RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/profile.
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 RUN echo "apt-get install --yes --no-download --no-install-recommends $PACKAGE" >> /install
 RUN echo 'apt-get autoclean' >> /install
-RUN echo 'useradd -d /opt/opam -m -s /bin/bash opam' >> /install
+RUN echo 'useradd -d /opt/opam -m -s /bin/bash --system opam' >> /install
 RUN echo 'sudo -u opam opam init --disable-sandboxing --auto-setup --yes' >> /install
 # RUN echo 'sudo -u opam opam init --disable-sandboxing --auto-setup --yes --compiler=ocaml-base-compiler.4.14.1' >> /install
 # RUN echo 'echo export PATH="$PATH:/opt/opam/.opam/default/bin" > /etc/profile.d/opam.sh' >> /install
