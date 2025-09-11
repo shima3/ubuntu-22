@@ -155,5 +155,4 @@ COPY root.profile /root/.profile
 RUN chmod +x /root/.profile
 COPY etc.profile /etc/profile
 
-# RUN cd /etc/skel && npm init -y
-
+RUN bash -c '. /opt/nvm/nvm.sh && cd /etc/skel && npm init -y && npm install express cors'
