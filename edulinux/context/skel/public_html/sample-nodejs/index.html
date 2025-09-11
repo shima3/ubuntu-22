@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><title>APIアクセス</title></head>
+<body>
+  <button id="btn">サーバにアクセス</button>
+  <div id="result"></div>
+  <script>
+    document.getElementById('btn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('http://165.242.90.53:3001/api/hello');
+        const data = await res.json();
+        document.getElementById('result').textContent = data.message;
+      } catch (err) {
+        console.error('通信エラー:', err);
+      }
+    });
+  </script>
+</body>
+</html>
