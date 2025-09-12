@@ -5,7 +5,7 @@ name="${data[1]% <*}"
 domain="${email#*@}"
 date "+%F %T%t$email%t$name" >> $HOME/handle.log
 chmod g+r $HOME/handle.log
-if [[ "$domain" =~ .hiroshima-cu.ac.jp || "$domain" == "hiroshima-cu.ac.jp" ]]
+if [[ "$domain" == "micron.com" || "$domain" =~ .hiroshima-cu.ac.jp || "$domain" == "hiroshima-cu.ac.jp" ]]
 then
   user="${email%@*}"
   password="$(docker exec edulinux reset-password.sh $user)"
