@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>BBS</title>
+</head>
+<body>
+  <h1>掲示板 (Bulletin Board System)</h1>
+  <form id="form">
+    <input id="msg" placeholder="メッセージを入力" required>
+    <button type="submit">送信</button>
+  </form>
+  <ul id="list"></ul>
+
+  <script>
+    async function loadMessages() {
+      const res = await fetch('/api/messages');
+      const data = await res.json();
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+      data.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = `[${m.time}] ${m.text}`;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = document.getElementById('msg').value;
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      document.getElementById('msg').value = '';
+      loadMessages();
+    });
+
+    // 初回ロード
+    loadMessages();
+    // 3秒ごとに更新
+    setInterval(loadMessages, 3000);
+  </script>
+</body>
+</html>

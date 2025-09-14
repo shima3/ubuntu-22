@@ -6,7 +6,7 @@ const PORT = 3000;
 // const cors = require('cors');
 // app.use(cors());
 
-app.use(express.static('html')); // htmlにHTML/JSを配置
+app.use(express.static('public')); // publicにHTML/JSを配置
 
 // APIエンドポイント
 app.get('/api/hello', (req, res) => {
