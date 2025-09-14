@@ -10,6 +10,7 @@ RUN mkdir -p /var/www/html/javase && cd /var/www/html/javase && curl -sL http://
 # RUN mkdir -p /var/www/html/javase/jp && cd /var/www/html/javase/jp && unzip /tmp/javase8docs-jp.zip && mv E54527_01 8
 RUN mkdir -p /var/www/html/javase/jp && cd /var/www/html/javase/jp && curl -sL http://download.oracle.com/docs/cds/javase/jp/8.zip | bsdtar -xf - && mv E[0-9]*_[0-9]? 8
 
+RUN apt-get update
 # RUN apt-get install --yes --download-only --fix-missing --no-install-recommends $PACKAGE
 RUN apt-get install --yes --download-only --fix-missing $PACKAGE
 RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /var/www/html/javase
