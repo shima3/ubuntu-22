@@ -71,6 +71,15 @@ RUN /install
 COPY --from=pkg:nodejs / /
 RUN /install
 
+COPY --from=pkg:haskell / /
+RUN /install
+
+COPY --from=pkg:maven / /
+RUN /install
+
+COPY --from=pkg:k-framework / /
+RUN /install
+
 RUN rm /install
  
 # Ctrl+Shift+SpaceでIME切り替え
