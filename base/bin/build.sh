@@ -2,15 +2,15 @@
 PACKAGE="\
   apt-file apt-transport-https apt-utils autoconf \
   bash build-essential \
-  coreutils curl \
+  cmake coreutils curl \
   dpkg-dev \
   git \
   libarchive-tools libtool \
+  pkg-config \
   snapd software-properties-common sudo supervisor \
   wget \
   xz-utils \
   "
-
 # python3-pip
 
 script="$(readlink -f $0)"
