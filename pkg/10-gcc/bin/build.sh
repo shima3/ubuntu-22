@@ -1,5 +1,8 @@
 #!/bin/bash
-PACKAGE="gcc g++ libmpfr6 libgmp10 libmpfr-dev libgmp-dev pkg-config libsecp256k1-dev zlib1g-dev cmake llvm-15 clang-15 lld-15 llvm-15-tools libboost-all-dev libfmt-dev libyaml-dev libjemalloc-dev xxd bison flex libunwind-15-dev libc++-15-dev libc++abi-15-dev"
+PACKAGE="gcc g++ libmpfr6 libgmp10 libmpfr-dev libgmp-dev libsecp256k1-dev zlib1g-dev libboost-all-dev libfmt-dev libyaml-dev libjemalloc-dev xxd libunwind-15-dev libc++-15-dev libc++abi-15-dev"
+# llvm-15 clang-15 lld-15 llvm-15-tools
+# cmake pkg-config
+# bison flex
 
 script="$(readlink -f $0)"
 bin="${script%/*}"
