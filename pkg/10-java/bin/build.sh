@@ -1,6 +1,6 @@
 #!/bin/bash
 # PACKAGE="openjdk-8-jdk openjdk-17-jdk libmpfr6 libgmp10 libmpfr-dev libgmp-dev"
-PACKAGE="openjdk-8-jdk openjdk-17-jdk"
+PACKAGE="openjdk-8-jdk openjdk-17-jdk maven"
 
 script="$(readlink -f $0)"
 bin="${script%/*}"
