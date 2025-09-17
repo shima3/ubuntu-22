@@ -4,13 +4,22 @@ ARG DEBIAN_FRONTEND="noninteractive"
 COPY --from=pkg:gcc / /
 RUN /install
 
-COPY --from=pkg:jdk / /
+COPY --from=pkg:llvm / /
 RUN /install
 
-COPY --from=pkg:maven / /
+COPY --from=pkg:bison / /
+RUN /install
+
+COPY --from=pkg:java / /
 RUN /install
 
 COPY --from=pkg:haskell / /
+RUN /install
+
+COPY --from=pkg:python / /
+RUN /install
+
+COPY --from=pkg:z3 / /
 RUN /install
 
 # ------------------------------------------------------------------
