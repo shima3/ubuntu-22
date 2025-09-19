@@ -9,7 +9,8 @@ apt-get autoclean
 adduser xrdp pulse-access
 # echo "enable-autospawn = yes" >> /etc/pulse/client.conf
 echo "\nload-module module-xrdp-sink\nload-module module-xrdp-source" >> /etc/pulse/default.pa
-echo "pulseaudio --start" > /etc/profile.d/pulseaudio.sh
+# echo "pulseaudio --start" > /etc/profile.d/pulseaudio.sh
+echo "pulseaudio --start" > /etc/X11/Xsession.d/99pulseaudio
 # なくても影響なかった 2025/3/19
 # awk '{print $0;}/\[Globals\]/{print "enable_sound=true";}' /etc/xrdp/xrdp.ini > /tmp/xrdp.ini
 # mv /tmp/xrdp.ini /etc/xrdp/
