@@ -107,6 +107,8 @@ COPY client_folder.desktop /etc/skel/.config/autostart/
 
 # PATH, history, nano, clientの設定
 COPY skel/ /etc/skel/
+RUN chmod -R go-w /etc/skel
+
 # thinclient_drives -> .thinclient_drives
 # COPY xrdp/sesman.ini /etc/xrdp/
 COPY sesman.ini /etc/xrdp/
