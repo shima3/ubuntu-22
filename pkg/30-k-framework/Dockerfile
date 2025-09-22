@@ -37,7 +37,7 @@ RUN cd /opt/k/haskell-backend/src/main/native/haskell-backend && stack setup
 RUN mkdir -p /root/.hawtjni/mpfr_java && cd /tmp && jar xf /opt/mpfr-java/target/mpfr_java-1.4-linux64.jar META-INF/native/linux64/libmpfr_java.so && mv META-INF/native/linux64/libmpfr_java.so /root/.hawtjni/mpfr_java/
 RUN cd /opt/k && mvn -B -DskipTests package
 
-RUN echo 'export PATH="/opt/k/k-distribution/target/release/k/bin:$PATH"' > /etc/profile.d/k-framework.sh
+RUN echo 'export PATH="$PATH:/opt/k/k-distribution/target/release/k/bin"' > /etc/profile.d/k-framework.sh
 
 RUN tar Jcf /pkg.tar.xz opt/k etc/profile.d/k-framework.sh root/.hawtjni/mpfr_java opt/mpfr-java root/.stack
 
