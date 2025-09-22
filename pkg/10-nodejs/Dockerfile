@@ -19,7 +19,7 @@ RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 # RUN echo 'apt-get update' >> /install
 # RUN echo "apt-get install --yes --no-download --fix-missing $PACKAGE" >> /install
 # RUN echo '. /opt/nvm/nvm.sh' >> /install
-# RUN echo 'echo ". /opt/nvm/nvm.sh" > /etc/profile.d/nvm.sh' >> /install
+# RUN echo 'echo "export NVM_DIR=/opt/nvm; . $NVM_DIR/nvm.sh" > /etc/profile.d/nvm.sh' >> /install
 # RUN echo 'cp /opt/nvm/nvm.sh /etc/profile.d/nvm.sh' >> /install
 
 RUN chmod +x /install
