@@ -36,6 +36,7 @@ docker run \
        -p "0.0.0.0:$ssh_port:22" \
        -p "0.0.0.0:$ttyd_port:7681" \
        -p "0.0.0.0:$nodejs_ports:$nodejs_ports" \
+       -p "0.0.0.0:443:443" \
        --device /dev/fuse --cap-add SYS_ADMIN \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
