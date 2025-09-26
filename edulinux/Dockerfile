@@ -155,10 +155,9 @@ COPY mozc /etc/skel/.config/mozc
 # COPY 99ulimit /etc/X11/Xsession.d/
 # RUN ulimit -c 0
 
-
 # COPY userdir.conf /etc/apache2/mods-available/
 COPY apache2/ /etc/apache2/
-RUN a2enmod userdir
+RUN a2enmod userdir ssl proxy_http rewrite headers
 RUN a2ensite ttyd.conf
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
@@ -181,3 +180,5 @@ WORKDIR /etc/skel/nodejs
 RUN bash -c '. /opt/nvm/nvm.sh && npm init -y && npm install cors express pegjs'
 RUN git config --global user.email "shima@hiroshima-cu.ac.jp" && git config --global user.name 'Kazuyuki Shima' && git init && git add . && git commit -m 'Initial commit'
 WORKDIR /
+
+RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u+s pam-auth

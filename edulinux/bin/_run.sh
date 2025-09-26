@@ -41,6 +41,7 @@ docker run \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
+       --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
        "$@"
 
 #       --name "$base" --hostname "$(hostname)" \
