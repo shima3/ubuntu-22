@@ -42,6 +42,7 @@ docker run \
        --shm-size="1gb" \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
+       --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
        "$@"
 
 #       --name "$base" --hostname "$(hostname)" \
