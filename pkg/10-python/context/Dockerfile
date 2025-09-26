@@ -11,11 +11,11 @@ ARG PACKAGE
 
 RUN apt-get update
 RUN apt-get install --yes --download-only --fix-missing $PACKAGE
-RUN tar cf /pkg.tar /var/cache/apt/archives /var/lib/apt/lists
+RUN tar cf /pkg.tar var/cache/apt/archives var/lib/apt/lists
 
 RUN apt-get install --yes --no-download $PACKAGE
 RUN pip3 download pygame -d /opt/python
-RUN tar rf /pkg.tar /opt/python && xz /pkg.tar
+RUN tar rf /pkg.tar opt/python && xz /pkg.tar
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 RUN echo "apt-get install --yes --no-download $PACKAGE" >> /install

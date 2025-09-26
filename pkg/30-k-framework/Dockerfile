@@ -22,6 +22,8 @@ RUN /install
 COPY --from=pkg:z3 / /
 RUN /install
 
+RUN apt update && apt install --yes gawk libgmp-dev libmpfr-dev libmpc-dev
+
 # ------------------------------------------------------------------
 FROM prepare-stage AS download-stage
 
