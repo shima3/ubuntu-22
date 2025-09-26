@@ -43,6 +43,7 @@ docker run \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
        --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
+       --mount "type=volume,src=$base-etc-apache2,dst=/etc/apache2" \
        "$@"
 
 #       --name "$base" --hostname "$(hostname)" \
