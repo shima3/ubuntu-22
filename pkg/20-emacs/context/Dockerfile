@@ -15,7 +15,7 @@ ARG PACKAGE
 
 RUN apt-get install --yes --download-only --fix-missing $PACKAGE
 
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists
+RUN tar Jcf /pkg.tar.xz var/cache/apt/archives var/lib/apt/lists
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 RUN echo "apt-get install --yes --no-download $PACKAGE" >> /install

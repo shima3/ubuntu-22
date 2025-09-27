@@ -17,7 +17,7 @@ ARG PACKAGE
 
 # RUN apt-get install --yes --download-only $PACKAGE
 RUN apt-get install --yes --download-only --fix-broken --fix-missing $PACKAGE
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists
+RUN tar Jcf /pkg.tar.xz var/cache/apt/archives var/lib/apt/lists
 
 RUN echo 'apt-get clean' > /install
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' >> /install
