@@ -1,7 +1,7 @@
 #!/bin/bash
 email="$1"
 domain="$2"
-if cd /etc/letsencrypt/live
+if cd "/etc/letsencrypt/live/$domain"
 then
     if test -f fullchain.pem -a -f privkey.pem
     then exit 0
