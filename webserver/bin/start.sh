@@ -22,8 +22,6 @@ $bin/_run.sh \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
-    -p "0.0.0.0:80:80" \
-    -p "0.0.0.0:22:22" \
     $base
 
 #    --mount "type=volume,src=$base-var-log,dst=/var/log" \
