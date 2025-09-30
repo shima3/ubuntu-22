@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Lambda Alpha Normalizer</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    textarea { width: 100%; height: 4em; }
+    pre { background: #f0f0f0; padding: 1em; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>ラムダ式アルファ正規化ツール</h1>
+  <p>λ記号は <code>λ</code> または <code>\</code> を使えます。省略記法はサポートしません。必ず <code>λx. M</code> の形式で入力してください。</p>
+  <textarea id="input" placeholder="例: λx. x"></textarea>
+  <button onclick="process()">正規化</button>
+  <div id="output"></div>
+
+  <script>
+    // ===== パーサ =====
+    function tokenize(input) {
+      let tokens = [];
+      let i = 0;
+      while (i < input.length) {
+        let c = input[i];
+        if (/\s/.test(c)) { i++; continue; }
+        if (c === 'λ' || c === '\\') { tokens.push({type:'LAM'}); i++; continue; }
+        if (c === '.') { tokens.push({type:'DOT'}); i++; continue; }
+        if (c === '(') { tokens.push({type:'LPAREN'}); i++; continue; }
+        if (c === ')') { tokens.push({type:'RPAREN'}); i++; continue; }
+        if (/[_a-zA-Z][_a-zA-Z0-9]*/.test(c)) {
+          let m = input.slice(i).match(/^[_a-zA-Z][_a-zA-Z0-9]*/);
+          tokens.push({type:'VAR', value:m[0]});
+          i += m[0].length;
+          continue;
+        }
+        throw new Error("不正な文字: " + c);
+      }
+      tokens.push({type:'EOF'});
+      return tokens;
+    }
+
+    function parse(tokens) {
+      let pos = 0;
+      function peek() { return tokens[pos]; }
+      function consume(t) {
+        if (tokens[pos].type === t) { pos++; return; }
+        throw new Error("パースエラー: 期待した " + t + " ですが " + JSON.stringify(tokens[pos]) + " でした");
+      }
+
+      function parseAtom() {
+        let t = peek();
+        if (t.type === 'VAR') { pos++; return {type:'Var', name:t.value}; }
+        if (t.type === 'LPAREN') { pos++; let e=parseExpr(); consume('RPAREN'); return e; }
+        throw new Error("パースエラー: 予期しないトークン: " + JSON.stringify(t));
+      }
+
+      function parseApp() {
+        let e = parseAtom();
+        while (true) {
+          let t = peek();
+          if (t.type==='VAR' || t.type==='LPAREN' || t.type==='LAM') {
+            let e2 = parseAtom();
+            e = {type:'App', func:e, arg:e2};
+          } else break;
+        }
+        return e;
+      }
+
+      function parseExpr() {
+        let t = peek();
+        if (t.type==='LAM') {
+          pos++;
+          let v = peek();
+          if (v.type!=='VAR') throw new Error("パースエラー: λ の後に変数が必要です");
+          pos++;
+          if (peek().type!=='DOT') throw new Error("パースエラー: λ の後に '.' が必要です（例: λx. M）");
+          pos++;
+          if (peek().type==='EOF') throw new Error("パースエラー: λ の後に式が必要です（例: λx. M）");
+          let body=parseExpr();
+          return {type:'Lam', param:v.value, body:body};
+        }
+        return parseApp();
+      }
+
+      let e = parseExpr();
+      if (peek().type!=='EOF') throw new Error("パースエラー: 残りの入力があります");
+      return e;
+    }
+
+    // ===== アルファ正規化 =====
+    function alphaNormalize(expr) {
+      let counter=0;
+      function fresh() { return "x"+(counter++); }
+      function norm(e, env) {
+        if (e.type==='Var') {
+          return {type:'Var', name: (env[e.name]||e.name)};
+        }
+        if (e.type==='Lam') {
+          let v=fresh();
+          let env2={...env, [e.param]:v};
+          return {type:'Lam', param:v, body:norm(e.body, env2)};
+        }
+        if (e.type==='App') {
+          return {type:'App', func:norm(e.func, env), arg:norm(e.arg, env)};
+        }
+      }
+      return norm(expr, {});
+    }
+
+    // ===== pretty print =====
+    function show(expr, abbrev) {
+      if (expr.type==='Var') return expr.name;
+      if (expr.type==='Lam') {
+        let body=show(expr.body, abbrev);
+        return `λ${expr.param}. ${body}`;
+      }
+      if (expr.type==='App') {
+        let f=expr.func.type==='Lam'?`(${show(expr.func,abbrev)})`:show(expr.func,abbrev);
+        let a=expr.arg.type!=='Var'?`(${show(expr.arg,abbrev)})`:show(expr.arg,abbrev);
+        return f+" "+a;
+      }
+    }
+
+    function process() {
+      let src=document.getElementById('input').value;
+      let out=document.getElementById('output');
+      try {
+        let tokens=tokenize(src);
+        let ast=parse(tokens);
+        let norm=alphaNormalize(ast);
+        out.innerHTML='<h2>結果</h2>'+
+          '<p><b>アルファ正規化（略記なし）:</b></p><pre>'+show(norm,false)+'</pre>';
+      } catch(e) {
+        out.innerHTML='<p class="error">'+e.message+'</p>';
+      }
+    }
+  </script>
+</body>
+</html>

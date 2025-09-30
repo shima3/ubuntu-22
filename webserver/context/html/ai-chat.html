@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Chat by Gemini API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --background-color: #f4f7f9;
+            --container-bg-color: #ffffff;
+            --user-message-bg: #dcf8c6;
+            --ai-message-bg: #e9e9eb;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --error-color: #d9534f;
+            --code-bg-color: #282c34;
+            --code-header-bg: #3a404a;
+            --font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100dvh;
+            color: var(--text-color);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--container-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100dvh - 40px);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.2em; }
+        #settings-toggle { background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em; }
+        #settings-container { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        #settings-container.hidden { display: none; }
+        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .settings-grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
+        .form-group input { padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; }
+        
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+        }
+        
+        #chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message-row.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+            max-width: 90%;
+        }
+
+        .message-row.ai {
+            align-self: flex-start;
+            max-width: 100%;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-timestamp {
+            font-size: 0.75em;
+            color: #888;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .message-content { white-space: normal; word-break: break-word; }
+        .message-content img { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+
+        .user-message {
+            background-color: var(--user-message-bg);
+            border-bottom-right-radius: 4px;
+        }
+        .ai-message {
+            background-color: var(--ai-message-bg);
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Markdown用スタイル */
+        .ai-message .message-content p { margin-top: 0; margin-bottom: 0.5em; }
+        .ai-message .message-content p:last-child { margin-bottom: 0; }
+        .ai-message .message-content ul, .ai-message .message-content ol { padding-left: 20px; margin-top: 0.5em; margin-bottom: 0.5em; }
+        .ai-message .message-content li { margin-bottom: 0.25em; }
+        .ai-message .message-content blockquote { border-left: 4px solid #ccc; padding-left: 10px; margin-left: 0; color: #666; font-style: italic; }
+        .ai-message .message-content a { color: var(--primary-color); }
+        .ai-message .message-content table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+        .ai-message .message-content th, .ai-message .message-content td { border: 1px solid #ccc; padding: 8px; }
+        .ai-message .message-content th { background-color: #f0f0f0; }
+
+        mjx-container { text-align: left !important; }
+
+        .code-block-wrapper { margin: 1em 0; border-radius: 8px; overflow: hidden; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; background-color: var(--code-header-bg); padding: 5px 10px; color: #ccc; font-size: 0.8em; }
+        .code-header .language-name { font-weight: bold; }
+        .code-header .code-actions button { background: none; border: 1px solid #777; color: #ccc; padding: 3px 8px; border-radius: 4px; cursor: pointer; margin-left: 8px; font-size: 0.9em; }
+        .code-header .code-actions button:hover { background-color: #555; }
+        pre, code { margin: 0; font-family: 'Courier New', Courier, monospace; }
+        
+        .code-block-wrapper pre {
+            background-color: var(--code-bg-color);
+            padding: 15px;
+            max-height: 400px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-y: auto;
+        }
+        .ai-message .message-content > p > code, .ai-message .message-content > ul li code, .ai-message .message-content > ol li code {
+            background-color: rgba(0,0,0,0.08);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .svg-container { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin: 1em 0; }
+        .svg-container svg { max-width: 100%; height: auto; display: block; }
+
+        .message-files-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .user-message .message-files-container img { max-width: 150px; max-height: 150px; border-radius: 8px; margin-top: 0; }
+        .file-display-item { display: inline-flex; align-items: center; gap: 8px; background-color: rgba(0, 0, 0, 0.05); padding: 6px 12px; border-radius: 16px; font-size: 0.9em; }
+        .file-display-item svg { width: 16px; height: 16px; fill: #555; flex-shrink: 0; }
+
+        /* Loading Indicator Styles */
+        .typing-indicator-bubble {
+            background-color: var(--ai-message-bg);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            padding: 12px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #8e8e93;
+            border-radius: 50%;
+            animation: typing-blink 1.4s infinite both;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
+
+        #chat-form { flex-shrink: 0; }
+        #chat-form-container { padding: 10px 20px 20px 20px; border-top: 1px solid var(--border-color); }
+        #input-wrapper { display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: 20px; padding: 5px; }
+        #input-wrapper.drag-over { border-color: var(--primary-color); border-style: dashed; }
+        #file-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 10px 8px 10px; }
+        .file-item { background-color: #f0f0f0; padding: 5px 8px; border-radius: 12px; font-size: 0.8em; display: flex; align-items: center; gap: 5px; }
+        .file-item .remove-file { cursor: pointer; font-weight: bold; color: #999; }
+        #form-bottom-row { display: flex; gap: 10px; align-items: flex-end; }
+        #file-input-label { padding: 8px; cursor: pointer; transition: opacity 0.2s; }
+        #file-input-label svg { width: 24px; height: 24px; fill: #555; }
+        #message-input { flex-grow: 1; padding: 10px; border: none; resize: none; font-size: 1em; height: 24px; max-height: 100px; overflow-y: auto; background: transparent; }
+        #message-input:focus { outline: none; }
+        #send-button { padding: 0 20px; border: none; background-color: var(--primary-color); color: white; border-radius: 20px; cursor: pointer; font-size: 1em; align-self: flex-end; margin: 5px; height: 40px; }
+        #send-button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        #error-message { color: var(--error-color); padding: 10px 20px; text-align: center; font-weight: bold; display: none; }
+        #toast-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000; opacity: 0; transition: opacity 0.5s; font-size: 0.9em; }
+        #toast-notification.show { opacity: 1; }
+
+        .api-key-guide { margin-top: 20px; font-size: 0.9em; color: #555; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .api-key-guide h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+        .api-key-guide ol { margin: 0; padding-left: 20px; line-height: 1.6; }
+        .api-key-guide li { margin-bottom: 5px; }
+        .api-key-guide a { color: var(--primary-color); font-weight: 500; text-decoration: none; }
+        .api-key-guide a:hover { text-decoration: underline; }
+
+        .history-management { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .history-management h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+        .history-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .history-buttons button, .history-buttons .button-label { padding: 8px 15px; border: 1px solid var(--primary-color); background-color: white; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s, color 0.2s; text-align: center; display: inline-block; }
+        .history-buttons button:hover, .history-buttons .button-label:hover { background-color: var(--primary-color); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1 id="app-title">Gemini Chat</h1>
+            <button id="settings-toggle">設定</button>
+        </header>
+
+        <div id="settings-container" class="hidden">
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label for="api-key">APIキー</label>
+                    <input type="password" id="api-key" placeholder="Google AI Studioで取得したキー">
+                </div>
+                <div class="form-group">
+                    <label for="model-input">モデル</label>
+                    <input type="text" id="model-input" placeholder="例: gemini-1.5-pro-latest">
+                </div>
+            </div>
+            <div class="api-key-guide">
+                <h4>APIキーの取得方法</h4>
+                <ol>
+                    <li><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> にアクセスします。</li>
+                    <li>「Create API key」ボタンをクリックして新しいキーを作成します。</li>
+                    <li>生成されたキーをコピーし、上のAPIキー入力欄に貼り付けてください。</li>
+                </ol>
+                <p style="font-size: 0.85em; color: #666; margin-top: 10px; margin-bottom: 0;">※APIキーはブラウザのローカルストレージに保存され、このページ以外からアクセスされることはありません。</p>
+            </div>
+            <div class="history-management">
+                <h4>対話履歴の管理</h4>
+                <div class="history-buttons">
+                    <button id="download-history-btn">履歴をダウンロード</button>
+                    <label for="upload-history-input" class="button-label">履歴をアップロード</label>
+                    <input type="file" id="upload-history-input" accept=".json,application/json" style="display: none;">
+                </div>
+                <p style="font-size: 0.85em; color: #666; margin-top: 10px; margin-bottom: 0;">※現在の対話履歴をJSONファイルとして保存・読み込みできます。アップロードすると現在の履歴は上書きされます。</p>
+            </div>
+        </div>
+
+        <div id="error-message"></div>
+
+        <div id="chat-container">
+            <div id="chat-history"></div>
+            <!-- Loading indicator will be added here by JS -->
+            <form id="chat-form">
+                <div id="chat-form-container">
+                    <div id="input-wrapper">
+                        <div id="file-preview"></div>
+                        <div id="form-bottom-row">
+                           <label id="file-input-label" for="file-input">
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z" /></svg>
+                           </label>
+                           <input type="file" id="file-input" multiple style="display: none;">
+                           <textarea id="message-input" placeholder="メッセージを入力、またはファイルをドロップ (Ctrl+Enterで送信)" rows="1"></textarea>
+                           <button type="submit" id="send-button">送信</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="toast-notification">コピーしました！</div>
+
+    <script type="module">
+        const { GoogleGenerativeAI } = await import("https://unpkg.com/@google/generative-ai/dist/index.mjs");
+
+        // Code block data store
+        const codeBlocks = new Map();
+        let codeBlockIdCounter = 0;
+
+        // DOM Elements
+        const settingsContainer = document.getElementById('settings-container');
+        const settingsToggleBtn = document.getElementById('settings-toggle');
+        const apiKeyInput = document.getElementById('api-key');
+        const modelInput = document.getElementById('model-input');
+        const chatContainer = document.getElementById('chat-container');
+        const chatHistory = document.getElementById('chat-history');
+        const chatForm = document.getElementById('chat-form');
+        const inputWrapper = document.getElementById('input-wrapper');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const errorMessageDiv = document.getElementById('error-message');
+        const fileInput = document.getElementById('file-input');
+        const fileInputLabel = document.getElementById('file-input-label');
+        const filePreview = document.getElementById('file-preview');
+        const toastNotification = document.getElementById('toast-notification');
+        const downloadHistoryBtn = document.getElementById('download-history-btn');
+        const uploadHistoryInput = document.getElementById('upload-history-input');
+        const appTitle = document.getElementById('app-title');
+
+        // State
+        let genAI;
+        let chat;
+        let conversationHistory = [];
+        let messageTimestamps = [];
+        let attachedFiles = [];
+        let loadingIndicator;
+
+        const TEXT_MIME_TYPES = ['application/json', 'application/xml', 'application/javascript', 'application/csv', 'application/x-sh'];
+        const TEXT_EXTENSIONS = [ 'txt', 'md', 'html', 'css', 'js', 'ts', 'jsx', 'tsx', 'json', 'xml', 'csv', 'py', 'rb', 'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'sh', 'bat', 'ps1', 'sql', 'log', 'ini', 'toml', 'yaml', 'yml', 'svg', 'go', 'php', 'swift' ];
+        
+        function updateAppTitle() {
+            const modelName = modelInput.value.trim();
+            appTitle.textContent = modelName ? `AI Chat by Google ${modelName}` : 'Gemini Chat';
+        }
+
+        function displayInitialWelcomeMessage() {
+            const welcomeText = "ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。";
+            const timestamp = new Date().toISOString();
+            if (messageTimestamps.length === 0) {
+                messageTimestamps.push(timestamp);
+            }
+            addMessageToDisplay('model', welcomeText, [], timestamp);
+        }
+        
+        // ★★★ この関数が新しい安定版のレンダリング処理です ★★★
+        function renderFormattedContent(container, text) {
+            const placeholders = new Map();
+            let placeholderId = 0;
+
+            const fileBlockRegex = /\[添付ファイル: (.*?)\]\n```([\s\S]*?)```/g;
+            let processedText = text.replace(fileBlockRegex, (match, fileName) => {
+                return `\n> AIはファイル "${fileName}" の内容を参照しました\n`;
+            });
+
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
+            processedText = processedText.replace(codeBlockRegex, (match, lang, code) => {
+                const id = `%%CODE_BLOCK_PLACEHOLDER_${placeholderId++}%%`;
+                const language = (lang || 'plaintext').toLowerCase();
+                
+                const isSvg = (language === 'svg' || language === 'xml') && code.trim().startsWith('<svg');
+                let blockHtml;
+                if (isSvg) {
+                    blockHtml = `<div class="svg-container">${code}</div>`;
+                } else {
+                    const blockId = `code-block-${codeBlockIdCounter++}`;
+                    const highlightedCode = hljs.getLanguage(language)
+                        ? hljs.highlight(code, { language, ignoreIllegals: true }).value
+                        : hljs.highlightAuto(code).value;
+                    
+                    codeBlocks.set(blockId, { code, language });
+
+                    blockHtml = `
+                        <div class="code-block-wrapper" data-block-id="${blockId}">
+                            <div class="code-header">
+                                <span class="language-name">${language === 'plaintext' ? 'text' : language}</span>
+                                <div class="code-actions">
+                                    <button class="code-copy-btn">Copy</button>
+                                    <button class="code-download-btn">Download</button>
+                                </div>
+                            </div>
+                            <pre><code class="hljs language-${language}">${highlightedCode}</code></pre>
+                        </div>
+                    `;
+                }
+                
+                placeholders.set(id, blockHtml);
+                return id;
+            });
+
+            let html = '';
+            if (typeof marked !== 'undefined') {
+                html = marked.parse(processedText);
+            } else {
+                html = processedText.replace(/\n/g, '<br>');
+            }
+            
+            html = html.replace(/<p>(%%CODE_BLOCK_PLACEHOLDER_\d+%%)<\/p>/g, (match, placeholder) => {
+                return placeholders.get(placeholder) || '';
+            });
+            html = html.replace(/(%%CODE_BLOCK_PLACEHOLDER_\d+%%)/g, (match, placeholder) => {
+                return placeholders.get(placeholder) || '';
+            });
+            
+            container.innerHTML = html;
+            
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                Promise.resolve().then(() => MathJax.typesetPromise([container]))
+                    .catch((err) => console.error('MathJax typesetting error:', err))
+                    .finally(() => chatHistory.scrollTop = chatHistory.scrollHeight);
+            }
+        }
+        
+        function addMessageToDisplay(sender, text, files = [], timestamp = null) {
+            const messageDate = timestamp ? new Date(timestamp) : new Date();
+            const messageRow = document.createElement('div');
+            messageRow.classList.add('message-row', sender === 'user' ? 'user' : 'ai');
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+            const contentEl = document.createElement('div');
+            contentEl.classList.add('message-content');
+
+            if (sender === 'model') {
+                renderFormattedContent(contentEl, text);
+            } else {
+                if (text) {
+                    contentEl.textContent = text;
+                    contentEl.style.whiteSpace = 'pre-wrap';
+                }
+                if (files.length > 0) {
+                    const filesContainer = document.createElement('div');
+                    filesContainer.className = 'message-files-container';
+                    if (text) filesContainer.style.marginTop = '8px';
+                    files.forEach(file => {
+                        const isFileObject = file instanceof File;
+                        const isReconstructed = !!file.isReconstructed;
+                        const mimeType = isFileObject ? file.type : (file.inlineData ? file.inlineData.mimeType : (isReconstructed ? 'text/plain' : ''));
+                        const fileName = isFileObject ? file.name : (isReconstructed ? file.name : `添付ファイル (${mimeType})`);
+                        const isImage = mimeType && mimeType.startsWith('image/');
+                        if (isImage) {
+                            const img = document.createElement('img');
+                            if (isFileObject) {
+                                img.src = URL.createObjectURL(file);
+                                img.onload = () => URL.revokeObjectURL(img.src);
+                            } else {
+                                img.src = `data:${mimeType};base64,${file.inlineData.data}`;
+                            }
+                            filesContainer.appendChild(img);
+                        } else {
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'file-display-item';
+                            fileItem.innerHTML = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z" /></svg><span>${fileName}</span>`;
+                            filesContainer.appendChild(fileItem);
+                        }
+                    });
+                    contentEl.appendChild(filesContainer);
+                }
+            }
+            const timestampEl = document.createElement('div');
+            timestampEl.classList.add('message-timestamp');
+            timestampEl.textContent = messageDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+            messageEl.appendChild(contentEl);
+            messageRow.appendChild(messageEl);
+            messageRow.appendChild(timestampEl);
+            chatHistory.appendChild(messageRow);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function saveAndReinitializeChat() {
+            const apiKey = apiKeyInput.value.trim();
+            const modelName = modelInput.value.trim();
+            if (!apiKey) { displayError("APIキーを入力してください。"); return; }
+            if (!modelName) { displayError("モデル名を入力してください。"); return; }
+            localStorage.setItem('geminiApiKey', apiKey);
+            localStorage.setItem('geminiModel', modelName);
+            clearError();
+            conversationHistory = [];
+            messageTimestamps = [];
+            chatHistory.innerHTML = '';
+            displayInitialWelcomeMessage(); 
+            updateAppTitle();
+            setupChat();
+            settingsContainer.classList.add('hidden');
+        }
+        
+        function setupChat() {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) { displayError("APIキーが設定されていません。"); chatContainer.style.display = 'none'; return; }
+            try {
+                genAI = new GoogleGenerativeAI(apiKey);
+                const modelName = modelInput.value.trim();
+                if (!modelName) { displayError("モデル名を入力してください。"); chatContainer.style.display = 'none'; return; }
+                const model = genAI.getGenerativeModel({ model: modelName, systemInstruction: "ユーザーから図形やグラフの描画を指示された場合は、必ずSVGコードを生成し、そのコードブロックの言語指定を ```svg として応答してください。他の形式（xmlなど）は使用しないでください。また、数式を記述する際は、必ずLaTeX形式（インラインは`$...$`、ブロックは`$$...$$`）を使用してください。" });
+                chat = model.startChat({ history: conversationHistory });
+                chatContainer.style.display = 'flex';
+                clearError();
+            } catch (error) { displayError(`チャットの初期化に失敗: ${error.message}`); chatContainer.style.display = 'none'; }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const userInput = messageInput.value.trim();
+            if (!userInput && attachedFiles.length === 0) return;
+            inputWrapper.classList.add('submitting');
+            sendButton.disabled = true; messageInput.disabled = true; fileInput.disabled = true;
+            fileInputLabel.style.cssText = 'cursor: not-allowed; opacity: 0.5;';
+            document.querySelectorAll('.remove-file').forEach(btn => btn.style.display = 'none');
+            const filesToSend = [...attachedFiles];
+            const userTimestamp = new Date().toISOString();
+            messageTimestamps.push(userTimestamp);
+            addMessageToDisplay('user', userInput, filesToSend, userTimestamp);
+            chatHistory.appendChild(loadingIndicator);
+            loadingIndicator.style.display = 'block';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            try {
+                const filePromises = filesToSend.map(file => isTextFile(file) ? readTextFileAsPart(file) : fileToGenerativePart(file));
+                const allParts = await Promise.all(filePromises);
+                const textPartsContent = allParts.filter(p => p.text).map(p => p.text);
+                const dataParts = allParts.filter(p => p.inlineData);
+                const combinedText = [ ...textPartsContent, userInput ].filter(Boolean).join('\n\n');
+                const parts = [ ...dataParts, ...(combinedText ? [{ text: combinedText }] : []) ];
+                const result = await chat.sendMessage(parts);
+                const response = await result.response;
+                const text = response.text();
+                const aiTimestamp = new Date().toISOString();
+                messageTimestamps.push(aiTimestamp);
+                addMessageToDisplay('model', text, [], aiTimestamp);
+                clearError();
+            } catch (error) {
+                console.error('API Error:', error); messageTimestamps.pop();
+                const msg = error.message.includes("API key not valid") ? "APIキーが無効です。" : `APIエラー: ${error.message}`;
+                displayError(msg);
+                if (chatHistory.lastChild && chatHistory.lastChild.classList.contains('user')) chatHistory.removeChild(chatHistory.lastChild);
+            } finally {
+                inputWrapper.classList.remove('submitting');
+                sendButton.disabled = false; messageInput.disabled = false; fileInput.disabled = false;
+                fileInputLabel.style.cssText = 'cursor: pointer; opacity: 1;';
+                if (loadingIndicator.parentNode) loadingIndicator.parentNode.removeChild(loadingIndicator);
+                attachedFiles = []; renderFilePreview(); messageInput.value = ''; autoResizeTextarea();
+            }
+        }
+
+        function isTextFile(file) {
+            const fileType = file.type; const fileName = file.name || '';
+            const fileExtension = fileName.split('.').pop()?.toLowerCase();
+            if (fileType && fileType.startsWith('text/')) return true;
+            if (fileType && TEXT_MIME_TYPES.includes(fileType)) return true;
+            if (fileExtension && TEXT_EXTENSIONS.includes(fileExtension)) return true;
+            return false;
+        }
+
+        function readTextFileAsPart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => { const formattedText = `[添付ファイル: ${file.name}]\n\`\`\`\n${e.target.result}\n\`\`\``; resolve({ text: formattedText }); };
+                reader.onerror = reject; reader.readAsText(file);
+            });
+        }
+        
+        function fileToGenerativePart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({ inlineData: { data: reader.result.split(',')[1], mimeType: file.type } });
+                reader.onerror = reject; reader.readAsDataURL(file);
+            });
+        }
+        
+        async function handleDownloadHistory() {
+            if (!chat) { showToast("チャットが開始されていません。"); return; }
+            try {
+                const currentHistory = await chat.getHistory();
+                const historyTimestamps = messageTimestamps.slice(1);
+                if (currentHistory.length === 0) { showToast("対話履歴がありません。"); return; }
+                if (currentHistory.length !== historyTimestamps.length) { displayError("履歴とタイムスタンプの数が一致しません。"); return; }
+                const historyWithTimestamps = currentHistory.map((entry, index) => ({ ...entry, timestamp: historyTimestamps[index] }));
+                const dataToSave = { version: "1.0", model: modelInput.value.trim(), history: historyWithTimestamps };
+                const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                const now = new Date();
+                a.download = `gemini-chat-history-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+                showToast("履歴をダウンロードしました。");
+            } catch (error) { displayError("履歴のダウンロードに失敗しました。"); }
+        }
+
+        function handleUploadHistory(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    let newHistory, newTimestamps;
+                    if (loadedData.version === "1.0" && Array.isArray(loadedData.history)) {
+                        newHistory = loadedData.history.map(entry => { const { timestamp, ...rest } = entry; return rest; });
+                        newTimestamps = loadedData.history.map(entry => entry.timestamp);
+                        if (loadedData.model) { modelInput.value = loadedData.model; localStorage.setItem('geminiModel', loadedData.model); updateAppTitle(); }
+                    } else if (Array.isArray(loadedData)) {
+                        newHistory = loadedData; newTimestamps = newHistory.map(() => new Date().toISOString());
+                    } else { throw new Error("無効な履歴ファイル形式です。"); }
+                    conversationHistory = newHistory;
+                    messageTimestamps = [new Date().toISOString(), ...newTimestamps];
+                    rebuildChatDisplay(conversationHistory, messageTimestamps);
+                    setupChat(); settingsContainer.classList.add('hidden');
+                    showToast("履歴をアップロードしました。");
+                } catch (error) { displayError(`履歴の読み込みに失敗しました: ${error.message}`); } finally { event.target.value = ''; }
+            };
+            reader.onerror = () => displayError("ファイルの読み込み中にエラーが発生しました。"); reader.readAsText(file);
+        }
+    
+        function rebuildChatDisplay(history, timestamps) {
+            chatHistory.innerHTML = '';
+            const welcomeText = "ページの一番下にある枠にメッセージを入力し、送信するとAIが回答します。メッセージは外部に送信されるので、個人情報などを送信しないようご注意ください。AIの回答には誤りが含まれる可能性があるので、自己責任でご利用ください。";
+            addMessageToDisplay('model', welcomeText, [], timestamps[0]);
+            const fileBlockRegex = /\[添付ファイル: (.*?)\]\n```\n(?:[\s\S]*?)\n```\n?\s*/g;
+            history.forEach((message, index) => {
+                const timestamp = timestamps[index + 1];
+                const fileParts = message.parts.filter(p => p.inlineData);
+                const textParts = message.parts.filter(p => p.text);
+                let combinedText = textParts.map(p => p.text).join('\n\n');
+                const reconstructedFiles = [...fileParts];
+                if (message.role === 'user') {
+                    const cleanedText = combinedText.replace(fileBlockRegex, (match, fileName) => {
+                        reconstructedFiles.push({ name: fileName, isReconstructed: true }); return '';
+                    }).trim();
+                    addMessageToDisplay(message.role, cleanedText, reconstructedFiles, timestamp);
+                } else {
+                    addMessageToDisplay(message.role, combinedText, fileParts, timestamp);
+                }
+            });
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                Promise.resolve().then(() => MathJax.typesetPromise([chatHistory])).catch((err) => console.error('MathJax error:', err));
+            }
+        }
+
+        function handleDownloadClick(code, language, messageDate) {
+            const langMap = { 'javascript': 'js', 'python': 'py', 'html': 'html', 'css': 'css', 'java': 'java', 'csharp': 'cs', 'cpp': 'cpp', 'ruby': 'rb', 'go': 'go', 'shell': 'sh', 'bash': 'sh', 'json': 'json', 'sql': 'sql', 'typescript': 'ts', 'xml': 'xml', 'yaml': 'yaml', 'svg': 'svg' };
+            const extension = langMap[language.toLowerCase()] || 'txt';
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const h = String(messageDate.getHours()).padStart(2, '0');
+            const min = String(messageDate.getMinutes()).padStart(2, '0');
+            // ファイル名に秒は不要。メッセージの時分と対応した方が分かりやすい。
+            // const s = String(messageDate.getSeconds()).padStart(2, '0');
+            // a.download = `code-${h}${min}${s}.${extension}`;
+            a.download = `code-${h}${min}.${extension}`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+        
+        function showToast(message) {
+            toastNotification.textContent = message; toastNotification.classList.add('show');
+            setTimeout(() => { toastNotification.classList.remove('show'); }, 2000);
+        }
+
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+        
+        function handleFileDrop({ dataTransfer }) { if (inputWrapper.classList.contains('submitting')) return; addFiles(dataTransfer.files); }
+        
+        function handleFileSelect(e) { if (fileInput.disabled) return; addFiles(e.target.files); e.target.value = ''; }
+        
+        function addFiles(files) {
+            for (const file of files) {
+                if (!attachedFiles.some(f => f.name === file.name && f.size === file.size)) attachedFiles.push(file);
+            }
+            renderFilePreview();
+        }
+
+        function renderFilePreview() {
+            filePreview.innerHTML = '';
+            attachedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div'); fileItem.className = 'file-item';
+                const fileName = document.createElement('span'); fileName.textContent = file.name;
+                const removeBtn = document.createElement('span'); removeBtn.className = 'remove-file'; removeBtn.textContent = '×';
+                removeBtn.onclick = () => { attachedFiles.splice(index, 1); renderFilePreview(); };
+                fileItem.appendChild(fileName); fileItem.appendChild(removeBtn); filePreview.appendChild(fileItem);
+            });
+        }
+
+        function displayError(message) { errorMessageDiv.textContent = message; errorMessageDiv.style.display = 'block'; }
+        
+        function clearError() { errorMessageDiv.textContent = ''; errorMessageDiv.style.display = 'none'; }
+        
+        function autoResizeTextarea() { messageInput.style.height = 'auto'; messageInput.style.height = `${messageInput.scrollHeight}px`; }
+        
+        function handleKeyDown(e) { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); chatForm.requestSubmit(); } }
+
+        function initializeApp() {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ gfm: true, breaks: true, mangle: false, headerIds: false });
+            }
+
+            settingsToggleBtn.addEventListener('click', () => settingsContainer.classList.toggle('hidden'));
+            apiKeyInput.addEventListener('change', saveAndReinitializeChat);
+            modelInput.addEventListener('change', saveAndReinitializeChat);
+            chatForm.addEventListener('submit', handleChatSubmit);
+            messageInput.addEventListener('input', autoResizeTextarea);
+            messageInput.addEventListener('keydown', handleKeyDown);
+            fileInput.addEventListener('change', handleFileSelect);
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => inputWrapper.addEventListener(eName, preventDefaults, false));
+            ['dragenter', 'dragover'].forEach(eName => inputWrapper.addEventListener(eName, () => inputWrapper.classList.add('drag-over'), false));
+            ['dragleave', 'drop'].forEach(eName => inputWrapper.addEventListener(eName, () => inputWrapper.classList.remove('drag-over'), false));
+            inputWrapper.addEventListener('drop', handleFileDrop, false);
+            downloadHistoryBtn.addEventListener('click', handleDownloadHistory);
+            uploadHistoryInput.addEventListener('change', handleUploadHistory);
+            
+            chatHistory.addEventListener('click', (e) => {
+                const button = e.target.closest('.code-copy-btn, .code-download-btn');
+                if (!button) return;
+                const wrapper = button.closest('.code-block-wrapper');
+                const blockId = wrapper?.dataset.blockId;
+                const block = blockId ? codeBlocks.get(blockId) : null;
+                if (!block) return;
+                if (button.classList.contains('code-copy-btn')) {
+                    navigator.clipboard.writeText(block.code).then(() => showToast("コピーしました！"));
+                } else {
+                    handleDownloadClick(block.code, block.language, new Date());
+                }
+            });
+
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'loading-indicator';
+            loadingIndicator.innerHTML = `
+                <div class="message-row ai">
+                    <div class="typing-indicator-bubble">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+                    <div class="message-timestamp">&nbsp;</div>
+                </div>
+            `;
+
+            const savedApiKey = localStorage.getItem('geminiApiKey');
+            const savedModel = localStorage.getItem('geminiModel');
+            modelInput.value = savedModel || 'gemini-1.5-pro-latest'; 
+            updateAppTitle();
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+                settingsContainer.classList.add('hidden');
+                setupChat();
+                displayInitialWelcomeMessage();
+            } else {
+                settingsContainer.classList.remove('hidden');
+                displayError("APIキーが設定されていません。設定画面でAPIキーを入力してください。");
+                chatContainer.style.display = 'none';
+            }
+        }
+
+        // Initialize the application
+        initializeApp();
+    </script>
+</body>
+</html>
