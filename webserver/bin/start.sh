@@ -33,4 +33,6 @@ $bin/_run.sh \
 #    "$edulinux_img"
 #    -p "0.0.0.0:443:3389"
 
-docker exec -i "$base" config-apache2.sh "$(hostname)"
+hostname="$(hostname)"
+docker exec -i "$base" config-apache2.sh "$hostname"
+docker exec -i "$base" certbot-apache.sh shima@hiroshima-cu.ac.jp "$hostname"

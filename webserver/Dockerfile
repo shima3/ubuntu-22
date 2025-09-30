@@ -4,9 +4,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean
 
-COPY --from=pkg:japanese / /
-RUN /install
-
 COPY --from=pkg:emacs / /
 RUN /install
 
@@ -26,3 +23,4 @@ RUN a2enmod userdir ssl proxy_http rewrite headers cgi cgid
 
 COPY html /var/www/html
 COPY config-apache2.sh /usr/local/sbin/
+COPY certbot-apache.sh /usr/local/sbin/
