@@ -9,9 +9,9 @@ container="test"
 bin/_run.sh \
     -dit \
     --name "$container" \
-    -v $PWD/context/html/lambda-calculus:/var/www/html/lambda-calculus \
     "$base"
 
+#    -v $PWD/context/html/lambda-calculus:/var/www/html/lambda-calculus \
 #    -v $PWD/context/local/bin:/usr/local/bin \
 #       --name "$base" --hostname "$base" \
 #       -p "$xrdp_port:3389" \
