@@ -42,6 +42,7 @@ docker run \
        --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
        --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
        --mount "type=volume,src=$base-etc-apache2,dst=/etc/apache2" \
+       --network mynet \
        "$@"
 
 #       -p "0.0.0.0:$http_port:80" \

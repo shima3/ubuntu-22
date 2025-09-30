@@ -18,6 +18,7 @@ docker run \
        --device /dev/fuse --cap-add SYS_ADMIN \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
+       --network mynet \
        "$@"
 
 #       -e TZ="Japan" \
