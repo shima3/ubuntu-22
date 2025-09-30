@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>ラムダ式 α正規化</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN";padding:20px;line-height:1.6;}
+  textarea{width:100%;height:4.5rem;font-family:monospace;font-size:14px;}
+  input,button{font-size:14px;padding:8px 12px;}
+  .row{margin-bottom:12px;}
+  pre{background:#f7f7f7;padding:12px;white-space:pre-wrap;}
+  .ok{color:green}
+  .err{color:red}
+</style>
+</head>
+<body>
+  <h1>ラムダ式 α正規化</h1>
+  入力されたラムダ式の束縛変数を出現順に番号付けした変数に置き換え、α等価なラムダ式を表示します。
+  λ（ラムダ）の代わりに\（バックスラッシュ、円マーク）を使うことができます。
+  <p>入力例: <code>λx.λy.x</code>, <code>\x y. x</code>, <code>M N N2</code></p>
+  α正規化はβ簡約やη変換による正規化とは異なるので、ご注意ください。
+
+  <div class="row">
+    <label>ラムダ式（入力）</label>
+    <textarea id="input">λx.λy.x</textarea>
+  </div>
+
+  <div class="row">
+    <button id="go">α正規化して表示</button>
+  </div>
+
+  <div class="row">
+    <strong>α正規化後の式（略記なし）：</strong>
+    <div id="outFull" style="margin-top:8px;font-family:monospace;font-size:16px;"></div>
+    <button class="copy" onclick="copyText('outFull')">コピー</button>
+  </div>
+
+  <div class="row">
+    <strong>α正規化後の式（略記あり）：</strong>
+    <div id="outAbbrev" style="margin-top:8px;font-family:monospace;font-size:16px;"></div>
+    <button class="copy" onclick="copyText('outAbbrev')">コピー</button>
+  </div>
+
+  <div class="row">
+    <strong>α正規化された AST（デバッグ）</strong>
+    <pre id="ast"></pre>
+  </div>
+
+<script>
+/* === パーサ（前と同じ） === */
+function Parser(s){this.s=s;this.i=0;this.len=s.length;}
+Parser.prototype._skip=function(){while(this.i<this.len&&/\s/.test(this.s[this.i]))this.i++;};
+Parser.prototype._peek=function(){return this.s[this.i];};
+Parser.prototype._eat=function(ch){if(this.s[this.i]===ch){this.i++;return true;}return false;};
+Parser.prototype._expect=function(ch){if(!this._eat(ch))throw new Error("期待 '"+ch+"' at pos "+this.i);};
+Parser.prototype.parse=function(){this._skip();const e=this.parseExpr();this._skip();if(this.i<this.len)throw new Error("余分な入力: '"+this.s.slice(this.i)+"'");return e;};
+Parser.prototype.parseExpr=function(){return this.parseApplication();};
+Parser.prototype.parseApplication=function(){
+  let left=this.parseAtom();this._skip();
+  while(this.i<this.len){
+    const ch=this._peek();
+    if(ch==='('||ch==='λ'||ch==='\\'||/[a-zA-Z_]/.test(ch)){
+      const right=this.parseAtom();
+      left={type:'App',func:left,arg:right};
+      this._skip();
+    }else break;
+  }
+  return left;
+};
+Parser.prototype.parseAtom=function(){
+  this._skip();const ch=this._peek();
+  if(ch==='('){this.i++;const e=this.parseExpr();this._skip();this._expect(')');return e;}
+  if(ch==='λ'||ch==='\\'){return this.parseLambda();}
+  return this.parseVar();
+};
+Parser.prototype.parseLambda=function(){
+  this.i++;this._skip();
+  const vars=[];while(this.i<this.len){
+    const name=this._parseVarName();if(!name)break;vars.push(name);this._skip();if(this._peek()==='.')break;
+  }
+  if(this._peek()!=='.')throw new Error("期待 '.' after lambda params at pos "+this.i);
+  this.i++;this._skip();
+  const body=this.parseExpr();
+  return vars.reverse().reduce((acc,v)=>({type:'Lambda',param:v,body:acc}),body);
+};
+Parser.prototype._parseVarName=function(){
+  this._skip();if(this.i>=this.len)return null;
+  const m=this.s.slice(this.i).match(/^([a-zA-Z_][a-zA-Z0-9_]*)/);
+  if(m){this.i+=m[1].length;return m[1];}
+  return null;
+};
+Parser.prototype.parseVar=function(){
+  const name=this._parseVarName();
+  if(!name)throw new Error("期待された変数名 at pos "+this.i);
+  return {type:'Var',name};
+};
+
+/* === α正規化 === */
+function normalize(node,env=new Map(),counter={n:0}){
+  if(node.type==='Var'){
+    const m=env.get(node.name);return {type:'Var',name:m||node.name};
+  }
+  if(node.type==='Lambda'){
+    const newName='v'+(++counter.n);
+    const newEnv=new Map(env);newEnv.set(node.param,newName);
+    return {type:'Lambda',param:newName,body:normalize(node.body,newEnv,counter)};
+  }
+  if(node.type==='App'){
+    return {type:'App',func:normalize(node.func,env,counter),arg:normalize(node.arg,env,counter)};
+  }
+  throw new Error("不明なノード:"+JSON.stringify(node));
+}
+
+/* === 表示関数（略記なし） === */
+function toStringFull(ast){
+  if(ast.type==='Lambda'){
+    return 'λ'+ast.param+'. '+toStringFull(ast.body);
+  }
+  if(ast.type==='App'){
+    return '('+toStringFull(ast.func)+' '+toStringFull(ast.arg)+')';
+  }
+  if(ast.type==='Var')return ast.name;
+  throw new Error("unknown node");
+}
+
+/* === 表示関数（略記あり） === */
+function toStringAbbrev(ast){
+  if(ast.type==='Lambda'){
+    const vars=[];let cur=ast;
+    while(cur&&cur.type==='Lambda'){vars.push(cur.param);cur=cur.body;}
+    return 'λ'+vars.join(' ')+'. '+toStringAbbrev(cur);
+  }
+  if(ast.type==='App'){
+    const f=(ast.func.type==='Lambda')?'('+toStringAbbrev(ast.func)+')':toStringAbbrev(ast.func);
+    const a=(ast.arg.type==='Lambda')?'('+toStringAbbrev(ast.arg)+')':toStringAbbrev(ast.arg);
+    return f+' '+a;
+  }
+  if(ast.type==='Var')return ast.name;
+  throw new Error("unknown node");
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    console.log("コピーしました: " + text);
+  });
+}
+
+/* === 実行 === */
+document.getElementById('go').addEventListener('click',()=>{
+  const src=document.getElementById('input').value.trim();
+  const outF=document.getElementById('outFull');
+  const outA=document.getElementById('outAbbrev');
+  const astEl=document.getElementById('ast');
+  outF.textContent=outA.textContent=astEl.textContent='';
+  try{
+    const p=new Parser(src);
+    const ast=p.parse();
+    const norm=normalize(ast,new Map(),{n:0});
+    outF.innerHTML='<span class="ok">'+escapeHtml(toStringFull(norm))+'</span>';
+    outA.innerHTML='<span class="ok">'+escapeHtml(toStringAbbrev(norm))+'</span>';
+    astEl.textContent='元AST:\n'+JSON.stringify(ast,null,2)+'\n\nα正規化AST:\n'+JSON.stringify(norm,null,2);
+  }catch(e){
+    outF.innerHTML='<span class="err">'+escapeHtml(e.message)+'</span>';
+  }
+});
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

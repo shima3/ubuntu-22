@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ラムダ計算 — アルファ正規化可視化ツール</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Segoe UI", Roboto, "Noto Sans JP", sans-serif; line-height:1.5; padding:24px; background:#f7f7fb; color:#111; }
+  h1 { margin:0 0 6px 0; font-size:20px; }
+  p.desc { margin:0 0 16px 0; color:#333; }
+  .container { max-width:880px; margin:0 auto; background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.06); }
+  textarea { width:100%; min-height:110px; font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, "Courier New", monospace; font-size:14px; padding:10px; box-sizing:border-box; border:1px solid #ddd; border-radius:6px; resize:vertical; }
+  .row { display:flex; gap:12px; margin-top:12px; align-items:center; }
+  button { background:#1767d2; color:#fff; border:0; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; }
+  button:active { transform:translateY(1px); }
+  .examples { margin-top:10px; }
+  .example { display:inline-block; background:#eef4ff; color:#064; padding:6px 8px; border-radius:6px; margin:6px 6px 0 0; cursor:pointer; font-family:inherit; font-size:13px; }
+  .result-area { margin-top:18px; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .box { background:#fff; padding:12px; border-radius:8px; border:1px solid #eee; position:relative; min-height:84px; }
+  .box h3 { margin:0 0 8px 0; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .copy-btn { background:#eee; color:#333; border:0; padding:6px 8px; border-radius:6px; cursor:pointer; font-size:13px; }
+  pre.output { background:#072; color:#fff; padding:10px; border-radius:6px; white-space:pre-wrap; word-break:break-word; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace; }
+  .error { color:#900; margin-top:10px; font-weight:700; }
+  .hint { font-size:13px; color:#666; margin-top:6px; }
+  @media(max-width:720px){ .result-area { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>ラムダ計算 — アルファ正規化 可視化ツール</h1>
+  <p class="desc">
+    入力したラムダ式を **アルファ正規化**（束縛変数を v0, v1, v2, ... に一貫してリネーム）します。<br>
+    ※ ベータ簡約は行いません。構文エラー時は下にエラーメッセージを表示します。
+  </p>
+
+  <label for="input">式を入力（λ または \ を使用可。例: <code>λx y.x y</code>）:</label>
+  <textarea id="input" spellcheck="false">λx.x</textarea>
+
+  <div class="examples">
+    使い方例（クリックで入力欄に挿入）:
+    <button class="example" data-sample="λx.x">λx.x</button>
+    <button class="example" data-sample="λf x.f (f x)">λf x.f (f x)</button>
+    <button class="example" data-sample="(λx.λy.x) a b">(λx.λy.x) a b</button>
+    <button class="example" data-sample="λx.(x (λy.y))">λx.(x (λy.y))</button>
+    <button class="example" data-sample="(λx.((λy.(x y)) z))">(λx.((λy.(x y)) z))</button>
+  </div>
+
+  <div class="row">
+    <button id="run">アルファ正規化 実行</button>
+    <div class="hint">記法: 引数の省略（<code>λx y.M</code> は <code>λx.(λy.M)</code>）および左結合の適用（<code>M N P</code> は <code>((M N) P)</code>）をサポートします。 区切りの「.」は必須です。</div>
+  </div>
+
+  <div id="error" class="error" style="display:none;"></div>
+
+  <div class="result-area" style="margin-top:12px;">
+    <div class="box">
+      <h3>略記なし（完全な括弧付け）
+        <button class="copy-btn" id="copy-full">コピー</button>
+      </h3>
+      <pre id="full-output" class="output" aria-live="polite"></pre>
+    </div>
+
+    <div class="box">
+      <h3>略記あり（読みやすい形式）
+        <button class="copy-btn" id="copy-abbrev">コピー</button>
+      </h3>
+      <pre id="abbrev-output" class="output" aria-live="polite"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  シンプルなラムダ計算パーサ + アルファ正規化 + 表示器
+  - トークン: λ or \, identifiers, '.', '(', ')'
+  - identifiers: 英数字とアンダースコアを許可、先頭は英字またはアンダースコア
+  - 複数引数: λx y.M を λx.(λy.M) とする
+  - 適用は左結合: M N P -> ((M N) P)
+  - アルファ正規化: 束縛変数を v0, v1, ... の順に割当て。割当時に既存の自由変数名と衝突しないように新しい名前を選ぶ。
+  - 出力:
+    * 完全括弧形式: すべての抽象と適用に明示的に括弧を付ける
+    * 略記形式: ネストしたλを collapse、左結合適用はフラットに展開、必要な場合のみ括弧を付ける
+  エラーメッセージは parse 時に検出して表示。
+*/
+
+// AST ノードコンストラクタ
+function Var(name){ this.type='var'; this.name = name; }
+function Abs(param, body){ this.type='abs'; this.param = param; this.body = body; }
+function App(left, right){ this.type='app'; this.left = left; this.right = right; }
+
+// --- トークナイザ ---
+function tokenize(input){
+  const tokens = [];
+  let i=0;
+  while(i<input.length){
+    const ch = input[i];
+    if(/\s/.test(ch)){ i++; continue; }
+    if(ch === 'λ' || ch === '\\'){ tokens.push({type:'lambda', val:ch}); i++; continue; }
+    if(ch === '.') { tokens.push({type:'dot', val:'.'}); i++; continue; }
+    if(ch === '(') { tokens.push({type:'lpar'}); i++; continue; }
+    if(ch === ')') { tokens.push({type:'rpar'}); i++; continue; }
+    // identifier: [A-Za-z_][A-Za-z0-9_]*
+    if(/[A-Za-z_]/.test(ch)){
+      let j=i+1;
+      while(j<input.length && /[A-Za-z0-9_]/.test(input[j])) j++;
+      tokens.push({type:'ident', val: input.slice(i,j)});
+      i=j;
+      continue;
+    }
+    // unknown character
+    throw new SyntaxError('不正な文字: ' + ch + ' (位置 ' + i + ')');
+  }
+  return tokens;
+}
+
+// --- パーサ ---
+// 文法（簡潔）
+// term := application
+// application := atom { atom }
+// atom := variable | '(' term ')' | abstraction
+// abstraction := ('λ' | '\') var+ '.' term
+//
+// 注意: 複数引数 var+ を捉え、λx y.M をネストした Abs に変換する。
+function parse(tokens){
+  let pos = 0;
+  function peek(){ return tokens[pos]; }
+  function consume(expected){
+    const t = tokens[pos];
+    if(!t || t.type !== expected) throw new SyntaxError('期待するトークン: ' + expected + '（位置 ' + pos + '）');
+    pos++;
+    return t;
+  }
+
+  function parseTerm(){
+    return parseApplication();
+  }
+
+  function parseApplication(){
+    let node = parseAtom();
+    while(true){
+      const t = peek();
+      if(!t) break;
+      if(t.type === 'ident' || t.type === 'lpar' || t.type === 'lambda'){
+        const right = parseAtom();
+        node = new App(node, right);
+        continue;
+      }
+      break;
+    }
+    return node;
+  }
+
+  function parseAtom(){
+    const t = peek();
+    if(!t) throw new SyntaxError('予期せぬ入力の終端（位置 ' + pos + '）');
+    if(t.type === 'ident'){ pos++; return new Var(t.val); }
+    if(t.type === 'lpar'){ pos++; const inner = parseTerm(); if(!peek() || peek().type !== 'rpar') throw new SyntaxError('対応する ) がありません（位置 ' + pos + '）'); pos++; return inner; }
+    if(t.type === 'lambda'){ pos++; return parseAbstraction(); }
+    throw new SyntaxError('予期しないトークン: ' + t.type + '（位置 ' + pos + '）');
+  }
+
+  function parseAbstraction(){
+    // 1つ以上の識別子を取り、次に '.' が必須
+    const params = [];
+    while(true){
+      const t = peek();
+      if(!t) throw new SyntaxError('抽象の引数がありません（位置 ' + pos + '）');
+      if(t.type === 'ident'){ params.push(t.val); pos++; continue; }
+      break;
+    }
+    if(params.length === 0) throw new SyntaxError('λ の後に少なくとも1つの識別子が必要です（位置 ' + pos + '）');
+    if(!peek() || peek().type !== 'dot') throw new SyntaxError('抽象の引数リストの後に "." が必要です（位置 ' + pos + '）');
+    pos++; // consume dot
+    const body = parseTerm();
+    // params が複数あればネストした Abs にする（左から順に）
+    let node = body;
+    for(let i=params.length-1;i>=0;i--){
+      node = new Abs(params[i], node);
+    }
+    return node;
+  }
+
+  const ast = parseTerm();
+  if(pos < tokens.length) throw new SyntaxError('余分なトークンがあります（位置 ' + pos + '）');
+  return ast;
+}
+
+// --- 自由変数の抽出 ---
+function freeVars(ast, bound = new Set()){
+  if(ast.type === 'var'){
+    if(!bound.has(ast.name)) return new Set([ast.name]);
+    else return new Set();
+  }
+  if(ast.type === 'abs'){
+    const b2 = new Set(bound); b2.add(ast.param);
+    return freeVars(ast.body, b2);
+  }
+  if(ast.type === 'app'){
+    const l = freeVars(ast.left, bound);
+    const r = freeVars(ast.right, bound);
+    return new Set([...l, ...r]);
+  }
+  return new Set();
+}
+
+// --- アルファ正規化 ---
+function alphaNormalize(ast){
+  // 事前に元式の自由変数名集合を得て、vN と衝突しないようにする
+  const reserved = freeVars(ast);
+  const nameCounter = {n:0};
+  function fresh(reservedSet){
+    while(true){
+      const cand = 'v' + (nameCounter.n++);
+      if(!reservedSet.has(cand)) return cand;
+    }
+  }
+  // 再帰: scopeMap は現在の束縛名から新名へのマップ
+  function walk(node, scopeMap, reservedSet){
+    if(node.type === 'var'){
+      if(scopeMap.has(node.name)) return new Var(scopeMap.get(node.name));
+      return new Var(node.name); // 自由変数（変更しない）
+    }
+    if(node.type === 'abs'){
+      // 新しい名前を割り当て、スコープに追加して体を処理
+      // ただし、元の変数名が同じでも別の束縛なら別の vN を割当てる（出現順）
+      const newName = fresh(reservedSet);
+      reservedSet.add(newName); // 以後もこの名前を避ける
+      const newMap = new Map(scopeMap);
+      newMap.set(node.param, newName);
+      const newBody = walk(node.body, newMap, reservedSet);
+      return new Abs(newName, newBody);
+    }
+    if(node.type === 'app'){
+      const L = walk(node.left, scopeMap, reservedSet);
+      const R = walk(node.right, scopeMap, reservedSet);
+      return new App(L, R);
+    }
+    throw new Error('Unknown node type: ' + node.type);
+  }
+  // 注意: reservedSet はコピーして渡す（fresh が副作用で使う）
+  const reservedSet = new Set(reserved);
+  nameCounter.n = 0;
+  return walk(ast, new Map(), reservedSet);
+}
+
+// --- 表示: 完全括弧付き ---
+function toFullParen(ast){
+  if(ast.type === 'var') return ast.name;
+  if(ast.type === 'abs') {
+    // 表示形式: (λparam.(body))
+    return '(' + 'λ' + ast.param + '.(' + toFullParen(ast.body) + '))';
+  }
+  if(ast.type === 'app'){
+    return '(' + toFullParen(ast.left) + ' ' + toFullParen(ast.right) + ')';
+  }
+  return '';
+}
+
+// --- 表示: 略記あり ---
+// 方針: ネストしたλをまとめ、左結合の適用はフラット化。
+// アプリケーションの各項が抽象の場合は括弧で囲む。
+function toAbbrev(ast){
+  function isAbs(n){ return n && n.type === 'abs'; }
+  function isApp(n){ return n && n.type === 'app'; }
+
+  // 抽象を連鎖的にまとめて (params[], body)
+  function collapseAbs(n){
+    const params = [];
+    let cur = n;
+    while(cur && cur.type === 'abs'){
+      params.push(cur.param);
+      cur = cur.body;
+    }
+    return {params, body: cur};
+  }
+
+  // 左結合アプリケーションを配列に展開
+  function flattenApp(n){
+    const items = [];
+    let cur = n;
+    // ((a b) c) -> [a,b,c]
+    function collect(x){
+      if(x.type === 'app'){
+        collect(x.left);
+        collect(x.right);
+      } else {
+        items.push(x);
+      }
+    }
+    collect(n);
+    return items;
+  }
+
+  // main printer with context: returns string
+  function print(n){
+    if(n.type === 'var') return n.name;
+    if(n.type === 'abs'){
+      const {params, body} = collapseAbs(n);
+      // 出力: λp1 p2.... print(body)
+      return 'λ' + params.join(' ') + '.' + print(body);
+    }
+    if(n.type === 'app'){
+      const parts = flattenApp(n);
+      // each part: if it's an abstraction, must parenthesize
+      const printedParts = parts.map(p => {
+        if(p.type === 'abs') return '(' + print(p) + ')';
+        // if p is application or var: print recursively
+        return print(p);
+      });
+      return printedParts.join(' ');
+    }
+    return '';
+  }
+
+  return print(ast);
+}
+
+// --- DOM / UI ハンドラ ---
+const inputEl = document.getElementById('input');
+const runBtn = document.getElementById('run');
+const fullOut = document.getElementById('full-output');
+const abbrevOut = document.getElementById('abbrev-output');
+const errorEl = document.getElementById('error');
+const copyFullBtn = document.getElementById('copy-full');
+const copyAbbrevBtn = document.getElementById('copy-abbrev');
+
+function showError(msg){
+  errorEl.style.display = 'block';
+  errorEl.textContent = msg;
+}
+function clearError(){ errorEl.style.display = 'none'; errorEl.textContent = ''; }
+
+function setTempButtonLabel(button, label){
+  const orig = button.textContent;
+  button.textContent = label;
+  button.disabled = true;
+  setTimeout(()=>{ button.textContent = orig; button.disabled = false; }, 1200);
+}
+
+runBtn.addEventListener('click', ()=> {
+  clearError();
+  fullOut.textContent = '';
+  abbrevOut.textContent = '';
+  const src = inputEl.value.trim();
+  if(src.length === 0){ showError('式を入力してください。'); return; }
+  try {
+    const tokens = tokenize(src);
+    const ast = parse(tokens);
+    const normalized = alphaNormalize(ast);
+    const full = toFullParen(normalized);
+    const abbrev = toAbbrev(normalized);
+    fullOut.textContent = full;
+    abbrevOut.textContent = abbrev;
+  } catch(e){
+    if(e instanceof SyntaxError){
+      showError('構文エラー: ' + e.message);
+    } else {
+      showError('エラー: ' + (e.message || String(e)));
+      console.error(e);
+    }
+  }
+});
+
+// クリップボード
+copyFullBtn.addEventListener('click', async ()=>{
+  const text = fullOut.textContent;
+  if(!text){ setTempButtonLabel(copyFullBtn, '出力なし'); return; }
+  try {
+    await navigator.clipboard.writeText(text);
+    setTempButtonLabel(copyFullBtn, 'コピー完了');
+  } catch(e){
+    setTempButtonLabel(copyFullBtn, 'コピー失敗');
+  }
+});
+copyAbbrevBtn.addEventListener('click', async ()=>{
+  const text = abbrevOut.textContent;
+  if(!text){ setTempButtonLabel(copyAbbrevBtn, '出力なし'); return; }
+  try {
+    await navigator.clipboard.writeText(text);
+    setTempButtonLabel(copyAbbrevBtn, 'コピー完了');
+  } catch(e){
+    setTempButtonLabel(copyAbbrevBtn, 'コピー失敗');
+  }
+});
+
+// 例をクリックすると入力欄に挿入
+document.querySelectorAll('.example').forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    inputEl.value = btn.dataset.sample;
+    inputEl.focus();
+  });
+});
+
+// 初回実行: 表示更新
+runBtn.click();
+</script>
+</body>
+</html>

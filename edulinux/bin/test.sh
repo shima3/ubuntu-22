@@ -8,10 +8,11 @@ container="test"
 
 bin/_run.sh \
     -dit \
-    -v $PWD/context/local/bin:/usr/local/bin \
     --name "$container" \
+    -v $PWD/context/html/lambda-calculus:/var/www/html/lambda-calculus \
     "$base"
 
+#    -v $PWD/context/local/bin:/usr/local/bin \
 #       --name "$base" --hostname "$base" \
 #       -p "$xrdp_port:3389" \
 #       -p "$http_port:80" \

@@ -1,0 +1,64 @@
+* [2025-09-27 Sat]                                              :work_manage:
+:LOGBOOK:
+CLOCK: [2025-09-27 Sat 21:10]--[2025-09-27 Sat 21:10] =>  0:00
+CLOCK: [2025-09-27 Sat 21:10]--[2025-09-27 Sat 21:10] =>  0:00
+CLOCK: [2025-09-27 Sat 21:09]--[2025-09-27 Sat 21:09] =>  0:00
+:END:
+
+schedule.tsv
+
+各行の形式：
+年月日	開始時分	終了時分	テストID
+
+例：
+2025/09/28	14:40	16:10	test1
+2025/10/04	16:20	17:50	test2
+
+index.
+
+テストフォルダ
+tests/test1
+tests/test2
+
+q-and-a.md
+S: 採点式
+-----
+Q: 問題文
+補足
+-----
+A: 正解
+補足
+-----
+
+採点式が数値の場合、回答が正解と等しいとき、その数値を得点とする。
+採点式が関数の場合、関数に回答を引数として与え、その戻り値を得点とする。
+
+questions.html
+scoring.tsv
+
+学生フォルダ
+students/ユーザ名/test1/answer.tsv
+
+answer.tsv
+各行の形式：
+問題番号	回答
+
+例：
+1	3
+2	λx y.x
+
+#+begin_src 
+#+end_src
+
+C-Enter		見出し追加
+C-c !		日付挿入
+C-c C-e hh	HTMLエクスポート
+C-c C-x C-i	クロックイン
+C-c C-x C-o	クロックアウト
+C-c C-x C-u	更新
+C-c C-q		タグ付加
+C-c C-c		タグ付加
+C-c C-, s	ソースブロック
+
+#+BEGIN: clocktable  :maxlevel 4 :scope file :timestamp t :block thismonth
+#+END:

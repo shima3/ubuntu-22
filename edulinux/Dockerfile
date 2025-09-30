@@ -1,5 +1,5 @@
-# FROM utils
 FROM base
+LABEL maintainer="Kazuyuki Shima <shima@hiroshima-cu.ac.jp>"
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean
@@ -31,10 +31,6 @@ RUN /install && rm /install
 
 COPY --from=pkg:pdf / /
 RUN /install && rm /install
-
-# utilsにインストール済み
-# COPY --from=pkg:git / /
-# RUN /install && rm /install
 
 COPY --from=pkg:java / /
 RUN /install && rm /install
@@ -158,7 +154,7 @@ COPY mozc /etc/skel/.config/mozc
 # COPY userdir.conf /etc/apache2/mods-available/
 COPY apache2/ /etc/apache2/
 RUN a2enmod userdir ssl proxy_http rewrite headers
-RUN a2ensite ttyd.conf
+# RUN a2ensite ttyd.conf
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
 RUN a2enmod cgi
