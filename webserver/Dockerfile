@@ -22,7 +22,8 @@ RUN rm /install
 RUN a2enmod userdir ssl proxy_http rewrite headers cgi cgid
 
 COPY html /var/www/html
-COPY config-apache2.sh /usr/local/sbin/
-COPY certbot-apache.sh /usr/local/sbin/
-COPY ttyd.conf /etc/apache2/sites-available/
-RUN a2ensite ttyd
+# COPY config-apache2.sh /usr/local/sbin/
+# COPY certbot-apache.sh /usr/local/sbin/
+COPY sbin /usr/local/sbin
+COPY conf.d /etc/apache2/conf.d
+# RUN a2ensite ttyd
