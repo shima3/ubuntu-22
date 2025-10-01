@@ -14,7 +14,6 @@ $bin/ensure.sh
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
-    --mount "type=volume,src=edulinux-etc,dst=/etc" \
     --mount "type=volume,src=edulinux-home,dst=/home" \
     --mount "type=volume,src=$base-var,dst=/var" \
     --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
@@ -24,6 +23,7 @@ $bin/_run.sh \
     --name "$base" \
     $base
 
+#    --mount "type=volume,src=edulinux-etc,dst=/etc" \
 #    --mount "type=volume,src=$base-var-log,dst=/var/log" \
 #    --mount "type=volume,src=$base-var-tmp,dst=/var/tmp" \
 #    --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
