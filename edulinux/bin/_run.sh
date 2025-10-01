@@ -8,7 +8,7 @@ osver="$(basename ${PWD%/*})"
 
 # TZ=Asia/Tokyo
 xrdp_port=3333
-http_port=8888
+http_port=80
 ssh_port=2222
 ttyd_port=7777
 nodejs_ports='3000-3009'
