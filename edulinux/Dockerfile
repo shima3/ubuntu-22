@@ -42,9 +42,9 @@ COPY --from=pkg:ssh / /
 RUN /install && rm /install
 EXPOSE 22
 
-COPY --from=pkg:apache2 / /
-RUN /install
-EXPOSE 80
+# COPY --from=pkg:apache2 / /
+# RUN /install
+# EXPOSE 80
 
 COPY --from=pkg:gimp / /
 RUN /install
