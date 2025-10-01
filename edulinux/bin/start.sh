@@ -70,7 +70,10 @@ $bin/_run.sh \
 #    "$edulinux_img"
 #    -p "0.0.0.0:443:3389"
 
-docker exec -i "$base" config-apache2.sh "$(hostname)"
+# docker exec -i "$base" config-apache2.sh "$(hostname)"
+hostname="$(hostname)"
+docker exec -i "$base" config-apache2.sh "$hostname"
+docker exec -i "$base" certbot-apache.sh shima@hiroshima-cu.ac.jp "$hostname"
 
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
