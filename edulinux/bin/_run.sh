@@ -33,6 +33,8 @@ docker run \
        --hostname "$base" \
        -p "0.0.0.0:$xrdp_port:3389" \
        -p "0.0.0.0:$ssh_port:22" \
+       -p "0.0.0.0:$http_port:80" \
+       -p "0.0.0.0:443:443" \
        --device /dev/fuse --cap-add SYS_ADMIN \
        --security-opt apparmor:unconfined \
        --shm-size="1gb" \
@@ -45,8 +47,6 @@ docker run \
 
 #       -p "0.0.0.0:$ttyd_port:7681" \
 #       -p "0.0.0.0:$nodejs_ports:$nodejs_ports" \
-#       -p "0.0.0.0:$http_port:80" \
-#       -p "0.0.0.0:443:443" \
 #       --name "$base" --hostname "$(hostname)" \
 #       --privileged=true \
 #       -e TZ="Japan" \

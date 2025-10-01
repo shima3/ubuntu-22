@@ -42,10 +42,6 @@ COPY --from=pkg:ssh / /
 RUN /install && rm /install
 EXPOSE 22
 
-# COPY --from=pkg:apache2 / /
-# RUN /install
-# EXPOSE 80
-
 COPY --from=pkg:gimp / /
 RUN /install
 
@@ -81,6 +77,10 @@ RUN /install
 
 COPY --from=pkg:k-framework / /
 RUN /install
+
+COPY --from=pkg:apache2 / /
+RUN /install
+EXPOSE 80
 
 RUN rm /install
  
@@ -151,14 +151,11 @@ COPY mozc /etc/skel/.config/mozc
 # COPY 99ulimit /etc/X11/Xsession.d/
 # RUN ulimit -c 0
 
-# COPY userdir.conf /etc/apache2/mods-available/
-# COPY apache2/ /etc/apache2/
-# RUN a2enmod userdir ssl proxy_http rewrite headers
-# RUN a2ensite ttyd
+COPY apache2/ /etc/apache2/
+RUN a2enmod userdir ssl proxy_http rewrite headers
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
-# RUN a2enmod cgi
-# RUN a2enmod cgid
+RUN a2enmod cgi cgid
 
 COPY html/ /var/www/html/
 RUN chgrp sudo /var/www/html && chmod g+w /var/www/html

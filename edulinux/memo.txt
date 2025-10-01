@@ -1,3 +1,19 @@
+2025/10/1 Wed
+alpha normalize tool の作成
+プロンプト：112行
+
+tsukumo2025
+gpt-oss:20b
+２日間待っても思考中
+
+tsukumo2025
+gpt-oss:120b
+22:16 開始
+22:26 コード出力完了262行
+22:28 使い方と実装のポイントの説明完了
+
+構文エラー: Maximum call stack size exceeded
+
 2025/9/30 Tue
 あなたはプロのWeb開発者です。これから説明する要件に従って、単一のHTMLファイルで動作するWebツールを作成してください。
 ---
