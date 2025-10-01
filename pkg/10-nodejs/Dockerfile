@@ -14,7 +14,7 @@ RUN bash -c '. /opt/nvm/nvm.sh && nvm install --lts node'
 RUN echo 'export NVM_DIR=/opt/nvm; . $NVM_DIR/nvm.sh' > /etc/profile.d/nvm.sh
 
 # RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists /etc/apt/sources.list.d /etc/apt/preferences.d /usr/share/keyrings
-RUN tar Jcf /pkg.tar.xz /opt/nvm /etc/profile.d/nvm.sh
+RUN tar Jcf /pkg.tar.xz opt/nvm etc/profile.d/nvm.sh
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 # RUN echo 'apt-get update' >> /install

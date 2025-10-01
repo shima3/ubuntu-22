@@ -24,7 +24,7 @@ RUN apt-get clean
 
 # RUN apt-get install --yes --fix-missing $PACKAGE
 RUN apt-get update && apt-get install --yes --download-only --fix-missing $PACKAGE
-RUN tar Jcf /pkg.tar.xz /var/cache/apt/archives /var/lib/apt/lists
+RUN tar Jcf /pkg.tar.xz var/cache/apt/archives var/lib/apt/lists
 
 # RUN apt-get clean
 # CMD ["/usr/bin/supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
