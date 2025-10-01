@@ -2,13 +2,9 @@
 reg="kshima"
 script="$(readlink -f $0)"
 bin="${script%/*}"
-# cd "${0%/*}/.."
 cd "$bin/.."
 base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
-
-# Architecture="$(docker inspect --format '{{.Architecture}}' --type=image $base)"
-# img="$reg/$osver-$base:$Architecture"
 
 id=($(docker images "$base" --format '{{.ID}}'))
 arch="$(docker inspect $id --format '{{.Architecture}}')"

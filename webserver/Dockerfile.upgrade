@@ -1,0 +1,7 @@
+FROM webserver
+ARG DEBIAN_FRONTEND=noninteractive
+
+# RUN echo "Y" | unminimize
+
+# security update
+RUN apt-get update && apt-get upgrade --yes && apt-get clean
