@@ -14,7 +14,7 @@
 
   <script>
     async function loadMessages() {
-      const res = await fetch('/api/messages');
+      const res = await fetch('api/messages');
       const data = await res.json();
       const list = document.getElementById('list');
       list.innerHTML = '';
@@ -28,7 +28,7 @@
     document.getElementById('form').addEventListener('submit', async e => {
       e.preventDefault();
       const text = document.getElementById('msg').value;
-      await fetch('/api/messages', {
+      await fetch('api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })
