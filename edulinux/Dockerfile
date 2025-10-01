@@ -152,13 +152,13 @@ COPY mozc /etc/skel/.config/mozc
 # RUN ulimit -c 0
 
 # COPY userdir.conf /etc/apache2/mods-available/
-COPY apache2/ /etc/apache2/
-RUN a2enmod userdir ssl proxy_http rewrite headers
-# RUN a2ensite ttyd.conf
+# COPY apache2/ /etc/apache2/
+# RUN a2enmod userdir ssl proxy_http rewrite headers
+# RUN a2ensite ttyd
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
-RUN a2enmod cgi
-RUN a2enmod cgid
+# RUN a2enmod cgi
+# RUN a2enmod cgid
 
 COPY html/ /var/www/html/
 RUN chgrp sudo /var/www/html && chmod g+w /var/www/html
