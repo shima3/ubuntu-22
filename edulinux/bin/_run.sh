@@ -43,6 +43,7 @@ docker run \
        --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
        --mount "type=volume,src=$base-etc-apache2,dst=/etc/apache2" \
        --network mynet \
+       --env SERVER_NAME="$(hostname)" \
        "$@"
 
 #       -p "0.0.0.0:$ttyd_port:7681" \
