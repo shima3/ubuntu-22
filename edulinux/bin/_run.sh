@@ -40,12 +40,12 @@ docker run \
        --shm-size="1gb" \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
        --mount "type=volume,src=$base-etc-letsencrypt,dst=/etc/letsencrypt" \
-       --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
-       --mount "type=volume,src=$base-etc-apache2,dst=/etc/apache2" \
-       --network mynet \
        --env SERVER_NAME="$(hostname)" \
        "$@"
 
+#       --network mynet \
+#       --mount "type=volume,src=$base-var-lib-letsencrypt,dst=/var/lib/letsencrypt" \
+#       --mount "type=volume,src=$base-etc-apache2,dst=/etc/apache2" \
 #       -p "0.0.0.0:$ttyd_port:7681" \
 #       -p "0.0.0.0:$nodejs_ports:$nodejs_ports" \
 #       --name "$base" --hostname "$(hostname)" \

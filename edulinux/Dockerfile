@@ -131,7 +131,7 @@ COPY cron.d/rsnapshot /etc/cron.d/
 RUN cd /usr/local && cc src/sush.c -o sbin/sush && chmod 4755 sbin/sush bin/p3e bin/p3eb
 
 RUN cd /usr/local && cc src/user2port.c -lpthread -o bin/user2port
-COPY user-port.sh /etc/profile.d/
+COPY profile.d /etc/profile.d
 
 # security update
 # RUN apt-get update && apt-get upgrade --yes && apt-get clean
