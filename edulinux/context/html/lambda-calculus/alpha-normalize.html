@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ラムダ計算 アルファ正規化ツール</title>
+    <title>λ計算α正規化ツール</title>
     <style>
         :root {
             --bg-color: #f8f9fa;
@@ -63,7 +63,14 @@
         }
 
         .examples {
+            margin-top: 20px;
             font-size: 0.9em;
+        }
+        .examples code {
+            background-color: #e9e9e9;
+            padding: 2px 5px;
+            border-radius: 3px;
+            cursor: pointer;
         }
 
         .example-link {
@@ -162,34 +169,52 @@
 <body>
 
     <div class="container">
-        <h1>ラムダ計算 アルファ正規化ツール</h1>
-        <p>入力されたラムダ式をアルファ正規化し、式の構造を明確に表示します。</p>
-
+        <h1>ラムダ計算アルファ正規化ツール</h1>
+        <p>ラムダ式をアルファ正規化するツールです。</p>
+          <div>このツールは、入力されたラムダ式の束縛変数を左から右への出現順に <code>v0, v1, ...</code> と名前を付け直します。ただし、自由変数は名前を保持します。このため、<code>v0, v1, ...</code> という名前の自由変数があると正しく正規化できない場合があります。</div>
+        <ul>
+          <li>アルファ正規化とは、アルファ等価なラムダ式を同じ形に統一するようにアルファ変換することです。
+          <li>アルファ等価とは、束縛変数の名前が違うだけで関数としての働きが同じという意味です。
+          <li>アルファ変換とは、元のラムダ式とアルファ等価な別のラムダ式を求めることです。
+          <li>アルファ正規化したラムダ式はベータ変換やイータ変換も必要となる正規形とは異なります。
+          <li>変数のシャドーイングとは、外側と内側で同じ名前の変数を宣言したとき、内側では内側の変数が優先し、外側の変数は参照できなくなることです。
+        </ul>
         <label for="lambda-input">ラムダ式を入力してください:</label>
         <textarea id="lambda-input" placeholder="例: λf x. f (f x)"></textarea>
-
         <div class="controls">
-            <div class="examples">
-                入力例:
-                <a class="example-link" data-example="λx.x">λx.x</a>
-                <a class="example-link" data-example="λf x. f (f x)">λf x. f (f x)</a>
-                <a class="example-link" data-example="(λx y. x) (λz.z) a">(λx y. x) (λz.z) a</a>
-                <a class="example-link" data-example="λx.(x (λx.x))">λx.(x (λx.x))</a>
-            </div>
-            <button id="run-button">正規化を実行</button>
+          <div class="hint"><strong>入力規則:</strong>
+            <ul>
+              <li>ラムダは λ または \ で書けます。
+              <li>複数引数は <code>λx y.M</code> のように書けます。
+              <li>適用は左結合、<code>M N P</code> = <code>((M N) P)</code> です。
+              <li>自由変数の名前に <code>v0, v1, ...</code> は使わないでください。
+            </ul>
+          </div>
+          <div class="examples">
+            <p><strong>入力例:</strong> (クリックで入力欄に挿入)</p>
+            <ul>
+              <li>恒等関数: <code onclick="setInput(this.innerText)">λx.x</code></li>
+              <li>高階関数: <code onclick="setInput(this.innerText)">\f x.f (f x)</code></li>
+              <li>適用（括弧あり）: <code onclick="setInput(this.innerText)">(λx y.x) (λz.z) a</code></li>
+              <li>適用（括弧なし）: <code onclick="setInput(this.innerText)">\x y.x (\z.z) a</code></li>
+              <li>変数のシャドーイング: <code onclick="setInput(this.innerText)">λx.(λx.x) x</code></li>
+              <li>複雑な適用: <code onclick="setInput(this.innerText)">(\x y.x) (\z.z) a</code></li>
+            </ul>
+          </div>
         </div>
+        <button id="run-button">正規化を実行</button>
 
         <div id="error-message"></div>
 
         <div id="result-area" class="result-area">
             <div class="result-box">
-                <h2>略記なし（完全な括弧付け）</h2>
+                <h2>完全括弧付き表記</h2>
                 <button class="copy-button" data-target="full-output-code">コピー</button>
                 <pre><code id="full-output-code"></code></pre>
             </div>
 
             <div class="result-box">
-                <h2>略記あり</h2>
+                <h2>略記形（可能な限り括弧を省略）</h2>
                 <button class="copy-button" data-target="short-output-code">コピー</button>
                 <pre><code id="short-output-code"></code></pre>
             </div>
@@ -198,20 +223,24 @@
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        // --- AST (Abstract Syntax Tree) Node Classes ---
-        // ASTノードのクラス定義
-        class Var {
-            constructor(name) { this.name = name; }
-        }
-        class Abs { // Abstraction
-            constructor(param, body) { this.param = param; this.body = body; }
-        }
-        class App { // Application
-            constructor(func, arg) { this.func = func; this.arg = arg; }
-        }
-
+      const inputEl = document.getElementById('lambda-input');
+      function setInput(text) {
+          inputEl.value = text;
+          inputEl.focus();
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+          // --- AST (Abstract Syntax Tree) Node Classes ---
+          // ASTノードのクラス定義
+          class Var {
+              constructor(name) { this.name = name; }
+          }
+          class Abs { // Abstraction
+              constructor(param, body) { this.param = param; this.body = body; }
+          }
+          class App { // Application
+              constructor(func, arg) { this.func = func; this.arg = arg; }
+          }
+          
         // --- Parser ---
         // 文字列をトークンに分解し、ASTを構築するパーサー
         class Parser {
@@ -345,7 +374,6 @@
         }
 
         // --- DOM Elements ---
-        const inputEl = document.getElementById('lambda-input');
         const runButton = document.getElementById('run-button');
         const resultArea = document.getElementById('result-area');
         const errorEl = document.getElementById('error-message');
@@ -355,8 +383,8 @@
         const exampleLinks = document.querySelectorAll('.example-link');
 
         // --- Event Handlers ---
-        
-        // 正規化実行ボタンのイベント
+
+          // 正規化実行ボタンのイベント
         runButton.addEventListener('click', () => {
             const inputText = inputEl.value.trim();
             if (!inputText) {
