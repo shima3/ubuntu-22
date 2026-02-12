@@ -174,7 +174,8 @@ COPY etc.profile /etc/profile
 COPY nodejs /etc/skel/nodejs
 WORKDIR /etc/skel/nodejs
 RUN bash -c '. /opt/nvm/nvm.sh && npm init -y && npm install cors express pegjs'
-RUN git config --global user.email "shima@hiroshima-cu.ac.jp" && git config --global user.name 'Kazuyuki Shima' && git init && git add . && git commit -m 'Initial commit'
+# テスト用
+# RUN git config --global user.email "shima@hiroshima-cu.ac.jp" && git config --global user.name 'Kazuyuki Shima' && git init && git add . && git commit -m 'Initial commit'
 WORKDIR /
 
 RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u+s pam-auth
