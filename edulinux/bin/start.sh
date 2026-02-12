@@ -78,3 +78,7 @@ docker exec -i "$base" certbot-apache.sh shima@hiroshima-cu.ac.jp
 
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
+
+$bin/exec.sh useradd -g sudo -m --key HOME_MODE=0751 -s /bin/bash shima
+$bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
+echo 'Kazuyuki Shima' | docker exec --interactive --user shima "$container" config-git.sh shima@hiroshima-cu.ac.jp
