@@ -1,5 +1,5 @@
 # FROM ubuntu AS download-stage
-FROM ubuntu
+FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG PACKAGE
 
