@@ -155,7 +155,7 @@ COPY mozc /etc/skel/.config/mozc
 # RUN ulimit -c 0
 
 COPY apache2/ /etc/apache2/
-RUN a2enmod userdir ssl proxy_http rewrite headers
+RUN a2enmod userdir ssl proxy_http rewrite headers authnz_external
 
 COPY cgi-bin/ /usr/lib/cgi-bin/
 RUN a2enmod cgi cgid

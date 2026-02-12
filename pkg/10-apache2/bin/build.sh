@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGE="apache2 php certbot python3-certbot-apache"
+PACKAGE="apache2 php certbot python3-certbot-apache libapache2-mod-authnz-external pwauth"
 
 script="$(readlink -f $0)"
 bin="${script%/*}"
