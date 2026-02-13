@@ -179,3 +179,6 @@ RUN bash -c '. /opt/nvm/nvm.sh && npm init -y && npm install cors express pegjs'
 WORKDIR /
 
 RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u+s pam-auth
+
+# テスト用
+RUN cd /etc/supervisor/conf.d && rm dbus.conf sshd.conf xrdp.conf
