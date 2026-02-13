@@ -180,5 +180,6 @@ WORKDIR /
 
 RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u+s pam-auth
 
-# テスト用
-RUN cd /etc/supervisor/conf.d && rm dbus.conf sshd.conf xrdp.conf
+# 確認用削除
+# RUN cd /etc/supervisor/conf.d && rm dbus.conf sshd.conf xrdp.conf
+# 削除すると起動しなくなるので残す。
