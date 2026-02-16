@@ -9,6 +9,7 @@ container="test"
 bin/_run.sh \
     -dit \
     --name "$container" \
+    -p 8000:8000 \
     "$base"
 
 #    -v $PWD/context/html/lambda-calculus:/var/www/html/lambda-calculus \

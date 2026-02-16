@@ -62,6 +62,7 @@ RUN /install
 
 COPY --from=pkg:nodejs / /
 RUN /install
+ENV PATH=/opt/nodejs/bin:$PATH
 
 COPY --from=pkg:haskell / /
 RUN /install
@@ -81,6 +82,10 @@ RUN /install
 COPY --from=pkg:apache2 / /
 RUN /install
 EXPOSE 80
+
+COPY --from=pkg:jupyter / /
+RUN /install
+EXPOSE 8000
 
 RUN rm /install
  
