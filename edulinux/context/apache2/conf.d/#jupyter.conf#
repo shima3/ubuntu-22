@@ -1,21 +1,3 @@
-# WebSocket含むリバースプロキシ
-# 通常の HTTP 用の設定
-# ProxyPass        /jupyter http://127.0.0.1:8000/jupyter retry=0
-# ProxyPassReverse /jupyter http://127.0.0.1:8000/jupyter
-# ProxyPass        /jupyter/ http://127.0.0.1:8000/jupyter/
-# ProxyPassReverse /jupyter/ http://127.0.0.1:8000/jupyter/
-# ProxyPass        /jupyter/ ws://127.0.0.1:8000/jupyter/ retry=0
-# ProxyPass        /jupyter/ ws://127.0.0.1:8000/jupyter/
-
-# WebSocket のアップグレードを許可する設定
-# RewriteEngine On
-# RewriteCond %{HTTP:Upgrade} =websocket [NC]
-# RewriteRule "/jupyter/(.*)" "ws://localhost:8000/jupyter/$1" [P,L]
-# RewriteCond %{HTTP:Upgrade} !=websocket [NC]
-# RewriteRule "/jupyter/(.*)" "http://localhost:8000/jupyter/$1" [P,L]
-# RewriteCond %{HTTP:Upgrade} =websocket [NC]
-# RewriteRule /jupyter/(.*) ws://127.0.0.1:8000/jupyter/$1 [P,L]
-
 <Location "/jupyter">
     # ブラウザが叩いたドメイン名をそのまま JupyterHub に伝える
     ProxyPreserveHost On
