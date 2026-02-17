@@ -37,7 +37,7 @@ if [[ "$(docker container inspect $base --format '{{json .Mounts}}' | jq --arg n
 fi
 
 ## 前回起動したコンテナを削除する。
-list="$(docker ps --filter name=$base --quiet)"
+list="$(docker ps --all --filter name=$base --quiet)"
 if [[ "$list" != "" ]]; then
     echo -n "remove $base container "
     docker rm -f "$list"
