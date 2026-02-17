@@ -24,7 +24,8 @@ bin/_run.sh \
 # echo 'Guest' | docker exec --interactive --user guest "$base" config-git.sh guest@e.hiroshima-cu.ac.jp
 
 bin/exec.sh useradd -g sudo -m --key HOME_MODE=0751 -s /bin/bash shima
-bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
+# bin/exec.sh usermod --password '$y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD' shima
+bin/exec.sh usermod --password '$y$j9T$4nNEnBJJRMYu9XGqCCTl/0$a9hGDNeBuh4OL4wB5AaHv2.AN2peG8A5uYoK7nwP0U7' shima
 echo 'Kazuyuki Shima' | docker exec --interactive --user shima "$container" config-git.sh shima@hiroshima-cu.ac.jp
 
 # user=a20999
