@@ -1,0 +1,5 @@
+2026/2/18 Wed
+./add.sh ou/groups.ldif
+./add.sh ou/people.ldif
+./add.sh cn/testgroup.ldif
+./add.sh uid/testuser.ldif

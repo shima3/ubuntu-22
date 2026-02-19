@@ -7,13 +7,20 @@ RUN bash -c '. /opt/nvm/nvm.sh && nvm install --lts node'
 # RUN echo 'export NVM_DIR=/opt/nvm; . $NVM_DIR/nvm.sh' > /etc/profile.d/nodejs.sh
 RUN echo 'export NVM_DIR=/opt/nvm' > /etc/profile.d/nodejs.sh
 RUN echo '. $NVM_DIR/nvm.sh' >> /etc/profile.d/nodejs.sh
-RUN echo 'export COREPACK_HOME=/opt/corepack' >> /etc/profile.d/nodejs.sh
-RUN echo 'corepack enable' >> /etc/profile.d/nodejs.sh
-RUN echo 'corepack prepare yarn@stable --activate' >> /etc/profile.d/nodejs.sh
 
-RUN . /etc/profile.d/nodejs.sh && export COREPACK_HOME=/opt/corepack && corepack prepare yarn@stable
+# configurable-http-proxyのインストールのため
+# corepackとyarnをインストールしたが、
+# npmでもインストールできたので
+# corepackとyarnはインストールしない。
+# RUN echo 'export COREPACK_HOME=/opt/corepack' >> /etc/profile.d/nodejs.sh
+# RUN echo 'corepack enable' >> /etc/profile.d/nodejs.sh
+# RUN echo 'corepack prepare yarn@stable --activate' >> /etc/profile.d/nodejs.sh
 
-RUN tar Jcf /pkg.tar.xz opt/nvm etc/profile.d/nodejs.sh /opt/corepack
+# RUN . /etc/profile.d/nodejs.sh && export COREPACK_HOME=/opt/corepack && corepack prepare yarn@stable
+RUN . /etc/profile.d/nodejs.sh
+
+# RUN tar Jcf /pkg.tar.xz opt/nvm etc/profile.d/nodejs.sh /opt/corepack
+RUN tar Jcf /pkg.tar.xz opt/nvm etc/profile.d/nodejs.sh
 
 RUN echo 'tar Jxf /pkg.tar.xz && rm /pkg.tar.xz' > /install
 RUN echo '. /etc/profile.d/nodejs.sh' >> /install
