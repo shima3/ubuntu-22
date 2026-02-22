@@ -22,3 +22,7 @@ RUN sed -i 's/^\(myhostname\s*=.*\)$/# \1/' /etc/postfix/main.cf
 RUN useradd --create-home --system _mailrecord
 COPY _mailrecord.sh /usr/local/bin/
 COPY dot.forward /home/_mailrecord/.forward
+
+ENV PAGER=less
+
+COPY master.cf /etc/postfix/master.cf
