@@ -188,3 +188,16 @@ RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u
 # 確認用削除
 # RUN cd /etc/supervisor/conf.d && rm dbus.conf sshd.conf xrdp.conf
 # 削除すると起動しなくなるので残す。
+
+# LDAP
+RUN apt-get update && apt-get install -y libnss-sss
+COPY ldap/sssd.conf /etc/sssd/sssd.conf
+RUN chmod 600 /etc/sssd/sssd.conf && chown root:root /etc/sssd/sssd.conf
+# COPY ldap/sss.conf /etc/supervisor/conf.d/sss.conf
+RUN apt-get install -y sssd-tools
+
+# 初回ログイン時にホーム作成
+RUN apt-get install libpam-modules
+COPY ldap/common-auth /etc/pam.d/common-auth
+COPY ldap/common-session /etc/pam.d/common-session
+RUN pam-auth-update --force --enable sss mkhomedir

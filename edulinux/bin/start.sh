@@ -64,6 +64,7 @@ $bin/_run.sh \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
     -p "0.0.0.0:22:22" \
+    --network mynet \
     $base
 
 #    -p "0.0.0.0:80:80" \
@@ -78,3 +79,7 @@ docker exec -i "$base" certbot-apache.sh shima@hiroshima-cu.ac.jp
 
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
+
+docker cp $HOME/ldap/certs/ca.crt edulinux:/etc/sssd/ldap-ca.crt
+docker exec "$base" chown root:root /etc/sssd/ldap-ca.crt
+docker exec --detach "$base" bash -c "sssd > /var/log/sssd.out.log 2> /var/log/sssd.err.log"
