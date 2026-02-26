@@ -191,13 +191,25 @@ RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u
 
 # LDAP
 RUN apt-get update && apt-get install -y libnss-sss
-COPY ldap/sssd.conf /etc/sssd/sssd.conf
-RUN chmod 600 /etc/sssd/sssd.conf && chown root:root /etc/sssd/sssd.conf
-# COPY ldap/sss.conf /etc/supervisor/conf.d/sss.conf
 RUN apt-get install -y sssd-tools
-
+RUN apt-get install -y gettext
 # 初回ログイン時にホーム作成
-RUN apt-get install libpam-modules
-COPY ldap/common-auth /etc/pam.d/common-auth
-COPY ldap/common-session /etc/pam.d/common-session
+RUN apt-get install -y libpam-modules
+
+# COPY ldap/common-auth /etc/pam.d/common-auth
+# COPY ldap/common-session /etc/pam.d/common-session
+COPY ldap/pam.d/ /etc/pam.d/
 RUN pam-auth-update --force --enable sss mkhomedir
+
+COPY ldap/sssd.sh /usr/local/sbin/sssd.sh
+RUN chmod +x /usr/local/sbin/sssd.sh
+
+# COPY ldap/sssd/no-tls.conf /etc/sssd/sssd.template.conf
+# COPY ldap/sssd/start-tls.conf /etc/sssd/sssd.template.conf
+COPY ldap/sssd/tls.conf /etc/sssd/sssd.template.conf
+# RUN chmod 600 /etc/sssd/sssd.conf && chown root:root /etc/sssd/sssd.conf
+
+COPY ldap/sss.conf /etc/supervisor/conf.d/sss.conf
+
+# 起動時 fsck は不要なので削除する。
+RUN rm /etc/update-motd.d/98-fsck-at-reboot

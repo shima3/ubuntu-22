@@ -52,6 +52,7 @@ fi
 
 # docker pull "$edulinux_img"
 $bin/ensure.sh
+# docker cp --follow-link ldap:/container/service/slapd/assets/certs/ca.crt $HOME/ldap
 $bin/_run.sh \
     -dit \
     --restart unless-stopped \
@@ -65,8 +66,11 @@ $bin/_run.sh \
     --name "$base" \
     -p "0.0.0.0:22:22" \
     --network mynet \
+    -v ldap_certs:/etc/sssd/certs \
+    --env-file $HOME/ldap/env \
     $base
 
+#    -v $HOME/ldap/ca.crt:/etc/sssd/ldap-ca.crt \
 #    -p "0.0.0.0:80:80" \
 #    "$edulinux_img"
 #    -p "0.0.0.0:443:3389"
@@ -80,6 +84,6 @@ docker exec -i "$base" certbot-apache.sh shima@hiroshima-cu.ac.jp
 ## $etctar から /etc/{passwd,shadow,group,gshadow} を復元する。
 docker exec -i "$base" bash -c "if [ -f $etctar ]; then echo restore: $etctar '-> /etc/{passwd,shadow,group,gshadow}'; tar xf $etctar -C /etc; fi"
 
-docker cp $HOME/ldap/certs/ca.crt edulinux:/etc/sssd/ldap-ca.crt
-docker exec "$base" chown root:root /etc/sssd/ldap-ca.crt
-docker exec --detach "$base" bash -c "sssd > /var/log/sssd.out.log 2> /var/log/sssd.err.log"
+# docker cp $HOME/ldap/certs/ca.crt edulinux:/etc/sssd/ldap-ca.crt
+# docker exec "$base" chown root:root /etc/sssd/ldap-ca.crt
+# docker exec --detach "$base" bash -c "sssd > /var/log/sssd.out.log 2> /var/log/sssd.err.log"
