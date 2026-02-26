@@ -20,8 +20,7 @@ SN="${USER_NAME%%[ ,　，]*}"
 GIDNUM="$($dir/../group/idnum.sh $GROUP_ID)"
 PASSHASH="$($dir/../pass/hash.sh "$PASSWORD")"
 
-# cat <<EOF | docker exec -i ldap add.sh
-cat <<EOF
+cat <<EOF | docker exec -i ldap add.sh
 dn: uid=$USER_ID,ou=people,dc=example,dc=local
 objectClass: inetOrgPerson
 objectClass: posixAccount

@@ -2,6 +2,7 @@
 script="$(readlink -f $0)"
 dir="${script%/*}"
 docker rm -f ldap
+docker run --rm -v $HOME/ldap/certs:/host -v ldap_certs:/volume -w /host ubuntu cp ldap.crt ldap.key ca.crt /volume
 docker run -d \
   --name ldap \
   --restart=always \
@@ -12,8 +13,11 @@ docker run -d \
   -v $dir/sbin:/usr/local/sbin \
   --env-file $HOME/ldap/env \
   --network mynet \
+  -v ldap_certs:/container/service/slapd/assets/certs \
+  --network-alias ldap.internal --hostname ldap.internal \
   osixia/openldap
 
+#  --network-alias docker-light-baseimage --hostname docker-light-baseimage \
 #  -v ldap_certs:/container/service/slapd/assets/certs \
 #  -v $HOME/ldap/certs:/container/service/slapd/assets/certs \
 #  -v $HOME/ldap/certs:/container/service/slapd/assets/certs:ro \

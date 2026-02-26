@@ -1,7 +1,4 @@
 2026/2/20 Fri
-docker exec -i ldap add.sh -f ou/group.ldif
-docker exec -i ldap add.sh -f ou/people.ldif
-
 group/add.sh sudo 10000
 group/add.sh students 10001
 
