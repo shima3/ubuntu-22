@@ -23,6 +23,9 @@ $bin/_run.sh \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
+    --network mynet \
+    --env-file $HOME/ldap/env \
+    -v /var/run/docker.sock:/var/run/docker.sock \
     "$base"
 
 #    --mount "type=bind,src=/Volumes/Sync/Backup/MailRecord,dst=/home/_mailrecord/MailRecord" \
@@ -39,3 +42,7 @@ docker exec "$base" postfix reload
 # docker exec "$base" usermod --create-home "$USER"
 # --password '$y$j9T$TZI2qVVjbYATACN2brqSa1$d3ClHj/6yTbHWW4asITrfGWelSjyr2BFxlpz5DA1DIC'
 # $y$j9T$whNZTgxbGdeIJuWEUSkJA0$0fr5b1BLfAbV4qd8GMzM8JOg5vle2spWcuUI3xW9jCD
+
+DOCKER_GID="$(stat -c '%g' /var/run/docker.sock)"
+docker exec "$base" groupmod --gid "$DOCKER_GID" docker
+docker exec "$base" usermod --gid "$DOCKER_GID" edulinux
