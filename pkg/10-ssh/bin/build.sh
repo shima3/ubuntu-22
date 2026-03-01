@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGE="openssh-server rsyslog"
+PACKAGE="openssh-server rsyslog mosh"
 
 script="$(readlink -f $0)"
 bin="${script%/*}"
