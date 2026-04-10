@@ -8,7 +8,7 @@ then
 fi
 useradd -g users -m --key HOME_MODE=0715 -s /bin/bash $user
 if [ "$pw" == "" ]
-then pw=$(pwgen -Bs1)
+then pw=$(pwgen -Bs1 10)
 fi
 echo $user:$pw | chpasswd
 echo $pw

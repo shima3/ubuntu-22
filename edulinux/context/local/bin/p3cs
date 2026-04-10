@@ -7,7 +7,8 @@ if [[ "$dir" != '.thinclient_drives' ]]; then
 fi
 client_wt="$PWD"
 script="${0##*/}"
-p3r="P3R$(($(date +%Y)-2018))"
+# p3r="P3R$(($(date +%Y)-2018))"
+p3r="P3"
 server_wt="$HOME/$p3r"
 export GIT_DIR="$server_wt/.git"
 if [[ ! -d "$GIT_DIR" ]]; then

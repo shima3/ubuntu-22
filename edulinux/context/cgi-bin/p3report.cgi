@@ -1,7 +1,8 @@
 #!/bin/bash
 echo 'Content-Type: text/plain'
 echo
-for dir in /home/[a-z]20*/P3R7
+# for dir in /home/[a-z]20*/P3R7
+for dir in /home/[a-z]20*/P3
 do
   pdir=${dir%/*}
   user=${pdir##*/}

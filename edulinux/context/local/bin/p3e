@@ -9,7 +9,8 @@ fi
 # mkdir -p "$logdir"
 # date +"%Y/%m/%d %H/%M:%S%t$0%t$*" >> "$logdir/$USER"
 
-p3r="P3R$(($(date +%Y)-2018))"
+# p3r="P3R$(($(date +%Y)-2018))"
+p3r="P3"
 program="$1"
 user="$2"
 

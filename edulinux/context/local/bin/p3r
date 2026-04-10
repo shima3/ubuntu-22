@@ -1,5 +1,6 @@
 #!/bin/bash
-dir="$HOME/P3R$(($(date +%Y)-2018))"
+# dir="$HOME/P3R$(($(date +%Y)-2018))"
+dir="$HOME/P3"
 mkdir -p $dir
 cd $dir
 chmod 705 .
