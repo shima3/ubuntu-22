@@ -30,13 +30,14 @@ $bin/_run.sh \
 
 #    --mount "type=bind,src=/Volumes/Sync/Backup/MailRecord,dst=/home/_mailrecord/MailRecord" \
 
-docker cp $HOME/mail/sender_canonical mail:/etc/postfix/
-docker cp $HOME/mail/header_checks mail:/etc/postfix/
-docker exec "$base" chown root.root /etc/postfix/{sender_canonical,header_checks}
-docker exec "$base" postmap /etc/postfix/sender_canonical
-docker exec "$base" postconf -e "sender_canonical_maps = hash:/etc/postfix/sender_canonical"
-docker exec "$base" postconf -e "smtp_header_checks = regexp:/etc/postfix/header_checks"
-docker exec "$base" postfix reload
+# Gmail用送信者ドメインを書き換える設定
+# docker cp $HOME/mail/sender_canonical mail:/etc/postfix/
+# docker cp $HOME/mail/header_checks mail:/etc/postfix/
+# docker exec "$base" chown root.root /etc/postfix/{sender_canonical,header_checks}
+# docker exec "$base" postmap /etc/postfix/sender_canonical
+# docker exec "$base" postconf -e "sender_canonical_maps = hash:/etc/postfix/sender_canonical"
+# docker exec "$base" postconf -e "smtp_header_checks = regexp:/etc/postfix/header_checks"
+# docker exec "$base" postfix reload
 
 # docker exec "$base" useradd --gid users --no-user-group --shell /bin/bash --uid "$(id -u)" --create-home "$USER"
 # docker exec "$base" usermod --create-home "$USER"
