@@ -7,7 +7,7 @@ base="${PWD##*/}"
 osver="$(basename ${PWD%/*})"
 
 # TZ=Asia/Tokyo
-xrdp_port=3333
+xrdp_port=3389
 http_port=80
 ssh_port=2222
 ttyd_port=7777
