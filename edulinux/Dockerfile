@@ -212,3 +212,6 @@ COPY ldap/sss.conf /etc/supervisor/conf.d/sss.conf
 # COPY ldap/sssd/start-tls.conf /etc/sssd/sssd.template.conf
 COPY ldap/sssd/tls.conf /etc/sssd/sssd.template.conf
 # RUN chmod 600 /etc/sssd/sssd.conf && chown root:root /etc/sssd/sssd.conf
+
+COPY fonts/ /usr/local/share/fonts/
+RUN fc-cache -fv
