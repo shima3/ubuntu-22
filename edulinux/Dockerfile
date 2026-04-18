@@ -190,7 +190,7 @@ RUN cd /usr/local/sbin && gcc -o pam-auth pam-auth.c -lpam -lpam_misc && chmod u
 # 削除すると起動しなくなるので残す。
 
 # 起動時 fsck は不要なので削除する。
-RUN rm /etc/update-motd.d/98-fsck-at-reboot
+RUN rm -f /etc/update-motd.d/98-fsck-at-reboot
 
 # LDAP
 RUN apt-get update && apt-get install -y libnss-sss
