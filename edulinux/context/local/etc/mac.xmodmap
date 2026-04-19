@@ -1,0 +1,10 @@
+! 左Shiftを救出（50番は絶対にShiftのままにする）
+keycode 50 = Shift_L NoSymbol Shift_L
+add shift = Shift_L
+! 右Command (116) を「¥」と「|」にする
+remove mod4 = 0x74
+! keycode 116 = backslash bar backslash bar
+keycode 116 = 0x005c 0x007c 0x005c 0x007c
+! Shift + 0 を「_」にする
+! keycode 19 = 0 underscore 0 underscore
+keycode 19 = 0 0x005f 0 0x005f
