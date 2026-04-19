@@ -214,4 +214,7 @@ COPY ldap/sssd/tls.conf /etc/sssd/sssd.template.conf
 # RUN chmod 600 /etc/sssd/sssd.conf && chown root:root /etc/sssd/sssd.conf
 
 COPY fonts/ /usr/local/share/fonts/
+RUN apt install fonts-noto-core fonts-noto-extra
 RUN fc-cache -fv
+
+COPY reconnectwm.sh /etc/xrdp/reconnectwm.sh
