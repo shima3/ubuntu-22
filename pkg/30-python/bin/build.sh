@@ -1,6 +1,6 @@
 #!/bin/bash
 PACKAGE="\
-  python3 python3-dev python3-pip python3-tk \
+  python3 python3-dev python3-pip python3-tk python3-pil.imagetk \
   libavformat-dev libfreetype6-dev libjpeg-dev \
   libportmidi-dev \
   libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
