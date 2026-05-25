@@ -64,7 +64,7 @@ $bin/_run.sh \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
-    -p "0.0.0.0:22:22" \
+    -p "0.0.0.0:22:3389" \
     --network mynet \
     -v ldap_certs:/etc/sssd/certs \
     --env-file $HOME/ldap/env \
