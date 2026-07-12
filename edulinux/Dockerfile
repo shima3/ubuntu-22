@@ -76,8 +76,8 @@ RUN /install
 COPY --from=pkg:z3 / /
 RUN /install
 
-COPY --from=pkg:k-framework / /
-RUN /install
+# COPY --from=pkg:k-framework / /
+# RUN /install
 
 COPY --from=pkg:apache2 / /
 RUN /install

@@ -64,12 +64,12 @@ $bin/_run.sh \
     --ulimit core=0 \
     --tmpfs /run --tmpfs /run/lock \
     --name "$base" \
-    -p "0.0.0.0:22:3389" \
     --network mynet \
     -v ldap_certs:/etc/sssd/certs \
     --env-file $HOME/ldap/env \
     $base
 
+#    -p "0.0.0.0:22:3389" \
 #    -v $HOME/ldap/ca.crt:/etc/sssd/ldap-ca.crt \
 #    -p "0.0.0.0:80:80" \
 #    "$edulinux_img"
