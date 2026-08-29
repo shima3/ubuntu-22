@@ -55,3 +55,8 @@ RUN useradd --create-home --system reset-password
 # COPY _mailrecord.sh /usr/local/bin/
 COPY bin /usr/local/bin
 COPY _mailrecord.forward /home/_mailrecord/.forward
+
+RUN useradd --create-home --system qrgen
+COPY qrgen /home/qrgen
+RUN apt-get update && apt-get install -y openjdk-25-jdk
+RUN javac --source-path /home/qrgen -cp "/home/qrgen:/home/qrgen/zxing/*" -d /home/qrgen QRCodeGenerator.java

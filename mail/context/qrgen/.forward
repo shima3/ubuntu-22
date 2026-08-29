@@ -1,0 +1,1 @@
+"| flock --timeout 60 $HOME/handle.log.lock bash $HOME/handle.sh"
