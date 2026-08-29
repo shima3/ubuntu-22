@@ -58,5 +58,6 @@ COPY _mailrecord.forward /home/_mailrecord/.forward
 
 RUN useradd --create-home --system qrgen
 COPY qrgen /home/qrgen
-RUN apt-get update && apt-get install -y openjdk-25-jdk
+# RUN apt-get update && apt-get install -y openjdk-25-jdk
+RUN apt-get install -y openjdk-25-jdk
 RUN cd /home/qrgen && javac -cp ".:/home/qrgen/zxing/*" QRCodeGenerator.java
