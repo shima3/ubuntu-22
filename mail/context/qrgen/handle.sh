@@ -7,10 +7,8 @@ date "+%F %T%t$email%t$name" >> $HOME/handle.log
 chmod g+r $HOME/handle.log
 if [[ "$domain" == "micron.com" || "$domain" =~ .hiroshima-cu.ac.jp || "$domain" == "hiroshima-cu.ac.jp" ]]
 then
-  user="${email%@*}"
-  password="$(docker exec edulinux reset-password.sh $user)"
-  echo "New password: $password" | mail -s "reset password for the user $user on edulinux" "$email"
-  docker exec edulinux usermod --comment "$name" "$user"
-  echo "$name" | docker exec --interactive edulinux su --command "config-git.sh $email" "$user"
+    user="${email%@*}"
+    java -cp "$HOME:$HOME/zxing/*" QRCodeGenerator "mailto:$email" "/tmp/$user.png"
+    echo "hoge" | mailx -s "hoge" -A "/tmp/$user.png" "$email"
 fi
 exit 0

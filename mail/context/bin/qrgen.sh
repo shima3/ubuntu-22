@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp /usr/local/java:/usr/local/java/zxing/* QRCodeGenerator $*
+java -cp /home/qrgen:/home/qrgen/zxing/* QRCodeGenerator $*
