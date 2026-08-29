@@ -24,6 +24,7 @@ docker run \
        -p "0.0.0.0:110:110" \
        -p "0.0.0.0:143:143" \
        --mount "type=volume,src=$base-etc-ssh,dst=/etc/ssh" \
+       --mount "type=volume,src=$base-home,dst=/home" \
        "$@"
 
 #       --hostname "$base" \
