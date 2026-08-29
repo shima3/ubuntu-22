@@ -9,7 +9,7 @@ if [[ "$domain" == "micron.com" || "$domain" =~ .hiroshima-cu.ac.jp || "$domain"
 then
     user="${email%@*}"
     qrcode="/tmp/mailto-$user.png"
-    java -cp "$HOME:$HOME/zxing/*" QRCodeGenerator "mailto:$email" "$qrcode"
+    java -cp "$HOME:$HOME/zxing/*" QRCodeGenerator "mailto:$name <$email>" "$qrcode"
     mailx -s "QR code of your email address" -A "$qrcode" "$email" <<EOF
 メールアドレスを入力する手間を省くためのQRコードです。
 本人や身分を証明するものではありません。
