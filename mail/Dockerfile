@@ -16,7 +16,7 @@ dpkg-reconfigure -f noninteractive postfix
 COPY --from=pkg:utils / /
 RUN /install
 
-RUN apt-get install -y docker-cli
+RUN apt-get update && apt-get install -y docker-cli
 RUN useradd --create-home --system --shell /bin/bash --gid docker edulinux
 COPY edulinux.forward /home/edulinux/.forward
 COPY handle.sh /home/edulinux/
