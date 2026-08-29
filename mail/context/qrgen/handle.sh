@@ -8,7 +8,13 @@ chmod g+r $HOME/handle.log
 if [[ "$domain" == "micron.com" || "$domain" =~ .hiroshima-cu.ac.jp || "$domain" == "hiroshima-cu.ac.jp" ]]
 then
     user="${email%@*}"
-    java -cp "$HOME:$HOME/zxing/*" QRCodeGenerator "mailto:$email" "/tmp/$user.png"
-    echo "hoge" | mailx -s "hoge" -A "/tmp/$user.png" "$email"
+    qrcode="/tmp/mailto-$user.png"
+    java -cp "$HOME:$HOME/zxing/*" QRCodeGenerator "mailto:$email" "$qrcode"
+    mailx -s "QR code of your email address" -A "$qrcode" "$email" <<EOF
+メールアドレスを入力する手間を省くためのQRコードです。
+本人や身分を証明するものではありません。
+定期試験や学割には使えません。
+ただし、公開しない方が無難です。
+EOF
 fi
 exit 0
