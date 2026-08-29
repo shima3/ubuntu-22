@@ -16,7 +16,7 @@ dpkg-reconfigure -f noninteractive postfix
 COPY --from=pkg:utils / /
 RUN /install
 
-RUN apt-get update --yes && apt-get install -y docker-cli
+RUN apt-get install -y docker-cli
 RUN useradd --create-home --system --shell /bin/bash --gid docker edulinux
 COPY edulinux.forward /home/edulinux/.forward
 COPY handle.sh /home/edulinux/
@@ -59,4 +59,4 @@ COPY _mailrecord.forward /home/_mailrecord/.forward
 RUN useradd --create-home --system qrgen
 COPY qrgen /home/qrgen
 RUN apt-get update && apt-get install -y openjdk-25-jdk
-RUN javac --source-path /home/qrgen -cp "/home/qrgen:/home/qrgen/zxing/*" -d /home/qrgen QRCodeGenerator.java
+RUN cd /home/qrgen && javac -cp ".:/home/qrgen/zxing/*" QRCodeGenerator.java
